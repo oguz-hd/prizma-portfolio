@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!--
+      Sayfa boyanmadan önceki zemin rengi.
+      Beyaz bir flaş görünürse ilk izlenim bozulur; koyu tema baştan devrede olmalı.
+      Değer presets.ts'teki tayf.ground ile aynı — tek eşleşme noktası, bilerek.
+    -->
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#070A12" />
+    <style>
+      html { background: #070A12; }
+    </style>
+
+    <!--
+      Sitenin TEK fontu (Oturum 2, kullanıcı isteği): önden çek. `font-display:
+      swap` tek başına yetmez — preload olmadan ilk kareler sistem fontuyla
+      boyanır, sonra değişir; girişteki yay ölçüsü de bir kez kayar.
+    -->
+    <link
+      rel="preload"
+      href="/fonts/DepartureMono-Regular.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+
+    <!--
+      Gerçek ikonu main.tsx token'lardan üretiyor (theme/favicon.ts). Bu boş ikon,
+      JS çalışmadan önce tarayıcının /favicon.ico'ya gidip 404 almasını önlüyor.
+    -->
+    <link rel="icon" href="data:," />
+
+    <title>Oğuz Han Duran</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

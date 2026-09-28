@@ -1,0 +1,42 @@
+# Yayın: statik build'i Caddy servis eder.
+#
+#   cp .env.example .env   (ve doldur)
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+#
+# DOMAIN boş bırakılırsa :80 dinlenir (yerel deneme). Gerçek bir alan adı
+# verilirse Caddy Let's Encrypt sertifikasını kendi alır.
+
+services:
+  web:
+    # Ayrı imaj adı — docker-compose.dev.yml'deki nota bak.
+    image: prizma-portfolio-web:prod
+    build:
+      target: prod
+    ports:
+      - '80:80'
+      - '443:443'
+    environment:
+      DOMAIN: ${DOMAIN:-}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-}
+    volumes:
+      # Caddyfile bağlanıyor, imaja gömülmüyor → yayın ayarı değişince
+      # yeniden build gerekmiyor, `restart` yetiyor.
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      # Uygulama verisi. Salt okunur: Caddy yalnızca OKUR (content.json, uploads).
+      # Yazan taraf Faz 5'teki API olacak.
+      - data:/srv/data:ro
+      # Caddy'nin kendi deposu (TLS sertifikaları). Uygulama verisinden AYRI tutuluyor:
+      # caddy imajı /data'yı kendi deposu olarak kullanıyor, çakışmasın.
+      - caddy_data:/data
+      - caddy_config:/config
+    restart: unless-stopped
+
+  api:
+    image: prizma-portfolio-api:prod
+    build:
+      target: prod
+    restart: unless-stopped
+
+volumes:
+  caddy_data:
+  caddy_config:

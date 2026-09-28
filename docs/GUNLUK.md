@@ -1,0 +1,18 @@
+# Günlük
+
+> Oturum başına 3-5 cümle. Ayrıntı commit mesajlarında, kalıcı kararlar konu dosyalarında.
+
+**Oturum 1 · Proje doğdu (28.09.2026).** trex-portfolio'nun hero prizması kullanıcıya
+yeni bir site fikri verdi: prizma sitenin merkezi, açılış ışığın geçişi, sayfa yerine
+slaytlar. Eski proje baştan sona incelendi; içerik, API, token sistemi, iki dillilik ve
+Docker aynen taşındı, dino (4.800 satır) bırakıldı. Kullanıcı kararları: Tayf paleti,
+prizma her slaytta ortada, bölüm başına bir slayt. Ekranda beş hata yakalandı — en
+öğreticisi, prizmayı her slaytta göstermek için konan cam panelin prizmayı tamamen
+yutmasıydı; karar kodda vardı, ekranda yoktu. Ayrıntı `DESIGN.md` § 8.
+
+**Oturum 2 · Işık, daire, tek font (28.09.2026).** Site trycloudflare ile geçici olarak
+yayına açıldı (Docker'da cloudflared). Kullanıcının geri bildirimiyle prizma parlatıldı ve
+fareden koparıldı — artık kendi salınımı ve ışık darbeleriyle yaşıyor, mobilde de. İsim ve
+bağlantılar prizmayı çevreleyen hayali bir dairenin yaylarına dizildi; site tek fonta
+(Departure Mono) indi; Projeler'in yerini Deneyim ve Eğitim aldı; İletişim açılışın aynası
+olan bir kapanış karesi oldu. Sırada beyaz tema.

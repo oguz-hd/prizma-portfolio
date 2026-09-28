@@ -1,0 +1,43 @@
+# Geliştirme: Vite dev sunucusu, HMR açık.
+#
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+#   → http://localhost:5174
+
+services:
+  web:
+    # ⚠️ Ayrı imaj adı ŞART. Dev ve prod aynı adı kullanırsa en son build edilen
+    # diğerini ezer ve `up` yanlış aşamayı çalıştırır (dev beklerken Caddy açılır).
+    image: prizma-portfolio-web:dev
+    build:
+      target: dev
+    ports:
+      - '5174:5174'
+    environment:
+      # Windows'ta bind mount üzerinden dosya değişikliği bildirimleri (inotify)
+      # konteynere ulaşmıyor; yoklama olmadan HMR gelmez.
+      # vite.config.ts bu değişkeni okuyor — yerel `npm run dev`de boşuna CPU yakmasın diye.
+      VITE_USE_POLLING: '1'
+    volumes:
+      # Kaynak kod host'tan bağlanıyor → kaydet, konteyner görsün.
+      - ./web:/app
+      # ⚠️ ANONİM VOLUME — bu satır kritik.
+      # Üstteki bind mount host'un `web/node_modules`ünü konteynerin üstüne serer.
+      # Host'taki paketler Windows için kurulu (win32 native binary'ler); Linux
+      # konteynerde çalışmazlar. Bu satır konteynerin kendi node_modules'ünü korur.
+      - /app/node_modules
+    # Geliştirmede konteyner çökerse haberimiz olsun, sessizce yeniden başlamasın.
+    restart: 'no'
+
+  api:
+    image: prizma-portfolio-api:dev
+    build:
+      target: dev
+    ports:
+      - '8001:8000'
+    environment:
+      DEBUG: '1'
+    volumes:
+      # Kaynak host'tan bağlı → kaydet, fastapi dev yeniden yüklesin.
+      - ./api/app:/app/app
+      - data:/data
+    restart: 'no'

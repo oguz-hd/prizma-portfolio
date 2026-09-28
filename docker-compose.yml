@@ -1,0 +1,36 @@
+# Temel tanım. Tek başına çalıştırılmaz — dev ya da prod dosyasıyla birlikte kullanılır:
+#
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+#
+# Ayrıntı: docs/ARCHITECTURE.md § 3
+
+name: prizma-portfolio
+
+services:
+  web:
+    build:
+      context: ./web
+
+  api:
+    build:
+      context: ./api
+    # ★ Paylaşılan volume: API yazar, Caddy okur (docs/ARCHITECTURE.md § 3).
+    volumes:
+      - data:/data
+    environment:
+      DATA_DIR: /data
+      JWT_SECRET: ${JWT_SECRET:-}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@localhost}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-degistir}
+
+volumes:
+  # ★ Kalıcı veri. İçeriği (Faz 5'ten itibaren):
+  #     /site.db        SQLite veritabanı
+  #     /content.json   API yazar, Caddy okur → paylaşılan
+  #     /uploads/       yüklenen görseller
+  #
+  # ⚠️ Bu volume ŞİMDİ tanımlanıyor, veritabanı Faz 5'te gelecek olmasına rağmen.
+  # Sebebi: imajın içinde kalan veri her `--build`de silinir ve bu, fark edildiğinde
+  # zaten veri kaybedilmiş olur. Yeri baştan doğru kurulsun.
+  data:

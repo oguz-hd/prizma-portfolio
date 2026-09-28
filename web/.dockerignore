@@ -1,0 +1,15 @@
+# ⚠️ node_modules kesinlikle dışarıda kalmalı.
+# Windows'ta kurulan paketlerin native binary'leri win32 — Linux konteynerde
+# çalışmazlar. Konteyner kendi bağımlılıklarını `npm ci` ile kuruyor.
+node_modules
+dist
+
+.git
+.gitignore
+*.log
+.env
+.env.*
+!.env.example
+
+Dockerfile
+.dockerignore

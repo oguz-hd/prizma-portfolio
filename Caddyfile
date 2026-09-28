@@ -1,0 +1,47 @@
+# Yayın sunucusu. docker-compose.prod.yml tarafından bağlanır.
+#
+# DOMAIN boşsa :80 dinlenir (yerel deneme). Gerçek alan adı verilirse Caddy
+# sertifikayı kendisi alır ve yeniler — ek iş yok.
+
+{
+	email {$ADMIN_EMAIL:admin@localhost}
+}
+
+{$DOMAIN::80} {
+	root * /srv
+	encode zstd gzip
+
+	# ★ İçerik paylaşılan volume'dan okunuyor, imajın içinden değil.
+	# Faz 6'da API buraya yazacak; site yalnızca bu dosyayı çekecek —
+	# veritabanı sorgusu yok, statik site hızı (docs/ARCHITECTURE.md § 3).
+	handle /content.json {
+		root * /srv/data
+		file_server
+	}
+
+	# Panelden yüklenen görseller (Faz 7)
+	handle /uploads/* {
+		root * /srv/data
+		file_server
+	}
+
+	# Değişmez varlıklar: Vite bunları içerik hash'iyle adlandırıyor,
+	# dolayısıyla uzun süre önbelleklenebilirler.
+	handle /assets/* {
+		header Cache-Control "public, max-age=31536000, immutable"
+		file_server
+	}
+
+	# SPA yönlendirmesi: bilinmeyen yollar index.html'e düşer.
+	# Faz 4'teki proje detay sayfaları (/proje/otopark-yonetim-sistemi) buna dayanacak.
+	handle {
+		try_files {path} /index.html
+		file_server
+	}
+
+	# index.html asla önbelleklenmemeli — yeni yayın anında görünsün.
+	@html path /index.html /
+	header @html Cache-Control "no-cache"
+
+	# Faz 9'da güvenlik başlıkları (CSP vb.) buraya eklenecek.
+}

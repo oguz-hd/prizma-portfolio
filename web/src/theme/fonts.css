@@ -1,0 +1,21 @@
+/*
+  Font varlık bildirimi.
+
+  ★ Sitenin TEK fontu Departure Mono (Oturum 2, kullanıcı isteği: "header'da
+  kullanılan font tüm sitenin fontu olsun"). Cabinet Grotesk ve Satoshi
+  kaldırıldı — kullanılmayan font indirilmesin.
+
+  Monospace PİKSEL font: yalnızca 11 px'in katlarında keskin (11, 22, 33, 44 …).
+  Tek ağırlığı var (400) — kalın yazdırılırsa tarayıcı sahte kalın üretir,
+  pikseller bulaşır; theme.css `font-synthesis: none` ile bunu kapatıyor.
+
+  Kendi sunucumuzda — üçüncü taraf CDN'e istek gitmiyor. Lisans aynı klasörde.
+*/
+
+@font-face {
+  font-family: 'Departure Mono';
+  src: url('/fonts/DepartureMono-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}

@@ -1,0 +1,42 @@
+# bağımlılıklar
+node_modules/
+
+# build çıktıları
+dist/
+web/dist/
+admin/dist/
+
+# veritabanı ve çalışma zamanı verisi
+# ⚠️ data/ Docker volume'una karşılık gelir — asla commit edilmez
+data/
+*.db
+*.db-wal
+*.db-shm
+
+# ortam değişkenleri (.env.example commit edilir, .env edilmez)
+.env
+.env.local
+.env.*.local
+
+# python (Faz 5)
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# editör / işletim sistemi
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# günlükler
+*.log
+npm-debug.log*
+
+# python sanal ortami (Docker icinde kuruluyor)
+api/.venv/
+
+# Playwright MCP test çıktıları (ekran görüntüsü, konsol günlüğü)
+.playwright-mcp/
