@@ -99,6 +99,39 @@ Faz 7'deki panelden parolayı değiştirmek.
 
 ---
 
+## Telefonda deneme (geçici yayın)
+
+Kalıcı yayın yok; telefonda denemek için derlenmiş site (`web/dist`) Cloudflare'in
+hızlı tüneliyle geçici bir adrese açılıyor. Hesap gerekmiyor, adres her başlatmada
+değişiyor. Dev konteyneri çalışıyor olmalı.
+
+```powershell
+# 1) Derle (web/dist güncellenir — tünel yeni dosyaları hemen sunar, bind mount)
+docker exec prizma-portfolio-web-1 npm run build
+
+# 2) İlk sefer: ağ + statik sunucu + tünel
+docker network create prizma-yayin
+docker run -d --name prizma-yayin-web --network prizma-yayin `
+  -v "C:\Users\drn49\Desktop\prizma-portfolio\web\dist:/srv:ro" `
+  caddy:2-alpine caddy file-server --root /srv --listen :80
+docker run -d --name prizma-tunel --network prizma-yayin `
+  cloudflare/cloudflared:latest tunnel --no-autoupdate --url http://prizma-yayin-web:80
+
+# 3) Adres
+docker logs prizma-tunel 2>&1 | Select-String trycloudflare.com
+```
+
+- **Bilgisayar uyudu / şarj bitti → adres çözülmüyor:** `docker restart prizma-tunel`,
+  yeni adres loglarda (Oturum 4'te yaşandı).
+- ⚠️ Oturum 3'te kurulan `prizma-yayin-web` ayar dosyasını (Caddyfile) o oturumun
+  geçici klasöründen bağlıyor. Dosya silinirse konteyner yeniden başlamaz →
+  `docker rm -f prizma-yayin-web` ve yukarıdaki komutla yeniden kur (ayar dosyası gerekmiyor).
+- `caddy file-server`'da SPA yönlendirmesi yok: `/#hakkimda` gibi adresler çalışır,
+  `/yok` gibi yollar sitenin 404'ü yerine sunucunun boş 404'ünü verir.
+- Kapatmak: `docker rm -f prizma-tunel prizma-yayin-web`
+
+---
+
 ## Sorun giderme
 
 ### Build hiç başlamıyor / çıktı vermeden düşüyor

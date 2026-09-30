@@ -29,6 +29,10 @@ giderse eski sitenin sunucusuna düşer. Sorun çıkarsa → `docs/CALISTIRMA.md
 `requestAnimationFrame` durur → GSAP ilerlemez. Önce `document.visibilityState`.
 Açılış gizli sekmede **başlamaz**, görünür olunca başlar (bilerek).
 Animasyonu kare kare okumak: `gsap.globalTimeline.time(t)`.
+Playwright MCP de kullanılıyor (Oturum 3-4): önce `page.bringToFront()` — sekme
+arkada kalınca rAF duruyor ve açılış `pending`'de takılı görünüyor (hata değil).
+**Testler dizüstü görünümünde** (1440×900, 1366×768) — kullanıcı tercihi; mobil
+yalnızca değişiklik mobile özgüyse.
 
 ### Doğrulama — **test yok, kapı bu ikisi**
 ```
@@ -69,7 +73,7 @@ docker exec prizma-portfolio-web-1 npm run build       # asıl derleme
 13. **Prizma fareye bağlı DEĞİL** — hareketi kendi hâlinde (salınım + ışık darbeleri);
     mobilde de aynı görünmeli (kullanıcı kararı, Oturum 2).
 
-## Durum · 28.09.2026
+## Durum · 30.09.2026
 
 ✅ **v1** (Oturum 1) — iskele · taşınan katmanlar · prizma sahnesi · açılış ·
 slayt gösterisi · cam panel · ray · 404 nm · favicon · API kopyası.
@@ -92,18 +96,34 @@ seçenekler artifact'taydı (https://claude.ai/artifact/LN9aUxFhh1JwEP9kEBX7zi, 
 geçiş dalgası (`scene.surge`, hafif) · tayfta çizgi/etiket yok (yalnızca 404'te) ·
 navbar'da akan tayflı "INTRO" · çözülme süresi her yerde 900 ms · İletişim girişin
 dairesinde (`components/Ring.tsx` ortak), müsaitlik cümlesi yok · isim kalın ·
-kartların sol üstündeki tayf çizgisi kalktı. → `DESIGN.md` § 12
+kartların sol üstündeki tayf çizgisi kalktı · kod incelemesi düzeltmeleri (daire
+artık hiç küçülmüyor; altbilgi/ipucu `usePlaceBelow` ile yayın altına) · temizlik
+(ölü CSS/kod) · GitHub'a yüklendi. → `DESIGN.md` § 12
 
-⏭ **Sırada (kullanıcı): genel düzenleme/temizlik, sonra back-end** (panel, content.json).
+⏭ **Sırada: BACK-END** (kullanıcı kararı, 30.09.2026 — frontend'e ara verildi).
+Başlamadan önce kullanıcıya sor. Önerilen ilk adımlar:
+1. Site içeriği `site.ts` yerine API'den: `GET /api/content` → `setContent()`
+   (`content/useContent.ts`), ARCHITECTURE § 3. Sözleşme: `content/types.ts`.
+2. Mevcut SQLite volume'unda eski İletişim müsaitlik cümlesi hâlâ duruyor —
+   tohumlama (`seed.py`) yalnızca BOŞ veritabanında çalışıyor.
+3. Panelin karşılaması gereken yerleşim gereksinimleri → ARCHITECTURE § 8.
+
+❓ **Açık karar:** `sections/Projects.tsx` kullanılmıyor (Projeler slaytı Oturum 2'de
+kalktı; proje kayıtları içerikte duruyor). Silinsin mi? Kullanıcıya soruldu, yanıt yok.
+
+**GitHub:** özel depo `github.com/oguz-hd/prizma-portfolio`; `master` →
+`origin/master`. `git push` doğrudan çalışıyor (kimlik Git Credential Manager'da).
+Kullanıcı her iş sonunda commit + push istiyor.
 
 ⏸ **Beyaz tema** (kullanıcı "daha sonra" dedi) — presets.ts'e açık bir ön
 ayar + seçici; theme.css renk kodu içermediği için bileşenlere dokunulmaz.
 ⚠️ Hale (`.prism-glow`) ve `mix-blend-mode: screen` koyu zemine göre — açık temada
 yeniden düşünülmeli.
 
-Yayın denemesi: trycloudflare hızlı tüneli (`cloudflare/cloudflared` imajı,
-`prizma-tunel` + `prizma-yayin-web` konteynerleri, `prizma-yayin` ağı) — adres
-her açılışta değişir. Kalıcı yayın için Cloudflare Pages önerildi, hesap gerekir.
+Telefonda deneme: trycloudflare hızlı tüneli (`prizma-tunel` + `prizma-yayin-web`,
+`prizma-yayin` ağı) `web/dist`'i sunuyor — adres her başlatmada değişir, bilgisayar
+uyuyunca kopar. Kurulum/yeniden başlatma → `docs/CALISTIRMA.md` "Telefonda deneme".
+Kalıcı yayın için Cloudflare Pages önerildi, hesap gerekir.
 
 🛑 **Bir sonraki faza kendiliğinden geçme — önce sor.** Kullanıcı her faz sonunda
 durmak istiyor.
@@ -112,7 +132,6 @@ durmak istiyor.
 - OG görseli (`web/public/og.png`, 1200×630) — tasarım oturunca çekilecek; `vite.config.ts`'e eklenecek
 - Admin panel, `content.json` bağlantısı (trex-portfolio'nun Faz 6-8'i) — aynı sözleşme
 - Proje `repoUrl`/`liveUrl` alanları boş — kullanıcı söyleyecek
-- Git uzak reposu yok (yalnızca yerel `git init`)
 
 ## İçerik nereden geliyor
 

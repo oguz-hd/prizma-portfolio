@@ -31,4 +31,7 @@ kalıyor, sayaç ve rayda alt sayfa çizgileri var. İş başka bir oturumda ba�
 kalmıştı (derlenmiyordu, işaretler ve CSS yoktu); tamamlandı. İletişim kısa telefonlara
 boşluklar daraltılarak sığdırıldı. Geçişte tayf büyüyüp küçülen bir dalga yapıyor (dört güç
 sitede `?fx` ile denendi, hafifi seçildi); tayftaki çizgi ve yazılar sadelik için kalktı;
-navbar'daki üçgenin yerine akan tayflı "INTRO" geldi. Sırada: genel temizlik, sonra back-end.
+navbar'daki üçgenin yerine akan tayflı "INTRO" geldi. İletişim girişin dairesine taşındı
+(ortak `Ring.tsx`); kod incelemesi o dairenin kısa ekranda küçülüp çöktüğünü buldu, düzeltildi.
+Ardından ölü CSS/kod temizlendi ve proje GitHub'a (özel depo) yüklendi. Frontend'e ara verildi;
+sırada back-end (kullanıcı kararı).
