@@ -164,10 +164,14 @@ export function Hero() {
                   isteği): harfleri Katakana'dan geçip yine kendine oturuyor. */}
               <g className="hero-arc-name" aria-hidden="true" data-reveal data-i18n-fade>
                 <text style={{ fontSize: geo.name }}>
+                  {/* ⚠️ `textAnchor="middle"` burada KULLANILMIYOR: WebKit (iPhone
+                      Safari) ortalamayı `textLength` germesinden ÖNCEKİ genişlikle
+                      yapıyor, fazlalık yalnızca sağa taşıyor ve isim yayda saat
+                      yönüne kayıyordu (ölçüldü, 30.09.2026). Başlangıç elle: yarım
+                      dairenin boyu πr, isim tam ortasına. */}
                   <textPath
                     href={`#${ids.top}`}
-                    startOffset="50%"
-                    textAnchor="middle"
+                    startOffset={(Math.PI * geo.r - geo.nameLen) / 2}
                     textLength={geo.nameLen}
                     lengthAdjust="spacingAndGlyphs"
                   >
