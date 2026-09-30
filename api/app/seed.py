@@ -49,19 +49,19 @@ def seed(session: Session) -> bool:
     rows.append(SiteSettings(id="settings", preset="tayf"))
     rows += _t(
         "settings", "settings", "metaTitle",
-        "Oğuz Han Duran — Full-stack geliştirici",
-        "Oğuz Han Duran — Full-stack developer",
+        "Oğuz Han Duran",
+        "Oğuz Han Duran",
     )
     rows += _t(
         "settings", "settings", "metaDescription",
-        "React, FastAPI ve .NET ile uçtan uca ürünler kuran full-stack geliştirici. İzmir.",
-        "Full-stack developer building end-to-end products with React, FastAPI and .NET. "
+        "React, FastAPI ve .NET ile arayüz ve servis yazan yazılım geliştirici. İzmir.",
+        "Software developer writing interfaces and services with React, FastAPI and .NET. "
         "İzmir, Türkiye.",
     )
 
     # ── Profil ──────────────────────────────────────────────────────────────
     rows.append(Profile(id="profile", name="Oğuz Han Duran"))
-    rows += _t("profile", "profile", "title", "Full-stack geliştirici", "Full-stack developer")
+    rows += _t("profile", "profile", "title", "Yazılım geliştirici", "Software developer")
     rows += _t("profile", "profile", "location", "İzmir", "İzmir, Türkiye")
     rows += _t(
         "profile", "profile", "tagline",
@@ -212,10 +212,12 @@ def seed(session: Session) -> bool:
     # silinecek bir satır, koda gömülü bir dize değil.
     # Projeler bölümü kullanıcı isteğiyle kalktı (Oturum 2); proje KAYITLARI
     # duruyor — bölüm geri eklenirse ön yüzde bileşeni hazır.
-    for sid, slug, order, heading, body in [
-        ("hakkimda", "hakkimda", 1, ("Hakkımda", "About"), None),
-        ("deneyim", "deneyim", 2, ("Deneyim ve Eğitim", "Experience & Education"), None),
-        ("iletisim", "iletisim", 3, ("İletişim", "Contact"),
+    # `nav_label` = üst menüdeki kısa ad; yoksa menü başlığı kullanır.
+    for sid, slug, order, heading, nav_label, body in [
+        ("hakkimda", "hakkimda", 1, ("Hakkımda", "About"), None, None),
+        ("deneyim", "deneyim", 2, ("Deneyim ve Eğitim", "Experience & Education"),
+         ("Deneyim", "Experience"), None),
+        ("iletisim", "iletisim", 3, ("İletişim", "Contact"), None,
          ("Mezun oldum, şu an yeni bir rol arıyorum. Uçtan uca sorumluluk aldığım "
           "— arayüzü de servisi de yazdığım — işler ilgimi çekiyor.",
           "I’ve graduated and I’m looking for a new role. I’m drawn to work where "
@@ -223,6 +225,8 @@ def seed(session: Session) -> bool:
     ]:
         rows.append(Section(id=sid, slug=slug, order=order))
         rows += _t("section", sid, "heading", heading[0], heading[1])
+        if nav_label:
+            rows += _t("section", sid, "nav_label", nav_label[0], nav_label[1])
         if body:
             rows += _t("section", sid, "body", body[0], body[1])
 

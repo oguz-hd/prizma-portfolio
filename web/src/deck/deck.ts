@@ -37,6 +37,17 @@ const THRESHOLD = 30
 const GAP = 140
 /** Dokunmatik: bu kadar px kaydırma bir slayt. */
 const SWIPE = 48
+/**
+ * Geçiş sürerken yeni bir hareket gelirse: sıraya girer, süren geçiş bu kat
+ * hızlanır. Önceden bu hareket yutuluyordu — normal hızda kaydıran kullanıcı
+ * her slayt için iki kez kaydırmak zorunda kalıyordu (Oturum 3, ölçüldü).
+ */
+const RUSH = 3
+/**
+ * Bu kadar px'lik taşma "kayabilir" sayılmaz. İletişim 390×844'te 4 px
+ * taşıyordu; o 4 px'i kaydırmak bir hareketi yutuyordu (ölçüldü).
+ */
+const SLACK = 8
 
 let slides: HTMLElement[] = []
 let index = 0
@@ -67,6 +78,7 @@ const scrollerOf = (slide: HTMLElement | undefined) =>
 
 function canScroll(el: HTMLElement | null, dir: number): boolean {
   if (!el) return false
+  if (el.scrollHeight - el.clientHeight <= SLACK) return false
   return dir > 0 ? el.scrollTop + el.clientHeight < el.scrollHeight - 1 : el.scrollTop > 0
 }
 
@@ -112,7 +124,9 @@ export function goTo(target: number, opts: GoOpts = {}): void {
   if (!slides.length) return
   const next = Math.max(0, Math.min(slides.length - 1, target))
   if (busy) {
+    if (next === index) return
     pending = { index: next, opts }
+    current?.timeScale(RUSH)
     return
   }
   if (next === index) {
@@ -223,12 +237,14 @@ function onWheel(e: WheelEvent) {
   }
 
   e.preventDefault()
-  if (busy || now < lockedUntil) {
+  if (now < lockedUntil) {
     needGap = true
     return
   }
   // İçerik kenara yeni dayandıysa ataletin kalanı slaytı değiştirmesin.
-  if (now - innerAt < 250) needGap = true
+  // Geçiş sürerken de yalnızca YENİ hareket sayılır: ataletin kuyruğu (aralıksız
+  // olay akışı) geçmez, sessizlikten sonra gelen tekerlek sıraya girer.
+  if (busy || now - innerAt < 250) needGap = true
   if (needGap) {
     if (gap < GAP) return
     needGap = false
@@ -267,7 +283,7 @@ function onTouchEnd(e: TouchEvent) {
   const dir = dy > 0 ? 1 : -1
   // Parmak kalktığında içerik o yöne hâlâ kayabiliyorduysa bu bir içerik kaydırmasıydı.
   if (dir > 0 ? touchCan.down : touchCan.up) return
-  if (busy || performance.now() < lockedUntil) return
+  if (performance.now() < lockedUntil) return
   goTo(index + dir)
 }
 
@@ -324,7 +340,7 @@ function onKey(e: KeyboardEvent) {
     sc!.scrollBy({ top: dir * step, behavior: reducedMotion() ? 'auto' : 'smooth' })
     return
   }
-  if (e.repeat || busy) return
+  if (e.repeat) return
   goTo(index + dir, { focus: true })
 }
 

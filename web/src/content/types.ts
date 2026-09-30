@@ -104,6 +104,8 @@ export type Section = {
   id: string
   slug: string
   heading: string
+  /** Üst menüdeki ad. İçerikte yoksa `heading` (telefonda uzun başlık sığmıyor). */
+  navLabel: string
   body: string[]
   order: number
 }
@@ -182,6 +184,7 @@ export type RawSection = {
   id: string
   slug: string
   heading: Localized<string>
+  navLabel?: Localized<string>
   body: Localized<string[]>
   order: number
 }

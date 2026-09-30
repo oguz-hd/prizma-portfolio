@@ -140,7 +140,7 @@ kendisiyle kuruluyor. `noindex`.
 
 | İstek | Karşılığı |
 |---|---|
-| Prizma renkleri daha parlak, göz alıcı | Tayf %62 opak; altında bulanık + doygun hale (`.prism-glow`, aynı şekillerin `<use>` kopyası); camda soluk gökkuşağı, sol kenarda parıltı |
+| Prizma renkleri daha parlak, göz alıcı | Tayf %62 opak; altında bulanık + doygun hale (`.prism-glow`, aynı şekillerin `<use>` kopyası); camda soluk gökkuşağı (sol kenardaki parıltı çizgisi Oturum 3'te kalktı) |
 | Prizma fareye bağlı olmasın, kendi hareket etsin (mobil) | İmleç takibi kalktı. İki dalgalı salınım (±3.6° + ±1.1°) + ışık darbeleri: huzmede parçacık → tayfta dikey dalga, 3.4 sn tur, aynı anda 2 |
 | İsim, prizmayı çevreleyen dairenin üst yayında; bağlantılar alt yayında; motto yok | `Hero.tsx`: SVG `textPath`, yarıçap `min(W·0.3, H·0.37)`; isim ~85° yaya yayılır, büyük harf. Ekran okuyucu için görünmez `<h1>` |
 | Üst çubukta alt çizgi olmasın, isim olmasın, menü solda | İlerleme çizgisi ve isim kalktı; zemin sert kenar yerine aşağı sönüyor |
@@ -155,3 +155,24 @@ Yakalanan: isim ilk denemede yayın ~110°'sine yayılıyordu, ekranda ~150° ok
 dil seçiciyi ekran dışına itiyordu → menü yatay kayıyor. Alt yay bağlantıları telefonda
 22px'te dikleşiyordu → 11px + saydam kalın çerçeve (dokunma alanı).
 Ölçüm (4× işlemci yavaşlatma): giriş 102 fps, içerik 112 fps, geçişte en uzun kare 47 ms.
+
+## 11. Oturum 3 — kullanıcı geri bildirimi (hepsi ekranda doğrulandı)
+
+| İstek | Karşılığı |
+|---|---|
+| Fareyle/telefonda slayt değiştirmek için iki kez kaydırmak gerekiyor | Geçiş (~0.95 sn) sürerken gelen hareket **yutuluyordu**. Artık sessizlikten sonra gelen yeni hareket sıraya girer ve süren geçiş 3× hızlanır (`RUSH`); ataletin kuyruğu yine sayılmaz. ≤ 8 px taşma "kayabilir" sayılmaz (`SLACK`) — İletişim 390×844'te 4 px taşıyor, bir hareketi yutuyordu |
+| Üçgende fazladan bozuk bir çizgi | `.prism-sheen` kalktı: uç kaydırmaları farklıydı, kenara paralel değildi, ikinci ve eğri bir kenar gibi okunuyordu; açılışta kenarlar çizilmeden de görünüyordu. Arkadaki ince üçgen (arka yüz, derinlik) kaldı |
+| Paragraflar piksel fontta okunmuyor | Düzyazı Atkinson Hyperlegible Next (18/16 px, notlar 15/13 px, satır 1.6); isim, başlık, menü, etiket Departure Mono'da. Kendi sunucumuzda, latin + latin-ext (19 KB) |
+| Tayf daha uzun olsun, başka öğelerle çakışmasın | Masaüstünde şerit sabit oran (W×0.33) yerine sağdaki boşluktan hesaplanıyor: ray (80 px) + etiketin ölçülen genişliği + 10 px. 1440'ta ~475 → ~555 px; etiket ile ray arası ~20 px. Telefonda zaten raya dayalıydı, değişmedi |
+| İsim harfleri daha geniş | `textLength` + `lengthAdjust="spacingAndGlyphs"`, 1.3×; yay ~85° → ~100° (aynı yayda kalsa harfler genişlemek yerine kısalırdı) |
+| Sekme adında yalnız isim; "Full-stack" fazla iddialı | `metaTitle` = isim; unvan "Yazılım geliştirici / Software developer"; açıklama da yumuşadı |
+| Dil geçişi ve açılış: "Katakana yağmuru + tayf renkli" (örnek sayfasında A7 + A5) | `scramble.ts`: Departure Mono metin düğümleri harf harf Katakana'dan geçip rastgele sırayla oturuyor, dönen harfler `--accent-k` tonlarında akıyor. Dil anında değişiyor (`flushSync`), eski metinden yenisine çözülüyor; düzyazı soluyor. Açılışta bloklar belirirken her harf Katakana'dan başlıyor. İsim çevrilmediği hâlde dil geçişine katılıyor (`data-i18n-fade`, kullanıcı isteği). React'in metin düğümüne yalnız `nodeValue` yazılıyor, geçici harfler yanına konup kalkıyor. Katakana'da Departure Mono yok: HTML'de harfin genişliğinde kutu + 0.72em, SVG yayda `textLength` kilidi — satır/yay kıpırdamıyor (ölçüldü) |
+| İletişim'e gelince site titriyor | 1280×720 ve 1366×768'de kapanış karesi 23–71 px taşıyordu (Atkinson'la iletişim cümlesi uzadı) → yalnız o slaytta kaydırma çubuğu çıkıp içeriği ~10 px sola itiyordu. `scrollbar-gutter: stable both-edges` (her slaytta aynı yer, ortası prizmayla hizalı) + kısa ekran kademeleri (≤ 820 / ≤ 740 px yükseklik) + `.closing-intro` 56ch. 5 boyut × 2 dilde taşma 0 (ölçüldü) |
+| Site İngilizce başlasın (ziyaretçi TR'ye geçince efekti görsün) | `DEFAULT_LOCALE = 'en'`, tarayıcı dili artık okunmuyor; kayıtlı seçim korunuyor. Statik HTML de `lang="en"`, og:locale en_US |
+| Dil geçişinde menü alt çizgisi görünüp kayboluyor | Başsız tarayıcıda üretilemedi (stil her karede doğru) → GPU katman aksaklığı. Çizgi artık `scaleX(0)` + `opacity: 0` ile gizli |
+| Mobilde üst menü sığmıyor | Bölüme isteğe bağlı `navLabel` (içerik, çevrilir): menü "Deneyim" yazar, slayt başlığı tam. 360 px'te TR ve EN sığıyor; kayan + sönen şerit yalnızca < 360 px |
+
+Ölçüm (Playwright, gerçek tekerlek/dokunma): tekerlek `0→1→2→1` (geçiş sürerken
+çentik sıraya giriyor, 40 olaylık atalet akışı tek adım); dokunma `0→1→2→3→2`.
+1024 px'te görülen, bu oturumdan önce de var olan iki çakışma: "Hα 656" ile "Na D 589"
+etiketleri üst üste biniyor; "SCROLL" ipucu alt yaydaki "GitHub"a değiyor.

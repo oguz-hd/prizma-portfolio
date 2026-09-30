@@ -92,6 +92,7 @@ class SectionOut(CamelModel):
     id: str
     slug: str
     heading: LocalizedText
+    nav_label: LocalizedText | None = None
     body: LocalizedList
     order: int
 

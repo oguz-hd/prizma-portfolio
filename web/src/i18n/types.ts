@@ -12,7 +12,11 @@ export const LOCALES = ['tr', 'en'] as const
 
 export type Locale = (typeof LOCALES)[number]
 
-export const DEFAULT_LOCALE: Locale = 'tr'
+/**
+ * Oturum 3 (kullanıcı kararı): site İngilizce açılır — tarayıcı dili Türkçe olsa
+ * bile. Ziyaretçi TR'ye geçince harf çözülmesini görüyor; seçimi hatırlanıyor.
+ */
+export const DEFAULT_LOCALE: Locale = 'en'
 
 /** Bir alanın her dildeki karşılığı. Faz 5'te SQLite'ta `translations` tablosu olacak. */
 export type Localized<T> = Record<Locale, T>

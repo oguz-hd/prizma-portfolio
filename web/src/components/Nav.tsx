@@ -24,7 +24,7 @@ export function Nav() {
           className="nav-link"
           aria-current={active === i + 1 ? 'true' : undefined}
         >
-          {s.heading}
+          {s.navLabel}
         </a>
       ))}
     </nav>

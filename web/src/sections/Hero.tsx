@@ -24,7 +24,7 @@ import { useStrings } from '../i18n/strings'
  * ve kök adresin hedefi.
  */
 
-type Geo = { W: number; H: number; r: number; name: number; link: number }
+type Geo = { W: number; H: number; r: number; name: number; nameLen: number; link: number }
 
 /** 11'in katına aşağı yuvarla, aralıkta tut. */
 const snap11 = (v: number, min: number, max: number) =>
@@ -37,6 +37,12 @@ const snap11 = (v: number, min: number, max: number) =>
 const ADV_GUESS = 0.65
 /** İsmin harf aralığı (em) — theme.css → .hero-arc-name ile aynı; yay hesabına giriyor. */
 const NAME_TRACKING = 0.06
+/**
+ * İsmin harfleri yatayda bu kat geniş (Oturum 3, kullanıcı: "harflerin genişliği
+ * artsın, daha göz alıcı olur"). Departure Mono'nun tek genişliği var; SVG
+ * `textLength` + `lengthAdjust="spacingAndGlyphs"` harfleri yay boyunca geriyor.
+ */
+const NAME_STRETCH = 1.3
 
 function geometry(W: number, H: number, nameChars: number, linkChars: number, adv: number): Geo {
   const mobile = W < 768
@@ -47,17 +53,21 @@ function geometry(W: number, H: number, nameChars: number, linkChars: number, ad
     göre iri, uçtakiler 55° eğilip "Oğuz" neredeyse dik duruyordu (ölçüldü).
     Boyut en yakın 11'in katına yuvarlanıyor; izin verilen yayı aşarsa bir basamak küçülüyor.
   */
-  const target = mobile ? 1.75 : 1.5
-  const limit = mobile ? 1.95 : 1.62
-  const perEm = nameChars * (adv + NAME_TRACKING)
+  // Geniş harflerle yay da biraz açılıyor (~100°): aynı yayda kalsa harfler
+  // genişlemek yerine kısalırdı.
+  const target = mobile ? 1.9 : 1.75
+  const limit = mobile ? 2.1 : 1.9
+  const perEm = nameChars * (adv * NAME_STRETCH + NAME_TRACKING)
   let name = snap11(Math.round((r * target) / perEm / 11) * 11, 22, 88)
   if ((name * perEm) / r > limit) name = Math.max(22, name - 11)
+  // Son harfin ardındaki aralık yayda yer kaplamasın.
+  const nameLen = name * (perEm - NAME_TRACKING)
   // Bağlantılar alt yayda 22px; yayın ~85°'sinden fazlasını kaplayacaksa 11px
   // (telefonda 22px'te ~150°'ye yayılıp "E-posta" dikleşiyordu — ölçüldü).
   // 11px'te dokunma alanı küçülmesin diye harflerin görünmez kalın bir
   // çerçevesi var (theme.css → .hero-arc-links a).
   const link = (linkChars * adv * 22) / (r + 16) < 1.5 ? 22 : 11
-  return { W, H, r, name, link }
+  return { W, H, r, name, nameLen, link }
 }
 
 export function Hero() {
@@ -150,9 +160,17 @@ export function Hero() {
                 </text>
               </g>
 
-              <g className="hero-arc-name" aria-hidden="true" data-reveal>
+              {/* İsim çevrilmiyor ama dil geçişine katılıyor (Oturum 3, kullanıcı
+                  isteği): harfleri Katakana'dan geçip yine kendine oturuyor. */}
+              <g className="hero-arc-name" aria-hidden="true" data-reveal data-i18n-fade>
                 <text style={{ fontSize: geo.name }}>
-                  <textPath href={`#${ids.top}`} startOffset="50%" textAnchor="middle">
+                  <textPath
+                    href={`#${ids.top}`}
+                    startOffset="50%"
+                    textAnchor="middle"
+                    textLength={geo.nameLen}
+                    lengthAdjust="spacingAndGlyphs"
+                  >
                     {profile.name}
                   </textPath>
                 </text>

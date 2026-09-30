@@ -9,7 +9,7 @@ import { SITE } from './src/content/site'
  * Sosyal ağların ve arama motorlarının tarayıcıları JS çalıştırmaz: etiketler
  * statik HTML'de olmak zorunda. Metni elle index.html'e yazmak içeriği ikinci bir
  * yerde tutmak olurdu (CLAUDE.md kural 3) — o yüzden `site.ts`'ten basılıyor.
- * Varsayılan dil Türkçe; dil değişince sekme başlığını App günceller.
+ * Varsayılan dil İngilizce (Oturum 3); dil değişince sekme başlığını App günceller.
  *
  * ⚠️ `og:image` henüz YOK: paylaşım görseli sitenin kendi ekran görüntüsü olacak,
  * tasarım oturunca çekilecek (`web/public/og.png`, 1200×630). Gelince buraya
@@ -22,16 +22,16 @@ function metaFromContent(): Plugin {
   return {
     name: 'meta-from-content',
     transformIndexHtml(html) {
-      const title = esc(SITE.settings.metaTitle.tr)
-      const desc = esc(SITE.settings.metaDescription.tr)
+      const title = esc(SITE.settings.metaTitle.en)
+      const desc = esc(SITE.settings.metaDescription.en)
       const tags = [
         `<title>${title}</title>`,
         `<meta name="description" content="${desc}" />`,
         `<meta property="og:type" content="website" />`,
         `<meta property="og:title" content="${title}" />`,
         `<meta property="og:description" content="${desc}" />`,
-        `<meta property="og:locale" content="tr_TR" />`,
-        `<meta property="og:locale:alternate" content="en_US" />`,
+        `<meta property="og:locale" content="en_US" />`,
+        `<meta property="og:locale:alternate" content="tr_TR" />`,
         `<meta name="twitter:card" content="summary" />`,
       ].join('\n    ')
       return html.replace(/<title>[^<]*<\/title>/, tags)

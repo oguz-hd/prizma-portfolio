@@ -139,6 +139,7 @@ def build_content(session: Session) -> SiteContentOut:
             id=s.id,
             slug=s.slug,
             heading=tr.text("section", s.id, "heading"),
+            nav_label=tr.maybe_text("section", s.id, "nav_label"),
             body=tr.paragraphs("section", s.id, "body"),
             order=s.order,
         )

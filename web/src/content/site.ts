@@ -13,19 +13,21 @@ export const SITE: RawSiteContent = {
   settings: {
     // Seçilen palet — docs/DESIGN.md § E
     preset: 'tayf',
+    // Sekme adı yalnızca isim (kullanıcı isteği, Oturum 3).
     metaTitle: {
-      tr: 'Oğuz Han Duran — Full-stack geliştirici',
-      en: 'Oğuz Han Duran — Full-stack developer',
+      tr: 'Oğuz Han Duran',
+      en: 'Oğuz Han Duran',
     },
     metaDescription: {
-      tr: 'React, FastAPI ve .NET ile uçtan uca ürünler kuran full-stack geliştirici. İzmir.',
-      en: 'Full-stack developer building end-to-end products with React, FastAPI and .NET. İzmir, Türkiye.',
+      tr: 'React, FastAPI ve .NET ile arayüz ve servis yazan yazılım geliştirici. İzmir.',
+      en: 'Software developer writing interfaces and services with React, FastAPI and .NET. İzmir, Türkiye.',
     },
   },
 
   profile: {
     name: 'Oğuz Han Duran',
-    title: { tr: 'Full-stack geliştirici', en: 'Full-stack developer' },
+    // Oturum 3: "Full-stack" kullanıcıya fazla iddialı geldi.
+    title: { tr: 'Yazılım geliştirici', en: 'Software developer' },
     location: { tr: 'İzmir', en: 'İzmir, Türkiye' },
     // ⚠️ Girişte artık GÖSTERİLMİYOR (kullanıcı isteği, Oturum 2: "mottoyu
     // kaldırmalıyız"). Alan sözleşmede (types.ts ↔ API) kaldığı için duruyor.
@@ -237,6 +239,8 @@ export const SITE: RawSiteContent = {
       id: 'deneyim',
       slug: 'deneyim',
       heading: { tr: 'Deneyim ve Eğitim', en: 'Experience & Education' },
+      // Üst menüde kısa ad: tam başlık telefonda menüyü taşırıyordu (Oturum 3).
+      navLabel: { tr: 'Deneyim', en: 'Experience' },
       body: { tr: [], en: [] },
       order: 2,
     },

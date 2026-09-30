@@ -2,6 +2,7 @@ import gsap from 'gsap'
 
 import { lockDeck, unlockDeck } from '../deck/deck'
 import { reducedMotion } from '../motion'
+import { scramble, settleScramble } from '../scramble'
 import { darkenScene, scene } from './scene'
 
 /**
@@ -12,7 +13,8 @@ import { darkenScene, scene } from './scene'
  *   1.0–1.7  beyaz ışık soldan, ekranın dışından prizmaya uzanır
  *   1.7–2.5  camın içinden geçer, tayf yelpazesi açılır
  *   2.3–2.9  şerit ve soğurma çizgileri, slaytın tonu yanar
- *   2.3–3.3  arayüz: içerik, sonra üst çubuk ve slayt rayı
+ *   2.3–3.3  arayüz: içerik, sonra üst çubuk ve slayt rayı — belirirken yazılar
+ *            Katakana'dan çözülerek oturuyor (Oturum 3, scramble.ts)
  *
  * Açılışın son karesi sitenin kendisi: animasyon bir perde değil, merkezdeki
  * prizmanın kurulma anı. Bitince hiçbir şey yerinden oynamaz.
@@ -76,6 +78,8 @@ function build(): gsap.core.Timeline {
     skipEvents.forEach((ev) => window.removeEventListener(ev, skip, true))
     delete root.dataset.intro
     gsap.set(all, { clearProps: 'opacity,transform' })
+    // Atlatıldıysa yazılar da son karede: yarım çözülmüş metin kalmasın.
+    settleScramble()
     if (stars) gsap.set(stars, { clearProps: 'opacity' })
     Object.assign(scene, { frame: 1, beam: 1, fan: 1, labels: 1, focus: 1, dirty: true })
     unlockDeck(400)
@@ -106,7 +110,14 @@ function build(): gsap.core.Timeline {
   if (chrome.length)
     t.fromTo(chrome, { opacity: 0 }, { opacity: 1, duration: 0.6, ease: 'power1.out', stagger: 0.1 }, 2.7)
 
-  if (seen()) t.timeScale(3)
+  // Çözülme GSAP'ın dışında, kendi saatinde; hızlı açılışta o da kısalıyor.
+  const speed = seen() ? 3 : 1
+  if (blocks.length)
+    t.call(() => { if (pending) scramble(blocks, { duration: 900 / speed, stagger: 80 / speed }) }, undefined, 2.35)
+  if (chrome.length)
+    t.call(() => { if (pending) scramble(chrome, { duration: 700 / speed, stagger: 100 / speed }) }, undefined, 2.7)
+
+  if (speed > 1) t.timeScale(speed)
 
   function skip() {
     t.progress(1)

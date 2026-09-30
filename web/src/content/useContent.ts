@@ -65,7 +65,12 @@ function resolveContent(source: RawSiteContent, locale: Locale): SiteContent {
       }))
       .sort((a, b) => a.order - b.order),
     sections: source.sections
-      .map((s) => ({ ...s, heading: s.heading[locale], body: s.body[locale] }))
+      .map((s) => ({
+        ...s,
+        heading: s.heading[locale],
+        navLabel: (s.navLabel ?? s.heading)[locale],
+        body: s.body[locale],
+      }))
       .sort((a, b) => a.order - b.order),
   }
 }

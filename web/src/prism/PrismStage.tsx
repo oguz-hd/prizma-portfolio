@@ -34,7 +34,8 @@ import { DIM, accentCount, scene } from './scene'
  * Oturum 2 (kullanıcı isteği):
  *   - "Renkler daha parlak ve göz alıcı" → tayf daha opak; altında bulanık,
  *     doygun bir hale katmanı (`.prism-glow`, aynı şekillerin <use> kopyası);
- *     camın içinde soluk bir gökkuşağı, sol kenarda parıltı.
+ *     camın içinde soluk bir gökkuşağı. (Sol kenardaki parıltı çizgisi Oturum 3'te
+ *     kalktı: kenara paralel değildi, ikinci ve eğri bir kenar gibi okunuyordu.)
  *   - "Fareye bağlı olmasın, kendi hâlinde hareket etsin — mobilde fare yok"
  *     → imleç takibi KALKTI. Işık iki dalgalı yavaş bir salınımla kendi
  *     kendine dönüyor ve ışık darbeleri akıyor: huzmede parlak bir parçacık
@@ -66,6 +67,12 @@ const BOX_CY = (AP.y + BL.y) / 2
 const PULSE_PERIOD = 3.4
 const PULSE_BEAM_SHARE = 0.36
 const PULSES = 2
+
+/** Şerit genişliği ve etiketin şeritten uzaklığı (px). */
+const STRIP_PX = 9
+const LABEL_GAP = 10
+/** Sağ kenardan rayın en uzun işaretine (24 + 36 px) ve ondan bir nefes (20 px). */
+const RAIL_ROOM = 80
 
 const sy = (y: number) => -y
 const clamp01 = (v: number) => Math.min(1, Math.max(0, v))
@@ -126,12 +133,17 @@ export function PrismStage({ lines = FRAUNHOFER, mark = false }: Props) {
       glow!.setAttribute('viewBox', vb)
       // Şerit ekranın sağ kısmında. Telefonda etiket yok; ama sağ kenarda slayt
       // rayı var — şerit ona binmesin diye kenardan ~50px içeride.
-      const screenX = W < 768 ? (W / 2 - 52) / s : Math.min((W * 0.33) / s, 5.5)
+      // Masaüstünde (Oturum 3, kullanıcı: "tayf daha uzun olsun") şerit, etiketleri
+      // raya değmeden sığabilecek en sağa gidiyor. Önceki W×0.33, 1440'ta sağda
+      // ~80px boş bırakıyor, 1024'te ise etiketi rayın 4px yanına kadar itiyordu (ölçüldü).
+      const labelW = Math.max(0, ...labelRefs.current.map((el) => el?.offsetWidth ?? 0))
+      const room = W / 2 - RAIL_ROOM - LABEL_GAP - labelW - STRIP_PX
+      const screenX = W < 768 ? (W / 2 - 52) / s : Math.min(room / s, 7)
       // Yerleşim prizmanın boyunu bilsin (giriş ızgarası ortadaki boşluğu buna göre açıyor).
       const rs = document.documentElement.style
       rs.setProperty('--prism-box', `${Math.round(PRISM_HEIGHT * s)}px`)
       rs.setProperty('--prism-w', `${Math.round(2 * s)}px`)
-      return { W, H, s, vx, vy, screenX, stripW: 9 / s }
+      return { W, H, s, vx, vy, screenX, stripW: STRIP_PX / s }
     }
 
     /** Dünya noktası → sahne kutusuna göre piksel (etiketler için). */
@@ -309,7 +321,7 @@ export function PrismStage({ lines = FRAUNHOFER, mark = false }: Props) {
         const el = labelRefs.current[i]
         const y = yAt(theta, nm, sc)
         if (!el || y === null) return
-        el.style.transform = `translate(${px(sc + sw) + 10}px, ${py(y)}px) translateY(-50%)`
+        el.style.transform = `translate(${px(sc + sw) + LABEL_GAP}px, ${py(y)}px) translateY(-50%)`
       })
 
       root!.style.opacity = String(scene.dim)
@@ -480,7 +492,6 @@ export function PrismStage({ lines = FRAUNHOFER, mark = false }: Props) {
         </g>
         <polygon ref={glassRef} className="prism-glass" points={pts(TRIANGLE)} fill={`url(#${glassId})`} />
         <line ref={innerRef} className="prism-inner" x1={P.x} y1={sy(P.y)} x2={P.x} y2={sy(P.y)} />
-        <line className="prism-sheen" x1={BL.x + 0.12} y1={sy(BL.y + 0.2)} x2={AP.x - 0.06} y2={sy(AP.y - 0.3)} />
         <polygon ref={faceRef} className="prism-face" points={pts(TRIANGLE)} pathLength={1} />
       </svg>
 

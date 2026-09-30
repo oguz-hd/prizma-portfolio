@@ -16,3 +16,11 @@ fareden koparıldı — artık kendi salınımı ve ışık darbeleriyle yaşıy
 bağlantılar prizmayı çevreleyen hayali bir dairenin yaylarına dizildi; site tek fonta
 (Departure Mono) indi; Projeler'in yerini Deneyim ve Eğitim aldı; İletişim açılışın aynası
 olan bir kapanış karesi oldu. Sırada beyaz tema.
+
+**Oturum 3 · Kaydırma, çizgi, menü (30.09.2026).** "İki kez kaydırmak gerekiyor" şikâyetinin
+kaynağı geçiş sürerken gelen hareketin yutulmasıydı; artık sıraya giriyor ve geçiş hızlanıyor.
+Üçgendeki eğri çizgi (sol kenar parıltısı) kalktı; mobil menü içerikteki kısa adlarla sığıyor.
+Yükleme ölçüldü: paket zaten küçük (~130 KB gzip), algılanan gecikmenin çoğu 3.4 sn'lik açılış.
+Sonra: düzyazı Atkinson'a geçti (tek font kuralı iki role ayrıldı), tayf raya kadar uzadı,
+isim harfleri genişledi, unvan "Yazılım geliştirici" oldu. Dil geçiş efekti bir seçenek sayfasından
+seçildi (Katakana + tayf renkli harf çözülmesi); açılışta da çalışıyor.

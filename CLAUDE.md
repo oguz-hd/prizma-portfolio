@@ -55,10 +55,13 @@ docker exec prizma-portfolio-web-1 npm run build       # asıl derleme
 8. **Durum öznitelikleri JSX'te yok** (`data-state`, `inert`, `aria-hidden` slaytlarda
    deck.ts'in). JSX'e yazılırsa dil değişiminde React ezer.
 9. **`[data-i18n-fade]`** dil geçişi, **`[data-reveal]`** slayt geçişi/açılış.
-   Yeni blok eklersen ikisini de düşün.
+   Yeni blok eklersen ikisini de düşün. İçlerindeki Departure Mono metin harf harf
+   çözülür (`scramble.ts`), düzyazı solar — ayrım fonttan, işaret gerekmez.
 10. **dev/prod ayrı imaj adı** (`:dev` / `:prod`).
-11. **Sitenin TEK fontu Departure Mono; her boyut 11px'in katı** (11/22/33/44/55/88)
-    — ara boyutta bulanıklaşır. Tek ağırlık: kalın yazma (`font-synthesis: none`).
+11. **İki font, iki rol** (Oturum 3): **Departure Mono** kimlik ve arayüz — her boyutu
+    11px'in katı (11/22/33/44/55/88), tek ağırlık, kalın yazma (`font-synthesis: none`).
+    **Atkinson Hyperlegible Next** yalnızca düzyazı (theme.css → düzyazı seçici listesi;
+    yeni paragraf bloğu oraya eklenir), `--text-prose` ölçeği.
 12. **Verimsiz kod yazma.** Bir sonraki faz için önden kod yazma.
 13. **Prizma fareye bağlı DEĞİL** — hareketi kendi hâlinde (salınım + ışık darbeleri);
     mobilde de aynı görünmeli (kullanıcı kararı, Oturum 2).
@@ -72,6 +75,14 @@ prizmayı çevreleyen dairede (isim büyük harf) · motto kalktı · üst çubu
 ve isim yok, menü solda, dönen tayflı üçgen · tek font · Projeler slaytı kalktı,
 yerine Deneyim ve Eğitim · mezuniyet paragrafı kalktı · İletişim = kapanış karesi.
 Slaytlar: Giriş · Hakkımda · Deneyim ve Eğitim · İletişim.
+✅ **Oturum 3** (30.09.2026) — geçiş sürerken kaydırma sıraya giriyor · üçgendeki
+parıltı çizgisi kalktı · mobil menü `navLabel` ile sığıyor · düzyazı Atkinson ·
+tayf raya kadar uzun · isim harfleri 1.3× geniş · sekme adı yalnız isim, unvan
+"Yazılım geliştirici" · menü alt çizgisi titremesi. → `DESIGN.md` § 11
+· **site İngilizce açılır** (tarayıcı dili okunmaz; seçim hatırlanır) ·
+kapanış karesi kısa ekranda sığıyor, kaydırma çubuğu yeri sabit
+· **harf çözülmesi** (Katakana + tayf, `scramble.ts`) açılışta ve dil geçişinde —
+seçenekler artifact'taydı (https://claude.ai/artifact/LN9aUxFhh1JwEP9kEBX7zi, A7+A5).
 
 ⏸ **Sırada: beyaz tema** (kullanıcı "daha sonra" dedi) — presets.ts'e açık bir ön
 ayar + seçici; theme.css renk kodu içermediği için bileşenlere dokunulmaz.

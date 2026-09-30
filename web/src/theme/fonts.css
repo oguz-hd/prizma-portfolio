@@ -1,9 +1,12 @@
 /*
   Font varlık bildirimi.
 
-  ★ Sitenin TEK fontu Departure Mono (Oturum 2, kullanıcı isteği: "header'da
-  kullanılan font tüm sitenin fontu olsun"). Cabinet Grotesk ve Satoshi
-  kaldırıldı — kullanılmayan font indirilmesin.
+  ★ İki font, iki rol (Oturum 3, kullanıcı isteği: okunabilirlik).
+    Departure Mono               kimlik — isim, başlıklar, menü, etiketler, veri
+    Atkinson Hyperlegible Next   düzyazı — bio, bölüm girişleri, notlar
+  Oturum 2'de site tek fonta (Departure Mono) inmişti; piksel font uzun
+  paragrafta, hele telefonda 11 px'te, yoruyordu. Atkinson okunabilirlik için
+  tasarlandı (Braille Institute): benzer harfler (I l 1, O 0) birbirinden ayrık.
 
   Monospace PİKSEL font: yalnızca 11 px'in katlarında keskin (11, 22, 33, 44 …).
   Tek ağırlığı var (400) — kalın yazdırılırsa tarayıcı sahte kalın üretir,
@@ -18,4 +21,31 @@
   font-weight: 400;
   font-style: normal;
   font-display: swap;
+}
+
+/*
+  Atkinson Hyperlegible Next — yalnızca 400. Google Fonts'un iki alt kümesi:
+  Türkçe'nin ğ ş İ harfleri latin-ext'te (ı latin'de), yani Türkçe sayfada ikisi
+  de iner (12 + 7 KB). Preload yok: düzyazı açılışın sonunda beliriyor, font o
+  ana kadar çoktan gelmiş oluyor.
+*/
+@font-face {
+  font-family: 'Atkinson Hyperlegible Next';
+  src: url('/fonts/AtkinsonHyperlegibleNext-Regular-latin.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304,
+    U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Atkinson Hyperlegible Next';
+  src: url('/fonts/AtkinsonHyperlegibleNext-Regular-latin-ext.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308,
+    U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113,
+    U+2C60-2C7F, U+A720-A7FF;
 }

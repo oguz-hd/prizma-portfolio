@@ -25,12 +25,9 @@ function readStored(): Locale | null {
   }
 }
 
+/** Kayıtlı seçim, yoksa varsayılan (EN). Tarayıcı dili bilerek okunmuyor — types.ts. */
 function detect(): Locale {
-  const stored = readStored()
-  if (stored) return stored
-  // navigator.language 'tr', 'tr-TR' olabilir — ön eke bakıyoruz.
-  const nav = typeof navigator !== 'undefined' ? navigator.language.slice(0, 2) : ''
-  return isLocale(nav) ? nav : DEFAULT_LOCALE
+  return readStored() ?? DEFAULT_LOCALE
 }
 
 /** main.tsx'te, mount'tan önce çağrılır. */
