@@ -126,11 +126,38 @@ Bağlantılar · Bölümler (yalnızca düzenleme + sıra) · Hesap. TR/EN yan y
 çeviri uyarısı, kaydedilmemiş değişiklik uyarısı, kart başına kaydet. Panel hep Tayf'ta
 (Aurora'da kırmızı yok → hata rengi kayboluyordu). → ARCHITECTURE § 7
 
-⏭ **Sırada (kullanıcı isteği, Oturum 5):** (1) büyüyen içerik testleri — ör. Hakkımda'ya
-10 yetenek grubu; sitenin yerleşimi nasıl tepki veriyor (ARCHITECTURE § 8), sonuçlar
-kullanıcıya · (2) panelin giriş ekranı sade kaldı: prizma/tayf teması ve animasyon —
-önce seçenek sayfası, kullanıcı seçer. Plan:
-`C:\Users\drn49\.claude\plans\hadi-back-and-e-hidden-puddle.md`.
+✅ **Oturum 5 · sonrası** — daire masaüstünde %90 (`DESKTOP_SCALE`), girişteki bağlantılar
+16.5 px (DESIGN § 13). Panel girişi İngilizce, seçenek sayfasından **B + E + F** seçildi
+(https://claude.ai/artifact/1CCFheJHSJoFp7dJC7kSBb); ilk sürüm `admin/src/Login.tsx`
+(kendi SVG'si + CSS). Prizma/yıldız stilleri bileşenlerin yanına taşındı
+(`prism/prism.css`, `components/starfield.css`); `scene.accentCount()` artık uygulanmış
+temadan (`applyTheme` → `appliedTokens`), içerikten değil — panel sahneyi içeriksiz kullanabilir.
+
+⏭ **Sırada (kullanıcı, Oturum 5 sonu — yarım kaldı):**
+1. **Giriş ekranı sitenin gerçek prizmasıyla** ("kalite intro sayfamızdaki gibi", "404'te
+   zaten bu prizma var, oradan uydur"): 404'ün düzeni — üstte ADMIN, ortada `PrismStage` +
+   `Starfield` (@site), altta tek satır form (email · password · sign in). Açılış = sitenin
+   `intro.ts` zamanlamaları `scene` üzerinde (frame 0.3/0.9 · beam 1.0/0.7 · fan 1.7/0.8 ·
+   labels 2.3). **Hata:** `lines=[{nm: 401, label: '401 nm'}]` + `mark` (404 gibi; `lines`
+   efekt bağımlılığı değil → `key` ile yeniden kur). **Giriş anı:** `scene.surge` büyür +
+   sahne tayfın içindeki bir noktadan yakınlaşır → tayf ekranı sarar → App düzeyinde tayf
+   örtüsü panelin üstünde söner. Kartın tepesindeki renk şeridi kalktı (kullanıcı).
+   `admin/package.json`'da gsap var, kilit güncel; **admin imajı yeniden kurulmadı** →
+   `build admin` + `up -d --no-deps --renew-anon-volumes admin`.
+2. **Büyüyen içerik testi bulguları** (prod build, ayrı veritabanı; kullanıcıya rapor
+   verilmedi): ✅ sığmayan slayt alt sayfalara bölünüyor — 10 yetenek grubu: Hakkımda
+   1440×900'de 2, 1366×768'de 3, telefonda 2 sayfa; bölüm gövdesi, uzun e-posta (11 px'e
+   iniyor), İletişim'de 7 bağlantı, uzun menü başlıkları (1440'ta) çalışıyor. ✗ Bölünen
+   slaytta iki sütun tek sütuna düşüyor (sağ yarı boş, gereğinden çok sayfa) · girişte 8
+   bağlantı alt yayda ~200° dolanıyor, "YouTube" tayfın üstüne biniyor → yay açısı sınırı
+   (aşınca 11 px ya da ikinci yay) · uzun unvan·konum iç yayda yataydan aşağı iniyor →
+   açı/uzunluk sınırı · 25 harflik isimde isim VE İletişim başlığı 22 px'e düşüyor
+   (İletişim başlığı ismin uzunluğundan hesaplanıyor). Senaryo betiği yeniden yazılmalı
+   (geçici klasördeydi): A = +6 grup, +3 deneyim, +1 eğitim, +2 bağlantı, 3. bio paragrafı;
+   B = +4 grup, 25 harf isim, uzun unvan/konum/başlıklar, uzun e-posta, 8 bağlantı.
+3. **Beyaz tema** (kullanıcı: back-end'den sonra planlansın; site + panel, farklı estetik,
+   prizma temasını koruyan) → önerilen sıra: Faz 7 bitince, Faz 8'den (tema paneli) ÖNCE.
+Plan: `C:\Users\drn49\.claude\plans\hadi-back-and-e-hidden-puddle.md`.
 Kullanıcı notu (Claude Docs, API'yi denerken bilinmesi gerekenler):
 https://claude.ai/code/artifact/8a071f83-aa54-4eb2-a4a7-592661b51c62
 

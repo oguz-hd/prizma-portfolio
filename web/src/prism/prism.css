@@ -1,0 +1,146 @@
+/*
+  Prizma sahnesinin stilleri (PrismStage.tsx). Bileşenin yanında: yönetim paneli
+  de kullanıyor (giriş ekranı, admin/src/Login.tsx) — sitenin theme.css'ini almadan.
+  Renkler token'lardan (applyTheme); boyut değişkenlerinin yedeği panel için.
+*/
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ★ Prizma sahnesi (prism/PrismStage.tsx)
+   Çizgiler ölçekten bağımsız piksel kalınlığında: vector-effect.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.prism-stage {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.prism-stage svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.prism-stage svg * {
+  vector-effect: non-scaling-stroke;
+}
+
+/* Hale (Oturum 2: "renkler daha parlak ve göz alıcı"). Işık şekillerinin
+   kopyası; bulanık ve doygun, ana çizimin ALTINDA — renk etrafa taşar,
+   keskin kenarlar üstte kalır. */
+.prism-glow {
+  filter: blur(22px) saturate(1.8) brightness(1.15);
+  opacity: 0.85;
+}
+
+/* Ön yüz: kenarları açılışta çizilerek belirir (pathLength=1 → dash 0..1).
+   vector-effect'siz — kalınlığı JS dünya biriminde veriyor. */
+.prism-stage svg .prism-face {
+  vector-effect: none;
+  fill: none;
+  stroke: var(--ink);
+  stroke-opacity: 0.85;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+}
+
+/* Camın içinde soluk gökkuşağı — ışık cam içinde de hafifçe ayrışıyor. */
+.prism-glass {
+  fill-opacity: 0.12;
+}
+
+.prism-back {
+  fill: none;
+  stroke: var(--ink);
+  stroke-opacity: 0.18;
+  stroke-width: 1;
+}
+
+.prism-inner {
+  stroke: var(--ink);
+  stroke-opacity: 0.6;
+  stroke-width: 1.5;
+}
+
+.prism-light-stop {
+  stop-color: var(--ink);
+}
+
+.prism-fan {
+  fill-opacity: 0.62;
+}
+
+/* Işık darbeleri: huzmede parlak parçacık, tayfta dikey dalga. Opaklık JS'te. */
+.prism-pulse {
+  fill: var(--ink);
+  mix-blend-mode: screen;
+}
+
+.prism-wave {
+  stroke: var(--ink);
+  stroke-width: 3;
+  stroke-linecap: round;
+  mix-blend-mode: screen;
+}
+
+/* Soğurma çizgileri zemin renginde: ışığı gerçekten "kesiyorlar". */
+.prism-ray-gap {
+  stroke: var(--ground);
+  stroke-opacity: 0.7;
+  stroke-width: 1;
+}
+
+.prism-strip-gap {
+  stroke: var(--ground);
+  stroke-width: 2;
+}
+
+/* Slaytın tonu — tayfın içinde tek parlak ışın; rengi JS'ten var(--accent-N). */
+.prism-focus {
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.prism-labels {
+  position: absolute;
+  inset: 0;
+}
+
+.prism-label {
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-family: var(--font-mono);
+  font-size: var(--label-size, 11px);
+  letter-spacing: 0.04em;
+  color: var(--ink-faint);
+  white-space: nowrap;
+}
+
+/* 404: tek çizgi, kalın ve lider renkli etiketiyle. */
+.prism-stage.is-mark .prism-strip-gap {
+  stroke-width: 4;
+}
+
+.prism-stage.is-mark .prism-ray-gap {
+  stroke-opacity: 1;
+  stroke-width: 2.5;
+}
+
+.prism-stage.is-mark .prism-label {
+  font-size: var(--label-size-lg, 22px);
+  color: var(--lead);
+}
+
+@media (max-width: 767px) {
+  .prism-labels {
+    display: none;
+  }
+
+  .prism-glow {
+    filter: blur(14px) saturate(1.8) brightness(1.15);
+  }
+}

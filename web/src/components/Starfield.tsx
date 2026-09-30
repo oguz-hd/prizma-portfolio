@@ -1,5 +1,7 @@
 import { useMemo } from 'react'
 
+import './starfield.css'
+
 /**
  * Gece göğü.
  *

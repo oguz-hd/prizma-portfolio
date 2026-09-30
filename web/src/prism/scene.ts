@@ -1,6 +1,6 @@
 import gsap from 'gsap'
 
-import { getPreset } from '../content/useContent'
+import { appliedTokens } from '../theme/applyTheme'
 import { PRESETS } from '../theme/presets'
 import { reducedMotion } from '../motion'
 import { deg, slideAccent, slideAngle } from './optics'
@@ -51,8 +51,14 @@ export const scene = {
  */
 export const DIM = 0.8
 
+/**
+ * Tayfın ton sayısı — ekranda uygulanmış paletten, içerikten değil (kural 5:
+ * prizma içerikten bağımsız). Böylece sahne içerik yüklenmeden de çiziliyor:
+ * yönetim panelinin giriş ekranı onu içeriksiz kullanıyor (Oturum 5).
+ * Tema her zaman önce uygulanıyor (main.tsx); yedek yalnızca güvence.
+ */
 export function accentCount(): number {
-  return PRESETS[getPreset()].tokens.accents.length
+  return (appliedTokens() ?? PRESETS.tayf.tokens).accents.length
 }
 
 /** Açılış öncesi: her şey karanlık. main.tsx mount'tan ÖNCE çağırıyor — ilk karede tam prizma parlamasın. */

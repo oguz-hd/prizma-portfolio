@@ -21,6 +21,7 @@ import {
   type Pt,
 } from './optics'
 import { DIM, SURGE, accentCount, scene } from './scene'
+import './prism.css'
 
 /**
  * ★ Sitenin merkezi: kalıcı prizma sahnesi.

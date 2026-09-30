@@ -1,9 +1,10 @@
-import { useCallback, useEffect, useState, useSyncExternalStore, type FormEvent, type MouseEvent } from 'react'
+import { useCallback, useEffect, useState, useSyncExternalStore, type MouseEvent } from 'react'
 
 import type { RawSiteContent } from '@site/content/types'
 
 import { ApiError, api, getToken, setToken, subscribeToken } from './api'
-import { SITE_URL, TextInput } from './fields'
+import { SITE_URL } from './fields'
+import { Login } from './Login'
 import { DirtyProvider, PanelProvider } from './panel'
 import { AccountPage } from './pages/AccountPage'
 import { LinksPage } from './pages/LinksPage'
@@ -47,58 +48,18 @@ function messageOf(err: unknown): string {
 
 export function App() {
   const token = useSyncExternalStore(subscribeToken, getToken)
-  return token ? <Panel /> : <Login />
-}
-
-// ── Giriş ───────────────────────────────────────────────────────────────────
-
-function Login() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState<string | null>(null)
-  const [busy, setBusy] = useState(false)
-
-  const submit = async (e: FormEvent) => {
-    e.preventDefault()
-    setBusy(true)
-    setError(null)
-    try {
-      const { accessToken } = await api.login(email.trim(), password)
-      setToken(accessToken)
-    } catch (err) {
-      setError(messageOf(err))
-      setBusy(false)
-    }
+  // Girişten gelindiyse panel tayfın ardından belirsin (E); sayfa yenilenince değil.
+  const [entering, setEntering] = useState(false)
+  const signedIn = (next: string) => {
+    setEntering(true)
+    setToken(next)
   }
-
-  return (
-    <main className="login">
-      <form className="card login-card" onSubmit={submit}>
-        <p className="brand">Yönetim</p>
-        <TextInput label="E-posta" type="email" autoComplete="username" value={email} onChange={setEmail} />
-        <TextInput
-          label="Parola"
-          type="password"
-          autoComplete="current-password"
-          value={password}
-          onChange={setPassword}
-        />
-        {error && (
-          <p className="status status-error" role="alert">
-            {error}
-          </p>
-        )}
-        <button type="submit" className="btn btn-primary" disabled={busy || !email || !password}>
-          {busy ? 'Giriş yapılıyor…' : 'Giriş'}
-        </button>
-      </form>
-    </main>
-  )
+  return token ? <Panel entering={entering} /> : <Login onSignedIn={signedIn} />
 }
 
 // ── Panel ───────────────────────────────────────────────────────────────────
 
-function Panel() {
+function Panel({ entering }: { entering: boolean }) {
   const page = useSyncExternalStore(subscribePage, readPage)
   const [content, setContent] = useState<RawSiteContent | null>(null)
   const [loadError, setLoadError] = useState<string | null>(null)
@@ -160,7 +121,7 @@ function Panel() {
   }
 
   return (
-    <div className="shell">
+    <div className={entering ? 'shell is-entering' : 'shell'}>
       <header className="topbar">
         <span className="brand">Yönetim</span>
         <div className="topbar-tools">

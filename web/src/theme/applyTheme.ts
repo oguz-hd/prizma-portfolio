@@ -13,10 +13,22 @@ import type { ThemeTokens } from './types'
  */
 const MAX_ACCENTS = 8
 
+/**
+ * Sayfaya son uygulanan token'lar. Prizma sahnesi tonların sayısını buradan
+ * okuyor (scene.ts → accentCount): içerikten değil, ekrandaki paletten — site
+ * içeriğin seçtiğini, yönetim paneli hep Tayf'ı uyguluyor.
+ */
+let applied: ThemeTokens | null = null
+
+export function appliedTokens(): ThemeTokens | null {
+  return applied
+}
+
 export function applyTheme(
   tokens: ThemeTokens,
   root: HTMLElement = document.documentElement,
 ): void {
+  if (root === document.documentElement) applied = tokens
   const s = root.style
 
   s.setProperty('--ground', tokens.ground)
