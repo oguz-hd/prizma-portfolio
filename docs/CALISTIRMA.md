@@ -52,6 +52,11 @@ docker compose -f docker-compose.yml -f docker-compose.dev.yml up
 
 → **http://localhost:5174** (site) · **http://localhost:8001/docs** (API)
 
+**İçerik API'den geliyor** (Faz 6): site açılırken `/content.json`'ı çekiyor, Vite
+bunu API'ye yönlendiriyor (`vite.config.ts` → proxy; meta etiketleri de API'den).
+API kapalıysa ya da henüz açılmadıysa site **"İçerik yüklenemedi"** ekranı gösterir —
+yedek içerik bilerek yok. API ayağa kalkınca "Yeniden dene" yeter.
+
 > Portlar trex-portfolio'dan (5173/8000) **bilerek farklı**: iki site aynı anda
 > çalışabilsin. Vite konteynerin içinde de 5174'te dinliyor — HMR soketi sayfanın
 > portuna bağlanıyor; 5173'e giderse eski sitenin sunucusuna düşer.
@@ -101,38 +106,64 @@ Faz 7'deki panelden parolayı değiştirmek.
 
 ## Telefonda deneme (geçici yayın)
 
-Kalıcı yayın yok; telefonda denemek için derlenmiş site (`web/dist`) Cloudflare'in
-hızlı tüneliyle geçici bir adrese açılıyor. Hesap gerekmiyor, adres her başlatmada
-değişiyor. Dev konteyneri çalışıyor olmalı.
+Kalıcı yayın yok; telefonda denemek için site Cloudflare'in hızlı tüneliyle geçici bir
+adrese açılıyor. Hesap gerekmiyor, adres her başlatmada değişiyor. Dev konteynerleri
+çalışıyor olmalı — içerik dev'in veritabanından geliyor (panelde yapılan değişiklik
+telefonda da hemen görünür).
+
+⚠️ Faz 6'dan beri `web/dist`'i düz bir statik sunucu SUNAMAZ: `index.html`'deki meta
+şablonunu Caddyfile işliyor, `/content.json` veri volume'undan geliyor. Bu yüzden tünelin
+arkasında **yayın imajı + projenin Caddyfile'ı + dev'in veri volume'u** duruyor.
+(`web/dist`'i bind mount etmek olmuyor: salt okunur bağlamanın içine volume bağlanamıyor.)
 
 ```powershell
-# 1) Derle (web/dist güncellenir — tünel yeni dosyaları hemen sunar, bind mount)
-docker exec prizma-portfolio-web-1 npm run build
+# 1) Derle: yayın imajı (kod her değiştiğinde)
+docker compose -f docker-compose.yml -f docker-compose.prod.yml build web
 
-# 2) İlk sefer: ağ + statik sunucu + tünel
-docker network create prizma-yayin
+# 2) Yayın sunucusu (her derlemeden sonra yeniden kur)
+docker network create prizma-yayin            # yalnızca ilk sefer
+docker rm -f prizma-yayin-web
 docker run -d --name prizma-yayin-web --network prizma-yayin `
-  -v "C:\Users\drn49\Desktop\prizma-portfolio\web\dist:/srv:ro" `
-  caddy:2-alpine caddy file-server --root /srv --listen :80
+  -v prizma-portfolio_data:/srv/data:ro `
+  -v "C:\Users\drn49\Desktop\prizma-portfolio\Caddyfile:/etc/caddy/Caddyfile:ro" `
+  prizma-portfolio-web:prod
+
+# 3) Tünel (yalnızca ilk sefer — sunucu yeniden kurulunca tünele dokunmak gerekmiyor)
 docker run -d --name prizma-tunel --network prizma-yayin `
   cloudflare/cloudflared:latest tunnel --no-autoupdate --url http://prizma-yayin-web:80
 
-# 3) Adres
+# 4) Adres
 docker logs prizma-tunel 2>&1 | Select-String trycloudflare.com
 ```
 
 - **Bilgisayar uyudu / şarj bitti → adres çözülmüyor:** `docker restart prizma-tunel`,
   yeni adres loglarda (Oturum 4'te yaşandı).
-- ⚠️ Oturum 3'te kurulan `prizma-yayin-web` ayar dosyasını (Caddyfile) o oturumun
-  geçici klasöründen bağlıyor. Dosya silinirse konteyner yeniden başlamaz →
-  `docker rm -f prizma-yayin-web` ve yukarıdaki komutla yeniden kur (ayar dosyası gerekmiyor).
-- `caddy file-server`'da SPA yönlendirmesi yok: `/#hakkimda` gibi adresler çalışır,
-  `/yok` gibi yollar sitenin 404'ü yerine sunucunun boş 404'ünü verir.
+- Tünelde `/api` çalışmaz (yayın sunucusu dev API'sinin ağında değil) — ziyaretçi
+  sitesinin API'ye ihtiyacı yok, panel yerelde kullanılır.
 - Kapatmak: `docker rm -f prizma-tunel prizma-yayin-web`
 
 ---
 
 ## Sorun giderme
+
+### Site "İçerik yüklenemedi" diyor
+
+`/content.json` gelmedi. Geliştirmede: API konteyneri çalışıyor mu
+(`docker ps`, `docker logs prizma-portfolio-api-1`)? Yayında: API en az bir kez açılıp
+`/data/content.json`'ı yazmış olmalı (her açılışta yazıyor — güvensiz varsayılanlar
+yüzünden kapanmadan ÖNCE de, yani site o durumda da ayakta).
+
+### `npm run typecheck`: "Unable to resolve @typescript/typescript-linux-x64"
+
+Konteynerin `node_modules`ü eski bir imajdan geliyor (Oturum 5'te yaşandı: 28.09'daki
+`npm ci` katmanı TypeScript 7'nin Linux paketini kurmamıştı, build önbelleği de onu
+tutuyordu; `down -v` sonrası konteyner o imajın paketlerine döndü). İmajı önbelleksiz
+yeniden kur ve anonim volume'u yenile:
+
+```powershell
+docker compose -f docker-compose.yml -f docker-compose.dev.yml build --no-cache web
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d --renew-anon-volumes web
+```
 
 ### Build hiç başlamıyor / çıktı vermeden düşüyor
 
@@ -170,4 +201,7 @@ docker compose -f docker-compose.yml -f docker-compose.dev.yml down -v
 docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
 ```
 
-⚠️ `-v` volume'ları da siler. Faz 5'ten sonra bu, veritabanını silmek demek.
+⚠️ `-v` volume'ları da siler. Faz 5'ten sonra bu, veritabanını silmek demek —
+içerik `seed.py`'deki ilk hâline döner, panelden yapılan her düzenleme gider.
+Konteynerin anonim `node_modules` volume'u da silinir; yenisi imajdan kurulur
+(imaj eskiyse yukarıdaki typecheck sorunu).

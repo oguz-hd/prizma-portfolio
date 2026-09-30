@@ -1,28 +1,41 @@
 import type { Locale } from '../i18n/types'
 import { useLocale } from '../i18n/useLocale'
-import { SITE } from './site'
 import type { Milestone, RawMilestone, RawSiteContent, SiteContent } from './types'
 
 /**
  * ★ İÇERİĞİN OKUNDUĞU TEK NOKTA.
  *
- * Kural: hiçbir bileşen site.ts'i doğrudan import etmeyecek. Hepsi buradan okuyacak.
- * Sebebi Faz 6: içerik content.json'a taşınınca değişecek tek dosya bu olsun,
- * bileşenlere hiç dokunulmasın (docs/ROADMAP.md).
+ * Kaynak `/content.json` (Faz 6): API veritabanından yazıyor, Caddy sunuyor —
+ * ziyaretçi tarafı veritabanını hiç görmüyor (docs/ARCHITECTURE.md § 3).
+ * Geliştirmede Vite aynı adresi API'ye yönlendiriyor (vite.config.ts).
  *
  * Bileşenler ÇÖZÜLMÜŞ içerik alıyor — düz string, dil bilgisi yok. Yani dil
  * eklenmesi bileşen imzalarını hiç değiştirmedi.
  *
- * ⚠️ Senkron — loading/error durumu yok. Faz 6'da content.json React mount'tan
- * ÖNCE yüklenip setContent() ile verilecek, bu imza değişmeyecek.
- * Gerekçe: docs/ARCHITECTURE.md § 3 (ziyaretçi tarafı statik site hızında kalmalı).
+ * ⚠️ Senkron — loading/error durumu yok. main.tsx içeriği React mount'tan ÖNCE
+ * bekliyor (`loadContent`); gelmezse site hiç mount edilmiyor, yerine hata ekranı.
+ * Yedek içerik bilerek yok (kullanıcı kararı, Faz 6): tek kaynak veritabanı.
  */
 
-let raw: RawSiteContent = SITE
+let raw: RawSiteContent | null = null
 
-/** Faz 6'da main.tsx content.json'ı çekip bunu çağıracak. */
-export function setContent(next: RawSiteContent): void {
-  raw = next
+/**
+ * main.tsx mount'tan önce bekliyor. index.html aynı adresi önden çekiyor
+ * (`<link rel="preload">`) — JS inerken içerik de iniyor.
+ *
+ * ⚠️ `fetch`'e önbellek seçeneği verilmiyor: preload'la eşleşmesi için istek
+ * birebir aynı olmalı. Tazelik sunucudan: Caddy `Cache-Control: no-cache`
+ * gönderiyor, her açılışta ETag ile doğrulanıyor (değişmediyse 304).
+ */
+export async function loadContent(): Promise<void> {
+  const res = await fetch('/content.json')
+  if (!res.ok) throw new Error(`/content.json yüklenemedi: HTTP ${res.status}`)
+  raw = (await res.json()) as RawSiteContent
+}
+
+function source(): RawSiteContent {
+  if (!raw) throw new Error('İçerik yüklenmeden okundu — main.tsx loadContent()’i beklemeli.')
+  return raw
 }
 
 function resolveMilestones(list: RawMilestone[], locale: Locale): Milestone[] {
@@ -77,10 +90,10 @@ function resolveContent(source: RawSiteContent, locale: Locale): SiteContent {
 
 export function useContent(): SiteContent {
   const locale = useLocale()
-  return resolveContent(raw, locale)
+  return resolveContent(source(), locale)
 }
 
 /** Tema ön ayarı dile bağlı değil — main.tsx mount öncesi buna ihtiyaç duyuyor. */
 export function getPreset(): RawSiteContent['settings']['preset'] {
-  return raw.settings.preset
+  return source().settings.preset
 }

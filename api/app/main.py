@@ -10,6 +10,7 @@ from app.auth import verify_password
 from app.config import INSECURE_DEFAULT_PASSWORD, INSECURE_DEFAULT_SECRET, get_settings
 from app.db import engine, init_db
 from app.models import AdminUser
+from app.publish import publish
 from app.seed import seed
 
 logger = logging.getLogger("uvicorn.error")
@@ -22,6 +23,9 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     with Session(engine) as session:
         if seed(session):
             logger.info("Veritabanı boştu, başlangıç içeriğiyle dolduruldu.")
+        # Güvenlik kontrolünden ÖNCE: API güvensiz varsayılanlar yüzünden açılmasa
+        # da site (Caddy) güncel içerikle ayakta kalsın — kapanan yalnızca panel.
+        publish(session)
         if not settings.debug:
             refuse_insecure_defaults(session)
     yield

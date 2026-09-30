@@ -4,7 +4,7 @@ import { useLocale } from './useLocale'
 /**
  * ARAYÜZ METİNLERİ — içerikten ayrı tutuluyor.
  *
- * Ayrımın sebebi: `content/site.ts` panelden düzenlenecek İÇERİK.
+ * Ayrımın sebebi: `/content.json` (veritabanı) panelden düzenlenen İÇERİK.
  * Buradakiler ise arayüzün kendi dili — "Deneyim", "Bana yaz" gibi etiketler.
  * Bunlar tasarımın parçası, kullanıcının düzenleyeceği veri değil.
  *
@@ -42,6 +42,10 @@ const STRINGS = {
     en: 'The light passed through the prism and split into its spectrum — but there’s a dark line at 404 nm. The page you were looking for was absorbed there.',
   },
   notFoundHome: { tr: 'Ana sayfaya dön', en: 'Back to the homepage' },
+
+  // İçerik gelmedi (main.tsx → components/LoadError.tsx)
+  loadError: { tr: 'İçerik yüklenemedi.', en: 'The content couldn’t be loaded.' },
+  retry: { tr: 'Yeniden dene', en: 'Try again' },
 } as const satisfies Record<string, Record<Locale, string>>
 
 type StringKey = keyof typeof STRINGS

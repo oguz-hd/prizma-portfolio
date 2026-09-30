@@ -9,7 +9,7 @@ import type { PresetId } from '../theme/types'
  *
  * ── İKİ ŞEKİL ───────────────────────────────────────────────────────────────
  *
- *   Raw*      → DEPOLAMA şekli. site.ts ve Faz 6'daki content.json bunu tutar.
+ *   Raw*      → DEPOLAMA şekli. content.json bunu tutar (api/app/schemas.py ile aynı).
  *               Düzyazı alanlar Localized<T>, yani her dilin karşılığı yan yana.
  *   (Raw'sız) → ÇÖZÜLMÜŞ şekil. Bileşenlerin gördüğü. Düz string.
  *
@@ -118,7 +118,7 @@ export type SiteContent = {
   sections: Section[]
 }
 
-// ── Depolama (site.ts / content.json) ──────────────────────────────────────
+// ── Depolama (content.json) ─────────────────────────────────────────────────
 
 export type RawSiteSettings = {
   preset: PresetId

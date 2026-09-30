@@ -17,14 +17,15 @@ from app.models import (
 )
 
 """
-İlk açılış verisi — kaynağı `web/src/content/site.ts`.
+İlk açılış verisi — sitenin içeriğinin ilk hâli.
+
+Faz 6'dan beri içeriğin tek kaynağı veritabanı: `web/src/content/site.ts` silindi
+(silinmeden önce bu dosyanın çıktısıyla alan alan karşılaştırıldı, birebir aynıydı).
+Sonraki her düzenleme panelden — buradaki metinler yalnızca BOŞ bir veritabanını
+(ilk kurulum, `down -v`) doldurur.
 
 ⚠️ Bu bir GÖÇ değil, TOHUM. Veritabanı boşsa doldurur, doluysa hiç dokunmaz.
 Yoksa panelden (Faz 7) yapılan her düzenleme yeniden başlatmada silinirdi.
-
-⚠️ Metinler hâlâ taslak — kullanıcıyla gözden geçirilecek (docs/BRIEF.md § 5).
-Gözden geçirme panel geldikten sonra olursa buradaki kopya bayatlar; o yüzden
-o iş panelden önce yapılmalı.
 """
 
 P = "\n\n"  # paragraf ayracı (models.py → Translation'daki nota bak)
@@ -46,7 +47,9 @@ def seed(session: Session) -> bool:
     rows: list[object] = []
 
     # ── Ayarlar ─────────────────────────────────────────────────────────────
+    # Seçilen palet — docs/DESIGN.md § E
     rows.append(SiteSettings(id="settings", preset="tayf"))
+    # Sekme adı yalnızca isim (kullanıcı isteği, Oturum 3).
     rows += _t(
         "settings", "settings", "metaTitle",
         "Oğuz Han Duran",
@@ -61,8 +64,11 @@ def seed(session: Session) -> bool:
 
     # ── Profil ──────────────────────────────────────────────────────────────
     rows.append(Profile(id="profile", name="Oğuz Han Duran"))
+    # Oturum 3: "Full-stack" kullanıcıya fazla iddialı geldi.
     rows += _t("profile", "profile", "title", "Yazılım geliştirici", "Software developer")
     rows += _t("profile", "profile", "location", "İzmir", "İzmir, Türkiye")
+    # ⚠️ Girişte artık GÖSTERİLMİYOR (kullanıcı isteği, Oturum 2: "mottoyu
+    # kaldırmalıyız"). Alan sözleşmede (types.ts ↔ schemas.py) kaldığı için duruyor.
     rows += _t(
         "profile", "profile", "tagline",
         "E-postayla dönen işleri tek ekrana indiriyorum — arayüzünden veritabanına kadar.",
@@ -92,8 +98,12 @@ def seed(session: Session) -> bool:
     )
 
     # ── Yetenekler ──────────────────────────────────────────────────────────
-    # Oturum 15'te sadeleşti — gerekçe web/src/content/site.ts'te. İki kopya
-    # Faz 6'ya kadar elle eşit tutuluyor.
+    # Teknoloji adları çevrilmez — React her dilde React; açıklama `note`'a gider.
+    # trex-portfolio Oturum 15'te sadeleşti (~20 → 10): yalnızca projelerde ve
+    # deneyimde kanıtlanan teknolojiler. curious.page: "içerik > teknoloji listesi".
+    # Sıra bio'nun cümlesini izliyor: arayüz → servis → veri. Çıkanlar: C, Django,
+    # Node.js, Express, JavaScript (TypeScript kapsıyor), Flutter, SQLite, Redis,
+    # RabbitMQ, Git.
     skills = [
         ("frontend", ["React.js", "TypeScript", "Vue.js"], "Ön yüz", "Front end", None),
         ("backend", ["FastAPI", "Python", ".NET Core 8"], "Servis", "Back end", None),
@@ -140,6 +150,7 @@ def seed(session: Session) -> bool:
         rows += _t("link", lid, "label", label[0], label[1])
 
     # ── Projeler ────────────────────────────────────────────────────────────
+    # curious.page kuralı 2: 3-5 proje, bağlamıyla (problem, yığın, demo).
     projects = [
         (
             "proje-portali", "universite-proje-portali",
@@ -169,7 +180,7 @@ def seed(session: Session) -> bool:
             (P.join([
                 "Plaka bazlı giriş-çıkış kaydı, anlık doluluk görünümü ve süreye göre otomatik "
                 "ücretlendirme.",
-                ".NET Core 8 üzerinde kuruldu, veriler MSSQL'de tutuluyor.",
+                ".NET Core 8 üzerinde kuruldu, veriler MSSQL’de tutuluyor.",
             ]),
              P.join([
                 "Plate-based entry and exit records, live occupancy view, and automatic "

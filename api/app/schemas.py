@@ -5,8 +5,8 @@ from pydantic.alias_generators import to_camel
 ★ Bu dosya bir SÖZLEŞME.
 
 Buradaki şekil, ön yüzdeki `web/src/content/types.ts` → `RawSiteContent` ile
-BİREBİR aynı olmak zorunda. Faz 6'da `site.ts`'in yerini `content.json` alacak
-ve hiçbir bileşene dokunulmayacak — bu ancak şekiller örtüşürse mümkün.
+BİREBİR aynı olmak zorunda. Site mount'tan önce `content.json`'ı (bu şeklin
+dökümü, publish.py) çekip doğrudan kullanıyor — arada dönüştürme yok.
 
 Alan adları JavaScript tarafında camelCase (`metaTitle`), Python tarafında
 snake_case. `alias_generator` ikisini birbirine çeviriyor; `populate_by_name`

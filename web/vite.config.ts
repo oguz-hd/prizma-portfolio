@@ -1,40 +1,50 @@
 import { defineConfig, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 
-import { SITE } from './src/content/site'
+/**
+ * API'nin adresi — geliştirme sunucusu içeriği ve meta etiketlerini buradan alıyor.
+ * Docker'da compose veriyor (`http://api:8000`, docker-compose.dev.yml); yerelde
+ * API'nin dışarı açılan portu.
+ */
+const API_ORIGIN = process.env.API_ORIGIN ?? 'http://localhost:8001'
+
+/** index.html'de meta etiketlerinin yeri. */
+const META_MARKER = '<!--site-meta-->'
 
 /**
- * Paylaşım kartı ve arama sonucu etiketleri — İÇERİKTEN, build sırasında.
+ * Paylaşım kartı ve arama sonucu etiketleri — İÇERİKTEN, sunucu tarafında.
  *
  * Sosyal ağların ve arama motorlarının tarayıcıları JS çalıştırmaz: etiketler
- * statik HTML'de olmak zorunda. Metni elle index.html'e yazmak içeriği ikinci bir
- * yerde tutmak olurdu (CLAUDE.md kural 3) — o yüzden `site.ts`'ten basılıyor.
- * Varsayılan dil İngilizce (Oturum 3); dil değişince sekme başlığını App günceller.
+ * statik HTML'de olmak zorunda. İçerik ise artık build sırasında elde değil
+ * (Faz 6: tek kaynak veritabanı) — etiketleri API üretiyor (api/app/content.py
+ * → render_meta), sunucu HTML'e gömüyor:
  *
- * ⚠️ `og:image` henüz YOK: paylaşım görseli sitenin kendi ekran görüntüsü olacak,
- * tasarım oturunca çekilecek (`web/public/og.png`, 1200×630). Gelince buraya
- * og:image + boyutları eklenir ve kart `summary_large_image` olur. Alan adı
- * belli olunca adres mutlak olmalı — bazı platformlar göreli görseli okumaz.
+ *   build  → Caddy şablonu: yayın anında /data/meta.html okunur (Caddyfile →
+ *            templates). Panelden yapılan değişiklik yeniden build istemez.
+ *   dev    → API'den her istekte çekilir.
+ *
+ * ⚠️ Build çıktısını (`dist`) yalnızca bu projenin Caddyfile'ıyla sun: başka bir
+ * sunucu şablonu işlemez, `{{…}}` sayfaya düz metin olarak düşer.
  */
 function metaFromContent(): Plugin {
-  const esc = (v: string) =>
-    v.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
   return {
     name: 'meta-from-content',
-    transformIndexHtml(html) {
-      const title = esc(SITE.settings.metaTitle.en)
-      const desc = esc(SITE.settings.metaDescription.en)
-      const tags = [
-        `<title>${title}</title>`,
-        `<meta name="description" content="${desc}" />`,
-        `<meta property="og:type" content="website" />`,
-        `<meta property="og:title" content="${title}" />`,
-        `<meta property="og:description" content="${desc}" />`,
-        `<meta property="og:locale" content="en_US" />`,
-        `<meta property="og:locale:alternate" content="tr_TR" />`,
-        `<meta name="twitter:card" content="summary" />`,
-      ].join('\n    ')
-      return html.replace(/<title>[^<]*<\/title>/, tags)
+    async transformIndexHtml(html, ctx) {
+      if (!ctx.server) {
+        return html.replace(
+          META_MARKER,
+          '{{if fileExists "/data/meta.html"}}{{readFile "/data/meta.html"}}{{end}}',
+        )
+      }
+      try {
+        const res = await fetch(`${API_ORIGIN}/api/meta`)
+        if (!res.ok) throw new Error(`HTTP ${res.status}`)
+        return html.replace(META_MARKER, await res.text())
+      } catch (err) {
+        // API henüz açılmadıysa sayfa yine gelsin; sekme adını App zaten koyuyor.
+        ctx.server.config.logger.warn(`meta etiketleri alınamadı (${API_ORIGIN}): ${err}`)
+        return html
+      }
     },
   }
 }
@@ -46,6 +56,11 @@ export default defineConfig({
     host: true,
     port: 5174,
     strictPort: true,
+    // Yayındaki adresin aynısı: orada Caddy /data/content.json'ı sunuyor,
+    // burada API aynı içeriği canlı üretiyor (api/app/content.py → read_content).
+    proxy: {
+      '/content.json': { target: API_ORIGIN, rewrite: () => '/api/content' },
+    },
     watch: {
       // Windows'ta bind mount üzerinden dosya değişikliği bildirimleri konteynere
       // ulaşmıyor; yoklama olmadan HMR gelmez. Yerel geliştirmede boşuna CPU

@@ -8,8 +8,8 @@ tech, sıra) burada, yalnızca DÜZYAZI çeviri tablosunda. Aynı URL'yi iki dil
 tutmak kaymaya davetiye çıkarır — biri güncellenir, diğeri unutulur.
 
 Kimlikler `str` ve iş anlamı taşıyor ('projeler', 'otopark'), otomatik artan sayı
-değil. Sebebi: ön yüzdeki `site.ts` de aynı kimlikleri kullanıyor, `slug`lar URL'de
-görünüyor ve panelden içerik taşınırken kimliğin sabit kalması gerekiyor.
+değil. Sebebi: ön yüz bölümleri `slug`la eşliyor (web/src/App.tsx), `slug`lar
+URL'de görünüyor ve panelden içerik taşınırken kimliğin sabit kalması gerekiyor.
 """
 
 

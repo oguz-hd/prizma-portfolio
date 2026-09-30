@@ -2,8 +2,8 @@
 
 > trex-portfolio'dan taşındı (28.09.2026). Oradaki kararlar (07.09.2026, Oturum 3)
 > burada da geçerli: yığın, içerik modeli, API, "renkler veri", iki dillilik.
-> Ön yüzün prizma/slayt katmanı → `DESIGN.md`. Admin panel ve `content.json`
-> bağlantısı henüz yapılmadı (aşağıda "Faz 6/7/8" diye geçen işler).
+> Ön yüzün prizma/slayt katmanı → `DESIGN.md`. `content.json` bağlantısı Faz 6'da
+> (Oturum 5) yapıldı — § 3; admin panel (Faz 7) ve tema paneli (Faz 8) sırada.
 >
 > Site statik bir sayfa değil: **React ön yüz + admin panelli, içerik yönetilebilir bir uygulama.**
 
@@ -68,6 +68,21 @@ gitmek bu kuralı çiğner. Çözüm:
 
 **Kazanç:** Statik sitenin hızı + CMS'in esnekliği. Ziyaretçi tarafı veritabanını hiç görmez.
 Admin paneli çökse bile site ayakta kalır.
+
+### Uygulama (Faz 6, Oturum 5)
+
+| Parça | Nerede | Ne yapıyor |
+|---|---|---|
+| Yayın | `api/app/publish.py` | `/data/content.json` + `/data/meta.html`'i atomik yazar (geçici dosya → `os.replace`). API her açılışta çağırır; Faz 7'de her panel kaydından sonra |
+| Sunum | `Caddyfile` | `/content.json` veri volume'undan, `Cache-Control: no-cache` + ETag (değişmediyse 304) |
+| Okuma | `web/src/content/useContent.ts` → `loadContent()` | `main.tsx` mount'tan ÖNCE bekler; `useContent()` senkron kaldı, bileşenlere dokunulmadı. `index.html` dosyayı `<link rel="preload">` ile önden çeker — JS inerken içerik de iner |
+| Meta | `content.py` → `render_meta` | `<title>`, description, og:title/description içerikten. Tarayıcılar JS çalıştırmadığı için sunucu gömer: yayında Caddy şablonu (`index.html` → `readFile /data/meta.html`), geliştirmede Vite `/api/meta`'dan |
+| Geliştirme | `web/vite.config.ts` | `/content.json` → API'nin `/api/content`'i (aynı şekil, canlı) |
+
+**Yedek içerik yok** (kullanıcı kararı): `site.ts` silindi, tek kaynak veritabanı.
+`/content.json` gelmezse site mount edilmez, yerine "İçerik yüklenemedi" ekranı
+(`components/LoadError.tsx`). Güvensiz varsayılanlarla API açılmayı reddetse bile
+içeriği ÖNCE yayınlıyor — kapanan yalnızca panel, site ayakta.
 
 ---
 
@@ -152,7 +167,7 @@ Koşul (Faz 5): `translations(entity, entity_id, field, locale, value)` tablosu.
 
 ### ★ Arayüz metni ≠ içerik (karar: Oturum 9)
 
-`content/site.ts` → **içerik**, panelden düzenlenecek (Faz 7).
+Veritabanı (`/content.json`) → **içerik**, panelden düzenlenir (Faz 7). İlk hâli `api/app/seed.py`.
 `i18n/strings.ts` → **arayüz metni** ("Deneyim", "Bana yaz"), tasarımın parçası.
 
 Aynı ayrım `theme.css ↔ presets.ts`'te de var: **sabit sistem ↔ düzenlenebilir veri.**
@@ -169,7 +184,8 @@ ayrı kayıt değil, aynı kaydın iki dili.
 ## 6. API yüzeyi
 
 ```
-GET   /api/content              → tüm site, tek JSON (public, önbelleklenir)
+GET   /api/content              → tüm site, tek JSON (content.json'ın canlı hâli; ziyaretçi dosyayı okur)
+GET   /api/meta                 → meta.html'in canlı hâli (geliştirmede Vite index.html'e gömer)
 POST  /api/auth/login           → JWT
 GET   /api/auth/me
 
@@ -193,12 +209,12 @@ prizma-portfolio/
 │     ├─ deck/            slayt gösterisi, alt sayfalar (paginate), ray
 │     ├─ components/      üst çubuk, dil seçici, daire (Ring), altbilgi, yıldızlar
 │     ├─ sections/        slaytlar: Hero · About · Experience · Contact · 404
-│     ├─ content/         ★ içerik sözleşmesi (types.ts) + bugünkü kaynak (site.ts)
+│     ├─ content/         ★ içerik sözleşmesi (types.ts) + /content.json okuyucu (useContent)
 │     ├─ i18n/            arayüz metni + dil durumu
 │     ├─ theme/           token sistemi, ön ayarlar, fontlar
 │     ├─ lab/             token laboratuvarı (/?lab)
 │     └─ scramble.ts      harf çözülmesi (açılış + dil geçişi)
-├─ api/                   FastAPI + SQLite (içerik, çeviriler, tohum verisi)
+├─ api/                   FastAPI + SQLite (içerik, çeviriler, tohum verisi, yayın → content.json)
 └─ admin/                 (henüz yok) yönetim paneli — ayrı build
 ```
 

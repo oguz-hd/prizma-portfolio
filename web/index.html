@@ -34,7 +34,22 @@
     -->
     <link rel="icon" href="data:," />
 
-    <title>Oğuz Han Duran</title>
+    <!--
+      Sitenin içeriği (Faz 6: veritabanı → /content.json). main.tsx mount'tan önce
+      bunu bekliyor; önden çekilince JS inerken içerik de iner. `crossorigin`
+      fetch()'in varsayılanıyla eşleşsin diye — eşleşmezse iki kez indirilir.
+    -->
+    <link rel="preload" href="/content.json" as="fetch" crossorigin />
+
+    <!--
+      <title>, description, og:title, og:description içerikten: sunucu buraya
+      gömüyor (vite.config.ts → metaFromContent). İçerikten bağımsız olanlar sabit.
+    -->
+    <!--site-meta-->
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:locale:alternate" content="tr_TR" />
+    <meta name="twitter:card" content="summary" />
   </head>
   <body>
     <div id="root"></div>

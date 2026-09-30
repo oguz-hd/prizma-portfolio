@@ -45,8 +45,9 @@ docker exec prizma-portfolio-web-1 npm run build       # asıl derleme
 1. **Hiçbir renk CSS'e sabit yazılmaz.** Tek istisna `theme/presets.ts` (+ index.html zemin).
 2. **`accents` mor → kırmızı sıralı** (kısa dalga boyundan uzuna). Prizma tonları
    bu sırayla tayfa diziyor, ray slaytları bu sırayla renklendiriyor.
-3. **İçerik ≠ arayüz metni.** `content/site.ts` içerik; `i18n/strings.ts` arayüzün
-   dili. **Bileşende sabit metin yazma.** Tayfsal simgeler (Hα 656, 404 nm) metin değil.
+3. **İçerik ≠ arayüz metni.** İçerik veritabanında (`/content.json`, ilk hâli
+   `api/app/seed.py`); `i18n/strings.ts` arayüzün dili. **Bileşende sabit metin
+   yazma.** Tayfsal simgeler (Hα 656, 404 nm) metin değil.
 4. **`skills.items` çevrilmez** (React her dilde React). Açıklama gerekirse `note`.
 5. **Prizma içerikten bağımsız.** Bölüm adı bilmez; deck ona sıra numarası verir,
    açı ve renk `optics.ts`'teki sayılardan türer. Sahnenin her alanının tek sahibi
@@ -73,7 +74,7 @@ docker exec prizma-portfolio-web-1 npm run build       # asıl derleme
 13. **Prizma fareye bağlı DEĞİL** — hareketi kendi hâlinde (salınım + ışık darbeleri);
     mobilde de aynı görünmeli (kullanıcı kararı, Oturum 2).
 
-## Durum · 30.09.2026
+## Durum · 01.10.2026
 
 ✅ **v1** (Oturum 1) — iskele · taşınan katmanlar · prizma sahnesi · açılış ·
 slayt gösterisi · cam panel · ray · 404 nm · favicon · API kopyası.
@@ -100,13 +101,18 @@ kartların sol üstündeki tayf çizgisi kalktı · kod incelemesi düzeltmeleri
 artık hiç küçülmüyor; altbilgi/ipucu `usePlaceBelow` ile yayın altına) · temizlik
 (ölü CSS/kod) · GitHub'a yüklendi. → `DESIGN.md` § 12
 
-⏭ **Sırada: BACK-END** (kullanıcı kararı, 30.09.2026 — frontend'e ara verildi).
-Başlamadan önce kullanıcıya sor. Önerilen ilk adımlar:
-1. Site içeriği `site.ts` yerine API'den: `GET /api/content` → `setContent()`
-   (`content/useContent.ts`), ARCHITECTURE § 3. Sözleşme: `content/types.ts`.
-2. Mevcut SQLite volume'unda eski İletişim müsaitlik cümlesi hâlâ duruyor —
-   tohumlama (`seed.py`) yalnızca BOŞ veritabanında çalışıyor.
-3. Panelin karşılaması gereken yerleşim gereksinimleri → ARCHITECTURE § 8.
+✅ **Oturum 5 · Faz 6** (01.10.2026) — back-end başladı (kullanıcı kararı: Faz 6 →
+7a admin API → 7b admin paneli, her birinin sonunda dur). **Site içeriği artık
+veritabanından:** API `/data/content.json` + `meta.html` yazıyor (`publish.py`), site
+mount'tan önce onu çekiyor; `site.ts` silindi, **yedek içerik yok** (kullanıcı kararı) —
+gelmezse "İçerik yüklenemedi" ekranı. Meta etiketlerini yayında Caddy şablonu gömüyor.
+Dev volume sıfırlandı (eski müsaitlik cümlesi gitti). Prod'da boş `DOMAIN` Caddy'yi
+açtırmıyordu — düzeltildi. → ARCHITECTURE § 3 "Uygulama"
+
+⏭ **Sırada: Faz 7a · Admin API** — JWT korumalı `/api/admin/*` (ayarlar, profil,
+yetenekler, deneyim/eğitim, bağlantılar, bölümler; parola değiştirme), her yazmada
+`publish()`. Plan: `C:\Users\drn49\.claude\plans\hadi-back-and-e-hidden-puddle.md`.
+Panelin karşılaması gereken yerleşim gereksinimleri → ARCHITECTURE § 8.
 
 ❓ **Açık karar:** `sections/Projects.tsx` kullanılmıyor (Projeler slaytı Oturum 2'de
 kalktı; proje kayıtları içerikte duruyor). Silinsin mi? Kullanıcıya soruldu, yanıt yok.
@@ -121,26 +127,31 @@ ayar + seçici; theme.css renk kodu içermediği için bileşenlere dokunulmaz.
 yeniden düşünülmeli.
 
 Telefonda deneme: trycloudflare hızlı tüneli (`prizma-tunel` + `prizma-yayin-web`,
-`prizma-yayin` ağı) `web/dist`'i sunuyor — adres her başlatmada değişir, bilgisayar
-uyuyunca kopar. Kurulum/yeniden başlatma → `docs/CALISTIRMA.md` "Telefonda deneme".
+`prizma-yayin` ağı). Faz 6'dan beri `web/dist` değil, **yayın imajı** + Caddyfile +
+dev'in veri volume'u sunuluyor (meta şablonu ve content.json için) — adres her
+başlatmada değişir, bilgisayar uyuyunca kopar. → `docs/CALISTIRMA.md` "Telefonda deneme".
 Kalıcı yayın için Cloudflare Pages önerildi, hesap gerekir.
 
 🛑 **Bir sonraki faza kendiliğinden geçme — önce sor.** Kullanıcı her faz sonunda
 durmak istiyor.
 
 ### Ertelenenler
-- OG görseli (`web/public/og.png`, 1200×630) — tasarım oturunca çekilecek; `vite.config.ts`'e eklenecek
-- Admin panel, `content.json` bağlantısı (trex-portfolio'nun Faz 6-8'i) — aynı sözleşme
+- OG görseli (`web/public/og.png`, 1200×630) — tasarım oturunca çekilecek; `index.html`'e eklenecek (not: `api/app/content.py` → `render_meta`)
+- Tema paneli (Faz 8): kontrast doğrulama, ince ayar, canlı önizleme — ARCHITECTURE § 4
+- Görsel yükleme — içerikte görsel alanı yok, gerekince
 - Proje `repoUrl`/`liveUrl` alanları boş — kullanıcı söyleyecek
 
 ## İçerik nereden geliyor
 
 ```
-BUGÜN    web/src/content/site.ts ──> useContent() ──> sections/*
-SONRA    api (SQLite) ──> GET /api/content ──> content.json ──> useContent()
+api (SQLite) ──publish.py──> /data/content.json ──Caddy──> loadContent() ──> useContent() ──> sections/*
+                        └──> /data/meta.html   ──Caddy şablonu──> index.html <head>
+geliştirmede: Vite /content.json → API /api/content (canlı, aynı şekil)
 ```
-**`content/types.ts` sözleşmedir** — API'nin döndürdüğü şekil ile birebir aynı.
-İkinci kopya: `api/app/seed.py` (içerik değişirse ikisi de).
+**`content/types.ts` sözleşmedir** — `api/app/schemas.py` ile birebir aynı şekil.
+İçeriğin ilk hâli `api/app/seed.py` (yalnızca BOŞ veritabanını doldurur); sonrası
+panelden (Faz 7). Panel gelene kadar metin değiştirmek: `seed.py` + dev volume'u
+sıfırla (`down -v`, CALISTIRMA "Temiz başlangıç").
 
 ## Şunu yaparken şunu oku
 

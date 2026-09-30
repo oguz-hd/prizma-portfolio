@@ -35,3 +35,11 @@ navbar'daki üçgenin yerine akan tayflı "INTRO" geldi. İletişim girişin dai
 (ortak `Ring.tsx`); kod incelemesi o dairenin kısa ekranda küçülüp çöktüğünü buldu, düzeltildi.
 Ardından ölü CSS/kod temizlendi ve proje GitHub'a (özel depo) yüklendi. Frontend'e ara verildi;
 sırada back-end (kullanıcı kararı).
+
+**Oturum 5 · Faz 6: içerik veritabanından (01.10.2026).** Back-end üç durağa bölündü (6 →
+7a admin API → 7b panel). Site artık içeriği API'nin yazdığı `/content.json`'dan alıyor;
+kullanıcı yedek istemedi, `site.ts` silindi (silmeden önce tohum verisiyle alan alan
+karşılaştırıldı — tek fark bir kesme işaretiydi). Tarayıcılar JS çalıştırmadığı için meta
+etiketlerini artık Caddy şablonu gömüyor. Prod denemesi, boş `DOMAIN`'in Caddy'yi hiç
+açtırmadığını ortaya çıkardı (baştan beri bozukmuş); `down -v` de eski bir imajın
+TypeScript'siz `node_modules`ünü geri getirdi — ikisi de düzeltildi, CALISTIRMA'da.

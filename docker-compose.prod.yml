@@ -16,8 +16,11 @@ services:
       - '80:80'
       - '443:443'
     environment:
-      DOMAIN: ${DOMAIN:-}
-      ADMIN_EMAIL: ${ADMIN_EMAIL:-}
+      # ⚠️ Varsayılanlar BURADA olmalı: `${X:-}` değişkeni boş string olarak
+      # geçirir, Caddy'nin `{$X:varsayılan}`ı ise yalnızca hiç tanımlı olmayanda
+      # devreye girer. Boş DOMAIN → anahtarsız site bloğu → Caddy açılmaz.
+      DOMAIN: ${DOMAIN:-:80}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@localhost}
     volumes:
       # Caddyfile bağlanıyor, imaja gömülmüyor → yayın ayarı değişince
       # yeniden build gerekmiyor, `restart` yetiyor.

@@ -1,6 +1,8 @@
 import json
+from html import escape
 
 from fastapi import APIRouter
+from fastapi.responses import HTMLResponse
 from sqlmodel import Session, select
 
 from app.db import SessionDep
@@ -168,15 +170,54 @@ def build_content(session: Session) -> SiteContentOut:
     )
 
 
+def render_meta(content: SiteContentOut) -> str:
+    """
+    Paylaşım kartı ve arama sonucu etiketleri — içerikten.
+
+    Sosyal ağların ve arama motorlarının tarayıcıları JS çalıştırmaz: etiketler
+    statik HTML'de olmak zorunda. Yayında Caddy bunu index.html'e gömüyor
+    (`meta.html`, Caddyfile → templates); geliştirmede Vite `/api/meta`'dan çekiyor
+    (web/vite.config.ts). İçerikten bağımsız etiketler (og:type, og:locale)
+    index.html'de sabit.
+
+    ⚠️ `og:image` henüz YOK: paylaşım görseli sitenin kendi ekran görüntüsü olacak,
+    tasarım oturunca çekilecek (`web/public/og.png`, 1200×630). Gelince index.html'e
+    og:image + boyutları eklenir ve kart `summary_large_image` olur. Alan adı belli
+    olunca adres mutlak olmalı — bazı platformlar göreli görseli okumaz.
+    """
+    # Site İngilizce açılır (web/src/i18n/types.ts → DEFAULT_LOCALE, Oturum 3);
+    # kart da o dilde. Dil değişince sekme başlığını App güncelliyor.
+    title = escape(content.settings.meta_title.en)
+    desc = escape(content.settings.meta_description.en)
+    # index.html'deki yerinin girintisiyle (4 boşluk) — kaynak görünümü düzgün kalsın.
+    return "\n    ".join(
+        [
+            f"<title>{title}</title>",
+            f'<meta name="description" content="{desc}" />',
+            f'<meta property="og:title" content="{title}" />',
+            f'<meta property="og:description" content="{desc}" />',
+        ]
+    )
+
+
 router = APIRouter(prefix="/api", tags=["content"])
 
 
-@router.get("/content")
+# response_model_exclude_none: opsiyonel alanlar (`note`, `navLabel`) yoksa hiç
+# yazılmıyor — content.json ile birebir aynı şekil (publish.py).
+@router.get("/content", response_model_exclude_none=True)
 def read_content(session: SessionDep) -> SiteContentOut:
     """
-    Tüm site içeriği, tek JSON.
+    Tüm site içeriği, tek JSON — `/data/content.json`'ın canlı hâli.
 
-    Public ve önbelleklenebilir. Ziyaretçi tarafı veritabanını hiç görmez —
-    Faz 6'da ön yüz yalnızca bunu çekecek (docs/ARCHITECTURE.md § 3).
+    Yayında ziyaretçi bunu değil, Caddy'nin sunduğu dosyayı okuyor (veritabanı
+    sorgusu yok, docs/ARCHITECTURE.md § 3). Geliştirmede Vite `/content.json`'ı
+    buraya yönlendiriyor (web/vite.config.ts).
     """
     return build_content(session)
+
+
+@router.get("/meta", response_class=HTMLResponse)
+def read_meta(session: SessionDep) -> str:
+    """`/data/meta.html`'in canlı hâli — geliştirmede Vite index.html'e gömüyor."""
+    return render_meta(build_content(session))

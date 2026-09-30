@@ -17,6 +17,10 @@ services:
       # konteynere ulaşmıyor; yoklama olmadan HMR gelmez.
       # vite.config.ts bu değişkeni okuyor — yerel `npm run dev`de boşuna CPU yakmasın diye.
       VITE_USE_POLLING: '1'
+      # İçerik (/content.json) ve meta etiketleri API'den (vite.config.ts).
+      API_ORIGIN: http://api:8000
+    depends_on:
+      - api
     volumes:
       # Kaynak kod host'tan bağlanıyor → kaydet, konteyner görsün.
       - ./web:/app

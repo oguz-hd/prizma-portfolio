@@ -1295,3 +1295,26 @@ html[data-intro='pending'] :is([data-reveal], [data-reveal-panel], [data-reveal-
 .not-found-home {
   margin-top: var(--space-6);
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   İçerik yüklenemedi — /content.json gelmedi (components/LoadError.tsx)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.load-error {
+  min-height: 100dvh;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: var(--space-6);
+  padding-inline: var(--gutter);
+  color: var(--ink-dim);
+  text-align: center;
+}
+
+/* .hero-link'in görünümü, düğmenin tarayıcı süslerinden arındırılmış hâli. */
+.load-error button {
+  background: none;
+  border-width: 0 0 1px;
+  padding: 0 0 var(--space-1);
+  cursor: pointer;
+}

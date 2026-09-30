@@ -11,11 +11,20 @@
 	root * /srv
 	encode zstd gzip
 
+	# API — yönetim paneli (Faz 7) ve sağlık kontrolü. Ziyaretçi sitesi API'ye
+	# hiç gitmez; içeriği aşağıdaki dosyadan okur.
+	handle /api/* {
+		reverse_proxy api:8000
+	}
+
 	# ★ İçerik paylaşılan volume'dan okunuyor, imajın içinden değil.
-	# Faz 6'da API buraya yazacak; site yalnızca bu dosyayı çekecek —
-	# veritabanı sorgusu yok, statik site hızı (docs/ARCHITECTURE.md § 3).
+	# API her değişiklikte buraya yazıyor (api/app/publish.py); site yalnızca bu
+	# dosyayı çekiyor — veritabanı sorgusu yok, statik site hızı (docs/ARCHITECTURE.md § 3).
 	handle /content.json {
 		root * /srv/data
+		# Her açılışta doğrulansın (ETag → değişmediyse 304): panelden gelen
+		# değişiklik bir sonraki açılışta görünür, eski kopya takılı kalmaz.
+		header Cache-Control "no-cache"
 		file_server
 	}
 
@@ -35,6 +44,9 @@
 	# SPA yönlendirmesi: bilinmeyen yollar index.html'e düşer.
 	# Faz 4'teki proje detay sayfaları (/proje/otopark-yonetim-sistemi) buna dayanacak.
 	handle {
+		# ★ Meta etiketleri (<title>, og:*) yayın anında içerikten: index.html'deki
+		# şablon /data/meta.html'i okuyor (web/vite.config.ts → metaFromContent).
+		templates @html
 		try_files {path} /index.html
 		file_server
 	}
