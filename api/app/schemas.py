@@ -1,5 +1,10 @@
-from pydantic import BaseModel, ConfigDict
+import re
+from typing import Annotated, Literal
+
+from pydantic import AfterValidator, BaseModel, ConfigDict, Field, StringConstraints
 from pydantic.alias_generators import to_camel
+
+from app.config import INSECURE_DEFAULT_PASSWORD
 
 """
 ★ Bu dosya bir SÖZLEŞME.
@@ -32,8 +37,13 @@ class LocalizedList(CamelModel):
     en: list[str] = []
 
 
+#: Tema ön ayarları — web/src/theme/types.ts → `PresetId` ile aynı liste. Renkler
+#: ön yüzde (presets.ts); veritabanı yalnızca hangisinin seçili olduğunu tutuyor.
+PresetId = Literal["aurora", "tayf", "yildiz", "turbo"]
+
+
 class SiteSettingsOut(CamelModel):
-    preset: str
+    preset: PresetId
     meta_title: LocalizedText
     meta_description: LocalizedText
 
@@ -107,12 +117,176 @@ class SiteContentOut(CamelModel):
     sections: list[SectionOut]
 
 
+# ── Yönetim girdileri (Faz 7, admin.py) ──────────────────────────────────────
+#
+# Girdi = çıktının şekli: panel aynı kaydın iki dilini yan yana düzenliyor
+# (docs/ARCHITECTURE.md § 5). Kimlik (`id`) ve sıra (`order`) yalnızca oluştururken
+# / sıralarken verilir; güncellemede adresten gelir.
+#
+# Doğrulamanın ölçüsü sitenin kendisi: yarım çevrilmiş bir alan, dil değişince
+# sitede boş bir satır demek — o yüzden iki dil birlikte dolu ya da birlikte boş.
+
+
+def _required(v: LocalizedText) -> LocalizedText:
+    v = LocalizedText(tr=v.tr.strip(), en=v.en.strip())
+    if not v.tr or not v.en:
+        raise ValueError("iki dil de doldurulmalı (tr, en)")
+    return v
+
+
+def _optional(v: LocalizedText | None) -> LocalizedText | None:
+    """Opsiyonel alan (`note`, `navLabel`): iki dil de boşsa alan hiç yok."""
+    if v is None:
+        return None
+    v = LocalizedText(tr=v.tr.strip(), en=v.en.strip())
+    if not v.tr and not v.en:
+        return None
+    if not v.tr or not v.en:
+        raise ValueError("ya iki dil de doldurulmalı ya da ikisi de boş bırakılmalı")
+    return v
+
+
+def _split(paragraphs: list[str]) -> list[str]:
+    """
+    Boş satır paragraf ayracı (models.py → Translation): bir paragrafın içindeki
+    boş satır, okunurken zaten iki paragraf olurdu — saklamadan önce ayrılıyor.
+    """
+    return [p.strip() for chunk in paragraphs for p in re.split(r"\n\s*\n", chunk) if p.strip()]
+
+
+def _paragraphs(v: LocalizedList) -> LocalizedList:
+    v = LocalizedList(tr=_split(v.tr), en=_split(v.en))
+    if bool(v.tr) != bool(v.en):
+        raise ValueError("ya iki dil de doldurulmalı ya da ikisi de boş bırakılmalı")
+    return v
+
+
+def _required_paragraphs(v: LocalizedList) -> LocalizedList:
+    v = _paragraphs(v)
+    if not v.tr:
+        raise ValueError("iki dil de doldurulmalı (tr, en)")
+    return v
+
+
+def _not_reserved(v: str) -> str:
+    # `PUT /api/admin/{kaynak}/order` sıralama adresi; bu kimlikli bir kayıt
+    # hiç güncellenemezdi (admin.py'de sıralama yolu önce tanımlı).
+    if v == "order":
+        raise ValueError("'order' ayrılmış bir ad")
+    return v
+
+
+def _safe_href(v: str) -> str:
+    # `javascript:` gibi şemalar bağlantıyı koda çevirir — yalnızca bilinenler.
+    if not re.fullmatch(r"(https?://|mailto:)\S+", v):
+        raise ValueError("bağlantı https://, http:// ya da mailto: ile başlamalı, boşluk içermemeli")
+    return v
+
+
+RequiredText = Annotated[LocalizedText, AfterValidator(_required)]
+OptionalText = Annotated[LocalizedText | None, AfterValidator(_optional)]
+Paragraphs = Annotated[LocalizedList, AfterValidator(_paragraphs)]
+RequiredParagraphs = Annotated[LocalizedList, AfterValidator(_required_paragraphs)]
+NonEmpty = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)]
+
+#: Kayıt kimliği: küçük harf, rakam, tire ('lion-staj'). Adreste ve ön yüzde anahtar.
+Slug = Annotated[
+    str,
+    StringConstraints(pattern=r"^[a-z0-9]+(?:-[a-z0-9]+)*$", max_length=64),
+    AfterValidator(_not_reserved),
+]
+Href = Annotated[str, StringConstraints(strip_whitespace=True), AfterValidator(_safe_href)]
+
+#: Deneyim ve eğitim aynı tablo (models.py → Milestone), `kind` ayırıyor.
+MilestoneKind = Literal["experience", "education"]
+
+
+class SettingsIn(CamelModel):
+    # Yalnızca listedeki ön ayarlar — serbest renk yok (docs/ARCHITECTURE.md § 4).
+    preset: PresetId
+    meta_title: RequiredText
+    meta_description: RequiredText
+
+
+class ProfileIn(CamelModel):
+    name: NonEmpty
+    title: RequiredText
+    location: RequiredText
+    # Sitede gösterilmiyor (Oturum 2) ama sözleşmede — olduğu gibi geri gönderilir.
+    tagline: LocalizedText
+    bio: RequiredParagraphs
+
+
+class SkillGroupIn(CamelModel):
+    group: RequiredText
+    # Teknoloji adları çevrilmez (React her dilde React); açıklama `note`'a.
+    items: Annotated[list[NonEmpty], Field(min_length=1)]
+    note: OptionalText = None
+
+
+class SkillGroupCreate(SkillGroupIn):
+    id: Slug
+
+
+class MilestoneIn(CamelModel):
+    org: NonEmpty
+    role: RequiredText
+    # Serbest metin, çevrilmez ('2025 — 2026', '05.2026'); boş olabilir.
+    period: Annotated[str, StringConstraints(strip_whitespace=True)] = ""
+    note: OptionalText = None
+
+
+class MilestoneCreate(MilestoneIn):
+    id: Slug
+    kind: MilestoneKind
+
+
+class LinkIn(CamelModel):
+    label: RequiredText
+    href: Href
+    icon: str = ""
+
+
+class LinkCreate(LinkIn):
+    id: Slug
+
+
+class SectionIn(CamelModel):
+    """Bölümler yalnızca düzenlenir: slug ↔ bileşen eşlemesi kodda (web/src/App.tsx)."""
+
+    heading: RequiredText
+    nav_label: OptionalText = None
+    body: Paragraphs = LocalizedList()
+
+
+class OrderIn(CamelModel):
+    """Yeni sıra: kayıtların TAMAMI, birer kez, istenen sırayla."""
+
+    ids: list[str]
+
+
+class MilestoneOrderIn(OrderIn):
+    kind: MilestoneKind
+
+
 # ── Kimlik doğrulama ────────────────────────────────────────────────────────
 
 
 class LoginIn(CamelModel):
     email: str
     password: str
+
+
+def _not_default(v: str) -> str:
+    # Varsayılan parolayı kabul eden hesapla API üretimde açılmıyor (main.py).
+    if v == INSECURE_DEFAULT_PASSWORD:
+        raise ValueError("varsayılan parola kullanılamaz")
+    return v
+
+
+class PasswordChangeIn(CamelModel):
+    current_password: str
+    new_password: Annotated[str, Field(min_length=10), AfterValidator(_not_default)]
 
 
 class TokenOut(CamelModel):

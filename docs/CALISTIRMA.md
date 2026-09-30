@@ -78,6 +78,23 @@ docker compose -f docker-compose.yml -f docker-compose.dev.yml down
 
 Kaydettiğinde tarayıcı yenilenmiyorsa ilk bakılacak yer bu değişken.
 
+### Yönetim API'sini denemek (Swagger)
+
+**http://localhost:8001/docs** — dev hesabı `admin@localhost` / `degistir`.
+
+1. `POST /api/auth/login` → *Try it out* → gövde
+   `{"email": "admin@localhost", "password": "degistir"}` → *Execute*
+2. Yanıttaki `accessToken`'ı kopyala → sağ üstte **Authorize** → yapıştır (başına
+   `Bearer` yazma) → *Authorize*. Kilitli uç noktalar artık açık.
+3. Bir kaydın güncel hâli için `GET /api/content`; gövdeyi oradan kopyalayıp değiştir.
+   Swagger'ın örnek gövdesindeki boş metinler **422** verir — doğrulama böyle
+   (iki dil birlikte dolu olmalı).
+
+⚠️ Yazmalar GERÇEK: veritabanı ve `content.json` anında değişir, site yenilenince
+görünür. Geri dönmek için aynı uç noktayla eski değeri yaz ya da dev verisini
+sıfırla ("Temiz başlangıç"). `PUT /api/auth/password` dev parolasını da değiştirir —
+`degistir`e API'den geri dönülemez (bilerek); dönmek için veritabanını sıfırla.
+
 ---
 
 ## Yayın (prod)
@@ -100,7 +117,9 @@ başlarken hata verip kapanır. Site (Caddy) etkilenmez, yalnızca API.
 tohumlama yalnızca boş veritabanında çalışır. Dev ve prod aynı `data` volume'unu
 paylaşıyor — dev'de `degistir` ile kurulan hesap prod'a da taşınır. Çözüm
 veritabanını sıfırlamak (aşağıdaki "Temiz başlangıç", **veri siler**) ya da
-Faz 7'deki panelden parolayı değiştirmek.
+parolayı **dev'de** değiştirmek (`PUT /api/auth/password`, Faz 7'de panelden de):
+prod API bu hesapla hiç açılmadığı için parola prod'dan değiştirilemez, ama
+volume ortak olduğundan dev'de değişen parola prod'da da geçerli.
 
 ---
 

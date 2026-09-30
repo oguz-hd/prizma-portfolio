@@ -109,9 +109,14 @@ gelmezse "İçerik yüklenemedi" ekranı. Meta etiketlerini yayında Caddy şabl
 Dev volume sıfırlandı (eski müsaitlik cümlesi gitti). Prod'da boş `DOMAIN` Caddy'yi
 açtırmıyordu — düzeltildi. → ARCHITECTURE § 3 "Uygulama"
 
-⏭ **Sırada: Faz 7a · Admin API** — JWT korumalı `/api/admin/*` (ayarlar, profil,
-yetenekler, deneyim/eğitim, bağlantılar, bölümler; parola değiştirme), her yazmada
-`publish()`. Plan: `C:\Users\drn49\.claude\plans\hadi-back-and-e-hidden-puddle.md`.
+✅ **Oturum 5 · Faz 7a** — yönetim API'si (`api/app/admin.py`): ayarlar, profil,
+yetenekler, deneyim/eğitim (`milestones`), bağlantılar, bölümler (yalnızca düzenleme
++ sıra), parola değiştirme (eski oturumlar düşer). Her yazma → `publish()`. Uçtan uca
+83 kontrol geçti. Swagger ile denemek → CALISTIRMA. Kararlar → ARCHITECTURE § 6.
+
+⏭ **Sırada: Faz 7b · Admin paneli** — `admin/` ayrı build (5175), `@site` alias'ıyla
+`types.ts` + `presets.ts` doğrudan; TR/EN yan yana formlar. Plan:
+`C:\Users\drn49\.claude\plans\hadi-back-and-e-hidden-puddle.md`.
 Panelin karşılaması gereken yerleşim gereksinimleri → ARCHITECTURE § 8.
 
 ❓ **Açık karar:** `sections/Projects.tsx` kullanılmıyor (Projeler slaytı Oturum 2'de

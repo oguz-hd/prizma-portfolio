@@ -43,3 +43,7 @@ karşılaştırıldı — tek fark bir kesme işaretiydi). Tarayıcılar JS çal
 etiketlerini artık Caddy şablonu gömüyor. Prod denemesi, boş `DOMAIN`'in Caddy'yi hiç
 açtırmadığını ortaya çıkardı (baştan beri bozukmuş); `down -v` de eski bir imajın
 TypeScript'siz `node_modules`ünü geri getirdi — ikisi de düzeltildi, CALISTIRMA'da.
+Ardından Faz 7a: yönetim API'si. Girdi çıktının şekliyle aynı (iki dil yan yana), yarım
+çevrilmiş alan reddediliyor; parola değişince token'daki parola izi eski oturumları
+düşürüyor. Uçtan uca bir betik her uç noktayı hatalı ve doğru girdiyle denedi, sonunda
+içeriği başlangıçtakiyle birebir karşılaştırdı (83/83).

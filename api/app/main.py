@@ -5,7 +5,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from sqlmodel import Session, select
 
-from app import auth, content
+from app import admin, auth, content
 from app.auth import verify_password
 from app.config import INSECURE_DEFAULT_PASSWORD, INSECURE_DEFAULT_SECRET, get_settings
 from app.db import engine, init_db
@@ -67,6 +67,7 @@ app = FastAPI(
 
 app.include_router(content.router)
 app.include_router(auth.router)
+app.include_router(admin.router)
 
 
 @app.get("/api/health", tags=["meta"])

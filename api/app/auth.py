@@ -1,3 +1,4 @@
+import hashlib
 from datetime import UTC, datetime, timedelta
 from typing import Annotated
 
@@ -10,7 +11,7 @@ from sqlmodel import select
 from app.config import get_settings
 from app.db import SessionDep
 from app.models import AdminUser
-from app.schemas import AdminOut, LoginIn, TokenOut
+from app.schemas import AdminOut, LoginIn, PasswordChangeIn, TokenOut
 
 """
 Tek admin kullanıcı, JWT ile giriş (docs/ARCHITECTURE.md § 2).
@@ -36,10 +37,20 @@ def verify_password(raw: str, hashed: str) -> bool:
     return password_hash.verify(raw, hashed)
 
 
-def create_access_token(subject: str) -> str:
+def _password_mark(password_hash: str) -> str:
+    """
+    Token'ın taşıdığı parola izi: parola değişince o ana kadar verilen bütün
+    token'lar geçersiz olsun (parola çalındıysa değiştirmek içerideki oturumu da
+    düşürmeli). İz hash'ten türüyor — şemaya sütun eklemek gerekmiyor; argon2 her
+    hash'e yeni tuz kattığı için aynı parola yeniden verilse bile iz değişir.
+    """
+    return hashlib.sha256(password_hash.encode()).hexdigest()[:16]
+
+
+def create_access_token(user: AdminUser) -> str:
     expires = datetime.now(UTC) + timedelta(minutes=settings.access_token_ttl_minutes)
     return jwt.encode(
-        {"sub": subject, "exp": expires},
+        {"sub": user.email, "pwd": _password_mark(user.password_hash), "exp": expires},
         settings.jwt_secret,
         algorithm=settings.jwt_algorithm,
     )
@@ -71,7 +82,7 @@ def get_current_admin(
         raise unauthorized
 
     user = session.exec(select(AdminUser).where(AdminUser.email == email)).first()
-    if user is None:
+    if user is None or payload.get("pwd") != _password_mark(user.password_hash):
         raise unauthorized
     return user
 
@@ -96,9 +107,30 @@ def login(data: LoginIn, session: SessionDep) -> TokenOut:
             detail="E-posta ya da parola hatalı",
         )
 
-    return TokenOut(access_token=create_access_token(user.email))
+    return TokenOut(access_token=create_access_token(user))
 
 
 @router.get("/me")
 def read_me(admin: CurrentAdminDep) -> AdminOut:
     return AdminOut(id=admin.id or 0, email=admin.email)
+
+
+@router.put("/password")
+def change_password(
+    data: PasswordChangeIn, admin: CurrentAdminDep, session: SessionDep
+) -> TokenOut:
+    """
+    Parolayı değiştirir ve YENİ bir token döndürür: eski token'lar — bu isteği
+    yapan dahil — parola iziyle birlikte geçersiz oluyor (`_password_mark`).
+
+    ⚠️ `.env`'deki ADMIN_PASSWORD'u değiştirmek hesabı değiştirmez (tohumlama
+    yalnızca boş veritabanında çalışır) — parola buradan değişir.
+    """
+    if not verify_password(data.current_password, admin.password_hash):
+        # 401 değil: oturum geçerli, yanlış olan formdaki parola. 401 panelde
+        # "oturum düştü" diye girişe atardı.
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Mevcut parola hatalı")
+    admin.password_hash = hash_password(data.new_password)
+    session.add(admin)
+    session.commit()
+    return TokenOut(access_token=create_access_token(admin))

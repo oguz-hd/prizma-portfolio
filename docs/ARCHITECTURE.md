@@ -188,15 +188,35 @@ GET   /api/content              → tüm site, tek JSON (content.json'ın canlı
 GET   /api/meta                 → meta.html'in canlı hâli (geliştirmede Vite index.html'e gömer)
 POST  /api/auth/login           → JWT
 GET   /api/auth/me
+PUT   /api/auth/password        → parola değiştir; YENİ token döner, eskiler geçersiz
 
-GET   /api/admin/{kaynak}       ┐
-POST  /api/admin/{kaynak}       │ kimlik doğrulama gerektirir
-PATCH /api/admin/{kaynak}/{id}  │
-DEL   /api/admin/{kaynak}/{id}  ┘
+── Yönetim (Faz 7a, api/app/admin.py) — hepsi JWT ister, yazmalar 204 ──
+PUT   /api/admin/settings                  preset (listeden) + metaTitle/metaDescription
+PUT   /api/admin/profile                   name, title, location, tagline, bio
+POST  /api/admin/{skills|milestones|links}              oluştur (id: slug; varsa 409)
+PUT   /api/admin/{skills|milestones|links|sections}/order   yeni sıra (kayıtların tamamı)
+PUT   /api/admin/{skills|milestones|links|sections}/{id}    güncelle
+DEL   /api/admin/{skills|milestones|links}/{id}             sil (çevirileriyle)
 
-POST  /api/admin/media          → görsel yükleme
-POST  /api/admin/theme/validate → kontrast kontrolü (kaydetmeden önce)
+── Sonra ──
+POST  /api/admin/media          → görsel yükleme (içerikte görsel alanı olunca)
+POST  /api/admin/theme/validate → kontrast kontrolü (Faz 8)
 ```
+
+**Faz 7a kararları:**
+- **Okuma ayrı değil:** panel `GET /api/content`'i kullanıyor (aynı veri, aynı şekil).
+  Yazmalar gövdesiz 204 döner; panel kaydettikten sonra içeriği yeniden çeker.
+- **Girdi = çıktının şekli:** çevrilen alanlar `{tr, en}` — aynı kaydın iki dili
+  yan yana (§ 5). Doğrulama sitenin kendisine göre: yarım çevrilmiş alan dil
+  değişince boş satır demek, o yüzden iki dil **birlikte dolu ya da birlikte boş**
+  (opsiyonel alan boşsa hiç yazılmaz). Bağlantılar yalnızca `https`/`http`/`mailto`.
+- **Deneyim ve eğitim tek kaynak** (`milestones`, gövdede `kind`) — tablo da tek.
+  Tür sonradan değişmez (sil + oluştur).
+- **Bölümler** yalnızca düzenlenir ve sıralanır; oluşturma/silme yok (bölüm ↔ bileşen
+  eşlemesi kodda, § 8). **Projeler** panelde yok — slayt kalktı (kural 12).
+- **Parola değişince bütün oturumlar düşer:** token, parola hash'inden türeyen bir
+  iz taşıyor (`auth.py` → `_password_mark`); şemaya sütun eklemeden. Varsayılan
+  parola (`degistir`) ve 10 karakterden kısası kabul edilmiyor.
 
 ## 7. Klasör düzeni (30.09.2026)
 
