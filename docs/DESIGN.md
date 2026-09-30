@@ -181,3 +181,29 @@ Oturumdan önce de var olan iki çakışma (ölçüm geniş çıktı, yalnız 10
   ekranın dibine sabit değil, Hero.tsx bağlantı yayının `getBBox()`'ından 16 px altına
   koyuyor; sığmazsa önce hareketli çizgi kalkıyor (`is-compact`), o da sığmazsa gizleniyor.
 İkisi de ölçüme dayalı — içerik panelden değişse de çalışır (→ ARCHITECTURE § 8).
+
+## 12. Oturum 4 — sığmayan slayt alt sayfalara bölünüyor (A1)
+
+Telefonda taşan slaytın içi kayıyordu; bir sonraki slayta geçmek için iki kez
+kaydırmak gerekiyordu. iPhone SE'de (375×553 görünür) Hakkımda 268 px taşıyordu —
+yazı küçültmekle kapanacak fark değil. Seçenekler bir örnek sayfasında gösterildi
+(https://claude.ai/artifact/H68nPe34Qt5XwJ5ZF8ctao); kullanıcı **A1**'i seçti.
+
+- **Bölme ölçerek** (`deck/paginate.ts`): `data-page-unit` birimleri (bio paragrafı,
+  yetenek grubu, zaman çizelgesi maddesi, bölüm giriş paragrafı) sırayla eklenir,
+  slayt taşınca yeni sayfa başlar. Sığan slayta dokunulmaz. Pencere, font, dil ya da
+  metin değişince yeniden bölünür; okuyucu aynı birimde kalır.
+- **Her hareket bir adım**: önce slaytın sonraki sayfası, sonra sonraki slayt
+  (tekerlek, dokunma, klavye). Sayfa geçişi slayt geçişinin aynısı; geri gelinen
+  slayt son sayfasından açılır.
+- **A1 görünümü**: başlık her sayfada kalır, ilk sayfadan sonra küçülür (22 px);
+  bölüm numarasının yanında sayaç ("01 2/3"); bölünen slayt tek sütun; rayda etkin
+  slaytın altında her sayfa için kısa çizgi (`useSlidePages`).
+- **İletişim bölünmüyor** (kapanış karesi, prizma ortada, üst/alt sıralar eşit):
+  kısa telefonda boşluklar daralıyor (≤ 760 / ≤ 620 px yükseklik); SE'de başlık 22 px
+  ve bölüm numarası gizli. Üstten kazanılan her piksel iki kat sayıyor — alt sıra aynalıyor.
+
+Ölçüm: SE'de Hakkımda ve Deneyim 3'er, iPhone 11'de 2'şer sayfa, 1280×720'de
+Hakkımda 2. Dokunmayla ileri-geri `ust → hakkimda 1/3 … 3/3 → deneyim 1/3 … 3/3 →
+iletisim` ve geri aynı sırayla. İletişim 6 telefon boyutu × 2 dilde taşmıyor
+(320×568 EN'de 2 px, SLACK altında), metin prizmadan ≥ 7 px uzakta.

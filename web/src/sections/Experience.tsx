@@ -33,7 +33,7 @@ function Timeline({ label, items }: { label: string; items: Milestone[] }) {
       <p className="label">{label}</p>
       <ul className="timeline">
         {items.map((m) => (
-          <li key={m.id} className="timeline-item">
+          <li key={m.id} className="timeline-item" data-page-unit>
             <p className="timeline-role">{m.role}</p>
             <p className="timeline-org">{m.org}</p>
             {m.period && <p className="label timeline-period">{m.period}</p>}

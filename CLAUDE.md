@@ -84,7 +84,12 @@ kapanış karesi kısa ekranda sığıyor, kaydırma çubuğu yeri sabit
 · **harf çözülmesi** (Katakana + tayf, `scramble.ts`) açılışta ve dil geçişinde —
 seçenekler artifact'taydı (https://claude.ai/artifact/LN9aUxFhh1JwEP9kEBX7zi, A7+A5).
 
-⏸ **Sırada: beyaz tema** (kullanıcı "daha sonra" dedi) — presets.ts'e açık bir ön
+✅ **Oturum 4** (30.09.2026) — sığmayan slayt alt sayfalara bölünüyor (A1,
+`deck/paginate.ts`; birimler `data-page-unit`) · İletişim kısa telefona sığıyor. → `DESIGN.md` § 12
+
+⏭ **Sırada (kullanıcı): genel düzenleme/temizlik, sonra back-end** (panel, content.json).
+
+⏸ **Beyaz tema** (kullanıcı "daha sonra" dedi) — presets.ts'e açık bir ön
 ayar + seçici; theme.css renk kodu içermediği için bileşenlere dokunulmaz.
 ⚠️ Hale (`.prism-glow`) ve `mix-blend-mode: screen` koyu zemine göre — açık temada
 yeniden düşünülmeli.

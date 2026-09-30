@@ -16,13 +16,15 @@ export function About(props: SectionProps) {
       <div className="about">
         <div className="about-bio" data-reveal data-i18n-fade>
           {profile.bio.map((p, i) => (
-            <p key={i}>{p}</p>
+            <p key={i} data-page-unit>
+              {p}
+            </p>
           ))}
         </div>
 
         <div className="about-side" data-reveal data-i18n-fade>
           {profile.skills.map((group) => (
-            <div key={group.id} className="skill-group">
+            <div key={group.id} className="skill-group" data-page-unit>
               <p className="label">{group.group}</p>
               {/*
                 Teknoloji listesi gerçek <ul> — ekran okuyucu "4 öğeli liste" desin.

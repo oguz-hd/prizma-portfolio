@@ -753,6 +753,29 @@ html[data-intro='pending'] :is([data-reveal], [data-reveal-panel], [data-reveal-
   opacity: 1;
 }
 
+/* Alt sayfalar (Oturum 4 · A1): etkin slaytın altında kısa çizgiler. */
+.rail-pages {
+  display: grid;
+  justify-items: end;
+  gap: var(--space-1);
+  padding-bottom: var(--space-1);
+}
+
+.rail-page {
+  width: 6px;
+  height: 2px;
+  background: var(--tone);
+  opacity: 0.4;
+  transition:
+    width var(--duration-base) var(--ease-out),
+    opacity var(--duration-base) var(--ease-out);
+}
+
+.rail-page.is-on {
+  width: 12px;
+  opacity: 1;
+}
+
 /* ⚠️ Gizliyken de yer kaplıyor: tıklamaya kapalı olmalı, yoksa panelin sağ
    kenarına dokunan kişi görünmez bir ray bağlantısına basıyordu (ölçüldü). */
 .rail-label {
@@ -958,6 +981,52 @@ html[data-intro='pending'] :is([data-reveal], [data-reveal-panel], [data-reveal-
   }
 }
 
+/* Kısa telefon (Oturum 4): kapanış karesinde bölünecek birim yok ve üst/alt
+   sıralar prizma ortada kalsın diye eşit — iPhone SE'de (375×553) 198 px,
+   iPhone 11'de (414×715) 22 px taşıyordu. Boşluklar daralıyor. */
+@media (max-width: 767px) and (max-height: 760px) {
+  .frame {
+    grid-template-rows: 1fr calc(var(--prism-box, 200px) + 2 * var(--space-4)) 1fr;
+  }
+
+  .frame-top {
+    padding-top: calc(var(--header-h) + var(--space-3));
+  }
+}
+
+@media (max-width: 767px) and (max-height: 620px) {
+  .frame {
+    grid-template-rows: 1fr calc(var(--prism-box, 200px) + 2 * var(--space-2)) 1fr;
+  }
+
+  /* Üst sıradan kazanılan her piksel iki kat sayıyor: alt sıra onu aynalıyor. */
+  .frame-top {
+    gap: var(--space-1);
+    padding-top: var(--header-h);
+  }
+
+  .closing-heading {
+    font-size: var(--text-title);
+  }
+
+  /* Kapanış karesinin numarası süs; SE'de (553 px) sığmak için ilk giden o. */
+  .frame .section-index {
+    display: none;
+  }
+
+  .closing-intro {
+    line-height: 1.35;
+  }
+
+  .frame .closing-links {
+    margin-top: var(--space-3);
+  }
+
+  .frame .site-footer {
+    padding-top: var(--space-3);
+  }
+}
+
 .closing-heading {
   font-size: var(--text-heading);
 }
@@ -1057,6 +1126,28 @@ html[data-intro='pending'] :is([data-reveal], [data-reveal-panel], [data-reveal-
 
 .section-heading {
   font-size: var(--text-heading);
+}
+
+/* ── Alt sayfalar (Oturum 4 · A1, deck/paginate.ts) ─────────────────────────
+   Bölünen slayt tek sütuna iner; ilk sayfadan sonra başlık küçülür ama kalır;
+   bölüm numarasının yanında sayaç. Öznitelikleri paginate.ts yazıyor. */
+[data-page-off] {
+  display: none !important;
+}
+
+.slide[data-paged] .about,
+.slide[data-paged] .timeline-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.slide[data-paged]:not([data-page='0']) .section-heading {
+  font-size: var(--text-title);
+}
+
+.section-index[data-page-label]::after {
+  content: attr(data-page-label);
+  margin-left: var(--space-2);
+  color: var(--ink-faint);
 }
 
 .section-intro {

@@ -24,3 +24,9 @@ Yükleme ölçüldü: paket zaten küçük (~130 KB gzip), algılanan gecikmenin
 Sonra: düzyazı Atkinson'a geçti (tek font kuralı iki role ayrıldı), tayf raya kadar uzadı,
 isim harfleri genişledi, unvan "Yazılım geliştirici" oldu. Dil geçiş efekti bir seçenek sayfasından
 seçildi (Katakana + tayf renkli harf çözülmesi); açılışta da çalışıyor.
+
+**Oturum 4 · Alt sayfalar (30.09.2026).** Telefonda taşan slaytlar içeriden kaymak yerine
+ölçülerek alt sayfalara bölünüyor (kullanıcı seçimi A1): her kaydırma bir adım, başlık
+kalıyor, sayaç ve rayda alt sayfa çizgileri var. İş başka bir oturumda başlamış ve yarım
+kalmıştı (derlenmiyordu, işaretler ve CSS yoktu); tamamlandı. İletişim kısa telefonlara
+boşluklar daraltılarak sığdırıldı. Sırada: genel temizlik, sonra back-end.

@@ -3,6 +3,7 @@ import { useSyncExternalStore } from 'react'
 
 import { reducedMotion } from '../motion'
 import { prismFocus } from '../prism/scene'
+import { firstVisibleUnit, pageCount, pageOf, pageOfUnit, paginate, setPage } from './paginate'
 
 /**
  * Slayt gösterisi — sayfa kaymaz, bölümler bakılan alana GELİR.
@@ -15,6 +16,9 @@ import { prismFocus } from '../prism/scene'
  *   data-reveal          geçişte kademeli giren/çıkan blok
  *   data-reveal-panel    geçişte yalnızca solup beliren kap (cam panel)
  *   data-prism="bright"  bu slaytta prizma kısılmaz (giriş)
+ *   data-page-unit       ekrana sığmayan slayt bu birimlerle alt sayfalara bölünür
+ *                        (paginate.ts). Her hareket bir adım: önce sonraki sayfa,
+ *                        sonra sonraki slayt.
  *
  * Durum öznitelikleri (data-state, inert, aria-hidden) JSX'te YOK, burada
  * yazılıyor — React aynı değerleri render etmediği için dil değişiminde ezmiyor.
@@ -25,7 +29,8 @@ import { prismFocus } from '../prism/scene'
  */
 
 type History = 'push' | 'replace' | 'none'
-type GoOpts = { history?: History; focus?: boolean }
+/** `atEnd`: hedef slayt son sayfasından / dibinden açılsın (geri adım). */
+type GoOpts = { history?: History; focus?: boolean; atEnd?: boolean }
 
 const OUT = 0.35
 const IN = 0.6
@@ -52,7 +57,10 @@ const SLACK = 8
 let slides: HTMLElement[] = []
 let index = 0
 let busy = false
-let pending: { index: number; opts: GoOpts } | null = null
+/** Geçiş sürerken gelen hareket — geçiş bitince çalışır. */
+let pending: (() => void) | null = null
+/** Geçiş sürerken istenen yeniden bölme — geçiş bitince yapılır. */
+let repaginateLater = false
 let current: gsap.core.Timeline | null = null
 let safety = 0
 /** Girdi bu ana kadar kilitli (açılış sırasında sonsuz). Bağlantı tıklaması kilitten muaf. */
@@ -69,6 +77,15 @@ function subscribe(fn: () => void) {
 
 export function useSlideIndex(): number {
   return useSyncExternalStore(subscribe, () => index, () => 0)
+}
+
+/** Etkin slaytın alt sayfaları — ray bunları kısa çizgilerle gösteriyor (A1). */
+export type SlidePages = { count: number; page: number }
+const NO_PAGES: SlidePages = { count: 1, page: 0 }
+let pages: SlidePages = NO_PAGES
+
+export function useSlidePages(): SlidePages {
+  return useSyncExternalStore(subscribe, () => pages, () => NO_PAGES)
 }
 
 /* ── Yardımcılar ───────────────────────────────────────────────────────────── */
@@ -115,6 +132,11 @@ function focusSlide(slide: HTMLElement) {
 }
 
 function syncShared() {
+  // Aynı değerde aynı nesne kalsın: useSyncExternalStore her yeni nesnede çizer.
+  const slide = slides[index]
+  const count = pageCount(slide)
+  const page = pageOf(slide)
+  if (count !== pages.count || page !== pages.page) pages = count > 1 ? { count, page } : NO_PAGES
   listeners.forEach((fn) => fn())
 }
 
@@ -125,7 +147,7 @@ export function goTo(target: number, opts: GoOpts = {}): void {
   const next = Math.max(0, Math.min(slides.length - 1, target))
   if (busy) {
     if (next === index) return
-    pending = { index: next, opts }
+    pending = () => goTo(next, opts)
     current?.timeScale(RUSH)
     return
   }
@@ -139,13 +161,15 @@ export function goTo(target: number, opts: GoOpts = {}): void {
   const dir = next > index ? 1 : -1
   index = next
   writeHistory(opts.history ?? 'replace')
-  syncShared()
   prismFocus(index, slides.length, to.dataset.prism === 'bright')
 
-  // Aşağıdan gelinen uzun slayt dibinden, yukarıdan gelinen tepesinden açılır —
-  // okuma kesintisiz sürsün. Bağlantıyla atlanınca her zaman tepesi.
+  // Aşağıdan gelinen uzun slayt son sayfasından/dibinden, yukarıdan gelinen
+  // tepesinden açılır — okuma kesintisiz sürsün. Bağlantıyla atlanınca tepesi.
+  const atEnd = opts.atEnd ?? (dir < 0 && !opts.focus)
+  setPage(to, atEnd ? -1 : 0)
+  syncShared()
   const sc = scrollerOf(to)
-  if (sc) sc.scrollTop = dir < 0 && !opts.focus ? sc.scrollHeight : 0
+  if (sc) sc.scrollTop = atEnd ? sc.scrollHeight : 0
 
   const outEls = blocks(from)
   const outPanels = panels(from)
@@ -167,17 +191,10 @@ export function goTo(target: number, opts: GoOpts = {}): void {
 
   const done = () => {
     if (!busy) return
-    busy = false
-    current = null
-    window.clearTimeout(safety)
     setState(from, null)
     const touched = [...outEls, ...outPanels, ...inEls, ...inPanels]
     if (touched.length) gsap.set(touched, { clearProps: 'opacity,transform' })
-    if (pending) {
-      const p = pending
-      pending = null
-      goTo(p.index, p.opts)
-    }
+    settle()
   }
 
   // Giriş slaytında cam panel yok: boş listeye tween kurulursa GSAP konsola uyarı basıyor.
@@ -192,6 +209,90 @@ export function goTo(target: number, opts: GoOpts = {}): void {
 
   // rAF durursa (sekme arkada) geçiş askıda kalmasın — setTimeout arkada da çalışır.
   safety = window.setTimeout(() => current?.progress(1), 2500)
+}
+
+/** Geçiş bitti: kilidi aç, bekleyen bölmeyi ve hareketi çalıştır. */
+function settle() {
+  busy = false
+  current = null
+  window.clearTimeout(safety)
+  if (repaginateLater) repaginate()
+  if (pending) {
+    const p = pending
+    pending = null
+    p()
+  }
+}
+
+/**
+ * Aynı slaytın başka sayfasına geç. Bloklar slayt geçişindeki gibi çıkar;
+ * ortada (hepsi saydamken) sayfa değişir, sonra yeni birimlerle girer.
+ * Bloklar (`data-reveal`) iki sayfada da aynı kaplar — değişen içleri.
+ */
+function turnPage(page: number, dir: number, opts: GoOpts) {
+  const slide = slides[index]
+  const els = blocks(slide)
+  const flip = () => {
+    setPage(slide, page)
+    syncShared()
+    const sc = scrollerOf(slide)
+    if (sc) sc.scrollTop = 0
+    if (opts.focus) focusSlide(slide)
+  }
+
+  if (reducedMotion() || !els.length) {
+    flip()
+    return
+  }
+
+  busy = true
+  const tl = gsap.timeline({
+    onComplete: () => {
+      gsap.set(els, { clearProps: 'opacity,transform' })
+      settle()
+    },
+    onInterrupt: () => settle(),
+  })
+  tl.to(els, { opacity: 0, y: -SHIFT * dir, duration: OUT, ease: 'power2.in', stagger: 0.02 }, 0)
+  tl.call(flip, [], OUT + 0.02)
+  tl.fromTo(
+    els,
+    { opacity: 0, y: SHIFT * dir },
+    { opacity: 1, y: 0, duration: IN, ease: 'power3.out', stagger: 0.06, immediateRender: false },
+    OUT + 0.04,
+  )
+  current = tl
+  safety = window.setTimeout(() => current?.progress(1), 2500)
+}
+
+/** Bir hareket: slaytın sonraki/önceki sayfası, yoksa sonraki/önceki slayt. */
+function step(dir: number, opts: GoOpts = {}) {
+  if (busy) {
+    pending = () => step(dir, opts)
+    current?.timeScale(RUSH)
+    return
+  }
+  const slide = slides[index]
+  const page = pageOf(slide) + dir
+  if (page >= 0 && page < pageCount(slide)) turnPage(page, dir, opts)
+  else goTo(index + dir, { ...opts, atEnd: dir < 0 })
+}
+
+/**
+ * Bütün slaytları yeniden böl (boyut, font ya da metin değişti). Etkin slaytta
+ * okuyucu aynı birimde kalır. Geçiş sürerken ertelenir — kaplar animasyonda.
+ */
+function repaginate() {
+  if (busy) {
+    repaginateLater = true
+    return
+  }
+  repaginateLater = false
+  const active = slides[index]
+  const anchor = active ? firstVisibleUnit(active) : null
+  slides.forEach((s) => paginate(s))
+  if (active) setPage(active, pageOfUnit(active, anchor))
+  syncShared()
 }
 
 /* ── Açılışla el sıkışma ───────────────────────────────────────────────────── */
@@ -254,7 +355,7 @@ function onWheel(e: WheelEvent) {
   if (Math.abs(acc) < THRESHOLD) return
   acc = 0
   needGap = true
-  goTo(index + dir)
+  step(dir)
 }
 
 let touchY = 0
@@ -284,7 +385,7 @@ function onTouchEnd(e: TouchEvent) {
   // Parmak kalktığında içerik o yöne hâlâ kayabiliyorduysa bu bir içerik kaydırmasıydı.
   if (dir > 0 ? touchCan.down : touchCan.up) return
   if (performance.now() < lockedUntil) return
-  goTo(index + dir)
+  step(dir)
 }
 
 function onKey(e: KeyboardEvent) {
@@ -295,30 +396,31 @@ function onKey(e: KeyboardEvent) {
   const sc = scrollerOf(slides[index])
   const page = (sc?.clientHeight ?? window.innerHeight) * 0.85
   let dir = 0
-  let step = 0
+  // `step` değil: aynı adlı fonksiyonu (sonraki sayfa/slayt) gölgeliyordu.
+  let amount = 0
   let jump: number | null = null
   switch (e.key) {
     case 'ArrowDown':
       dir = 1
-      step = 80
+      amount = 80
       break
     case 'ArrowUp':
       dir = -1
-      step = 80
+      amount = 80
       break
     case 'PageDown':
       dir = 1
-      step = page
+      amount = page
       break
     case 'PageUp':
       dir = -1
-      step = page
+      amount = page
       break
     case ' ':
       // Odaktaki düğme/bağlantı için boşluk onun işi.
       if (el?.closest('a, button')) return
       dir = e.shiftKey ? -1 : 1
-      step = page
+      amount = page
       break
     case 'Home':
       jump = 0
@@ -337,11 +439,11 @@ function onKey(e: KeyboardEvent) {
     return
   }
   if (canScroll(sc, dir)) {
-    sc!.scrollBy({ top: dir * step, behavior: reducedMotion() ? 'auto' : 'smooth' })
+    sc!.scrollBy({ top: dir * amount, behavior: reducedMotion() ? 'auto' : 'smooth' })
     return
   }
   if (e.repeat) return
-  goTo(index + dir, { focus: true })
+  step(dir, { focus: true })
 }
 
 /** Sayfadaki HER `#slayt` bağlantısı — nav, ray, "başa dön". Özel kod yok. */
@@ -370,6 +472,21 @@ export function initDeck(root: HTMLElement): () => void {
   prismFocus(index, slides.length, slides[index]?.dataset.prism === 'bright', true)
   syncShared()
 
+  // Bölme: şimdi, font gelince, pencere değişince ve metin değişince (dil,
+  // harf çözülmesi bitince). Gözlemci öznitelikleri izlemiyor — bölmenin kendi
+  // yazdıkları onu yeniden tetiklemesin. Çözülme her 45 ms'de metin yazıyor;
+  // bekleme süresi onun bitmesini bekliyor.
+  repaginate()
+  let timer = 0
+  const later = () => {
+    window.clearTimeout(timer)
+    timer = window.setTimeout(repaginate, 180)
+  }
+  document.fonts?.ready.then(repaginate)
+  window.addEventListener('resize', later)
+  const mo = new MutationObserver(later)
+  mo.observe(root, { childList: true, characterData: true, subtree: true })
+
   window.addEventListener('wheel', onWheel, { passive: false })
   window.addEventListener('touchstart', onTouchStart, { passive: true })
   window.addEventListener('touchend', onTouchEnd, { passive: true })
@@ -379,6 +496,9 @@ export function initDeck(root: HTMLElement): () => void {
 
   return () => {
     current?.progress(1)
+    window.clearTimeout(timer)
+    window.removeEventListener('resize', later)
+    mo.disconnect()
     window.removeEventListener('wheel', onWheel)
     window.removeEventListener('touchstart', onTouchStart)
     window.removeEventListener('touchend', onTouchEnd)

@@ -7,8 +7,9 @@ import type { ReactNode } from 'react'
  * yarı saydam bir cam panelin üstünde duruyor: sahne panelin arkasından
  * bulanık bir ışık olarak seçiliyor, metin okunur kalıyor.
  *
- * Slayt tek ekrana sığmazsa (telefon, kısa pencere) içerik `.slide-scroll`
- * içinde kayar; kenara gelince deck bir sonraki slayta geçer.
+ * Slayt tek ekrana sığmazsa (telefon, kısa pencere) `data-page-unit` birimleriyle
+ * alt sayfalara bölünür (deck/paginate.ts, Oturum 4 · A1); başlık her sayfada
+ * kalır. Tek birim ekrandan büyükse o sayfa `.slide-scroll` içinde kayar.
  *
  * Numaralı etiket (01/02/03) Departure Mono'da: sayfanın "veri" dili.
  */
@@ -40,7 +41,10 @@ export function Section({
         <div className="slide-inner container">
           <div className="panel" data-reveal-panel>
             <header className="section-head" data-reveal data-i18n-fade>
-              <p className="label section-index">{String(index).padStart(2, '0')}</p>
+              {/* data-page-count: bölünen slaytta sayaç ("1/2") buraya (paginate.ts). */}
+              <p className="label section-index" data-page-count>
+                {String(index).padStart(2, '0')}
+              </p>
               <h2 id={titleId} className="section-heading" data-slide-focus tabIndex={-1}>
                 {heading}
               </h2>
@@ -52,7 +56,9 @@ export function Section({
             {body.length > 0 && (
               <div className="section-intro" data-reveal data-i18n-fade>
                 {body.map((p, i) => (
-                  <p key={i}>{p}</p>
+                  <p key={i} data-page-unit>
+                    {p}
+                  </p>
                 ))}
               </div>
             )}
