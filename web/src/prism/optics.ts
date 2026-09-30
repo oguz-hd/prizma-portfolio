@@ -34,13 +34,13 @@ const EXAGGERATION = 10
 const CAUCHY_B = 0.0042 * EXAGGERATION
 
 /** Kırılma indisi: n(λ) = A + B/λ², 450 nm'de 1.52'ye sabitlenmiş. */
-export const nOf = (nm: number) => {
+const nOf = (nm: number) => {
   const um = nm / 1000
   return 1.52 + CAUCHY_B * (1 / (um * um) - 1 / (0.45 * 0.45))
 }
 
 /** İkinci yüzden çıkış açısı; tam iç yansımada null. */
-export function exitAngle(theta1: number, n: number): number | null {
+function exitAngle(theta1: number, n: number): number | null {
   const t2 = Math.asin(Math.sin(theta1) / n)
   const s4 = n * Math.sin(APEX - t2)
   return s4 >= 1 ? null : Math.asin(s4)

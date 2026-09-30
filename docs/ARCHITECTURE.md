@@ -182,19 +182,24 @@ POST  /api/admin/media          → görsel yükleme
 POST  /api/admin/theme/validate → kontrast kontrolü (kaydetmeden önce)
 ```
 
-## 7. Klasör düzeni (planlanan)
+## 7. Klasör düzeni (30.09.2026)
 
 ```
-trex-portfolio/
-├─ docs/                  notlar (mevcut)
-├─ research/              araştırma (mevcut)
-├─ web/                   React + Vite + TS  — halka açık site
-│  ├─ src/prism/          ★ prizma: optik, sahne, açılış (SVG + GSAP)
-│  ├─ src/deck/           slayt gösterisi
-│  ├─ src/theme/          token sistemi, content.json'dan beslenir
-│  └─ src/sections/
-├─ admin/                 React — yönetim paneli (ayrı build)
-└─ api/                   FastAPI + SQLite
+prizma-portfolio/
+├─ docs/                  kararlar: DESIGN · ARCHITECTURE · CALISTIRMA · GUNLUK
+├─ web/                   React + Vite + TS — halka açık site
+│  └─ src/
+│     ├─ prism/           ★ prizma: optik, sahne (scene), açılış (intro), çizim
+│     ├─ deck/            slayt gösterisi, alt sayfalar (paginate), ray
+│     ├─ components/      üst çubuk, dil seçici, daire (Ring), altbilgi, yıldızlar
+│     ├─ sections/        slaytlar: Hero · About · Experience · Contact · 404
+│     ├─ content/         ★ içerik sözleşmesi (types.ts) + bugünkü kaynak (site.ts)
+│     ├─ i18n/            arayüz metni + dil durumu
+│     ├─ theme/           token sistemi, ön ayarlar, fontlar
+│     ├─ lab/             token laboratuvarı (/?lab)
+│     └─ scramble.ts      harf çözülmesi (açılış + dil geçişi)
+├─ api/                   FastAPI + SQLite (içerik, çeviriler, tohum verisi)
+└─ admin/                 (henüz yok) yönetim paneli — ayrı build
 ```
 
 **Not:** `admin/` ayrı bir build. Ziyaretçi panel kodunu asla indirmez — hem hız hem
@@ -214,7 +219,8 @@ panelden değişince bunlar kendiliğinden işlemeyebilir. Panel (Faz 6-8) yazı
 
 | Bugün elle | Neden kırılabilir | Panelde |
 |---|---|---|
-| Kapanış karesi `max-height: 820 / 740 px` kademeleri (theme.css) + `.closing-intro` 56ch | Müsaitlik cümlesi uzarsa kısa ekranda yine taşar | Kareyi ölçüp sığdıran bir yerleşim (boşlukları `clamp()` ile yüksekliğe bağla) ya da kaydetmeden önce "bu metin 1366×768'de taşıyor" uyarısı |
+| İletişim dairesinde yalnızca başlık, e-posta ve bağlantılar var (Oturum 4); bölüm gövdesi gösterilmiyor | Panelden İletişim'e gövde metni girilirse sessizce düşer | Ya panel İletişim için gövde alanını hiç sunmasın, ya da daire bir yazı için yer açsın (tasarım kararı) |
+| 404'ün `.frame` ızgarası, `max-height: 820 / 740 px` kademeleri | 404 metni uzarsa kısa ekranda taşar | Metin kısa ve sabit (arayüz metni); gerekirse aynı ölçüm yaklaşımı |
 | Menüde kısa ad (`navLabel`) | Yeni bölümün adı uzunsa telefonda menü yine kayar | Yeni bölüm eklerken `navLabel` alanı; uzunluk sınırı / önizleme |
 | Yeni slayt | Bölüm ↔ bileşen eşlemesi `App.tsx`'te elle | Bölüm türü (serbest metin / zaman çizelgesi / kapanış) seçilerek genel bir bileşen |
 

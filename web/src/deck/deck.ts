@@ -142,7 +142,7 @@ function syncShared() {
 
 /* ── Geçiş ─────────────────────────────────────────────────────────────────── */
 
-export function goTo(target: number, opts: GoOpts = {}): void {
+function goTo(target: number, opts: GoOpts = {}): void {
   if (!slides.length) return
   const next = Math.max(0, Math.min(slides.length - 1, target))
   if (busy) {

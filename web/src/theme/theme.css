@@ -34,12 +34,11 @@
        body     22  paragraf (telefonda 11 — aşağıda)
        title    22  zaman çizelgesi rolü, küçük başlık
        heading  44  slayt başlığı (telefonda 33)
-       display  44  e-posta (telefonda 22); isim yayda JS'ten, 22–88 */
+     Dairenin yazıları (isim, İLETİŞİM, e-posta) JS'ten: components/Ring.tsx. */
   --text-meta: 11px;
   --text-body: 22px;
   --text-title: 22px;
   --text-heading: 44px;
-  --text-display: 44px;
   --label-size: 11px;
   --label-size-lg: 22px;
   --label-tracking: 0.12em;
@@ -80,26 +79,6 @@
   --gutter: var(--space-6);
   --header-h: 56px;
 
-  /* Soğurma çizgileri — tayf motifinin imzası (DESIGN.md § 2).
-     Şerit soldan mor (390 nm) başlayıp kırmızıya (700 nm) çıkar; boşluklar
-     gerçek Fraunhofer çizgilerinde. Konum = (λ − 390) / 310.
-     Renk değil ALFA maskesi — yalnızca opaklık okunuyor (kural 1'e dokunmuyor). */
-  --fraunhofer: linear-gradient(
-    90deg,
-    var(--ink) 0 0.9%,
-    transparent 0.9% 2.5%,
-    var(--ink) 2.5% 12.8%,
-    transparent 12.8% 13.5%,
-    var(--ink) 13.5% 30.65%,
-    transparent 30.65% 31.35%,
-    var(--ink) 31.35% 43.9%,
-    transparent 43.9% 44.5%,
-    var(--ink) 44.5% 63.9%,
-    transparent 63.9% 64.7%,
-    var(--ink) 64.7% 85.55%,
-    transparent 85.55% 86.25%,
-    var(--ink) 86.25%
-  );
 }
 
 @media (max-width: 1023px) {
@@ -115,7 +94,6 @@
     --gutter: var(--space-4);
     --header-h: 52px;
     --text-heading: 33px;
-    --text-display: 22px;
     --text-prose: 16px;
     --text-prose-sm: 13px;
   }
@@ -191,12 +169,6 @@ a {
 .container {
   width: min(100% - 2 * var(--gutter), var(--max-width));
   margin-inline: auto;
-}
-
-.spectrum-lines {
-  background: var(--spectrum);
-  -webkit-mask-image: var(--fraunhofer);
-  mask-image: var(--fraunhofer);
 }
 
 .label {
@@ -830,10 +802,6 @@ html[data-intro='pending'] :is([data-reveal], [data-reveal-panel], [data-reveal-
    (sections/Hero.tsx). SVG metni gerçek metin; boyutu JS 11'in katında veriyor.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-.slide-hero .slide-scroll {
-  padding-block: 0;
-}
-
 .hero,
 .ring-box {
   position: relative;
@@ -841,7 +809,7 @@ html[data-intro='pending'] :is([data-reveal], [data-reveal-panel], [data-reveal-
   min-height: 100%;
 }
 
-/* İletişim de girişin dairesinde (Oturum 4): kapanış karesinin kabı tam ekran. */
+/* Dairenin slaytları (Giriş, İletişim): kap tam ekran, üst boşluk yok. */
 .slide-ring .slide-scroll {
   padding-block: 0;
 }
@@ -949,7 +917,8 @@ html[data-intro='pending'] :is([data-reveal], [data-reveal-panel], [data-reveal-
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   Kapanış karesi (İletişim) ve 404 — ortası prizmaya boş bırakılmış ızgara.
+   404 — ortası prizmaya boş bırakılmış ızgara (İletişim Oturum 4'te daireye
+   geçti, bu ızgarayı artık yalnızca 404 kullanıyor).
    Orta satır prizmanın GERÇEK boyu (--prism-box, PrismStage yazıyor); 1fr'ler
    eşit kaldıkça boşluk tam ekranın ortasında, yani prizmanın üstünde.
    ═══════════════════════════════════════════════════════════════════════════ */
@@ -983,8 +952,8 @@ html[data-intro='pending'] :is([data-reveal], [data-reveal-panel], [data-reveal-
   padding-bottom: var(--space-6);
 }
 
-/* Kısa ekran (dizüstü, 768/720 px): kapanış karesi tek ekrana sığsın — taşınca
-   slayt kaydırılabilir oluyor, bir hareket de içeriği kaydırmaya gidiyordu. */
+/* Kısa ekran (dizüstü, 768/720 px): 404 tek ekrana sığsın. Sorgular olmadan
+   1366×650'de 23, 1024×600'de 58 px taşıyordu (ölçüldü). */
 @media (min-width: 768px) and (max-height: 820px) {
   .frame {
     grid-template-rows: 1fr calc(var(--prism-box, 200px) + 2 * var(--space-6)) 1fr;
@@ -1006,9 +975,8 @@ html[data-intro='pending'] :is([data-reveal], [data-reveal-panel], [data-reveal-
   }
 }
 
-/* Kısa telefon (Oturum 4): kapanış karesinde bölünecek birim yok ve üst/alt
-   sıralar prizma ortada kalsın diye eşit — iPhone SE'de (375×553) 198 px,
-   iPhone 11'de (414×715) 22 px taşıyordu. Boşluklar daralıyor. */
+/* Kısa telefon: üst/alt sıralar prizma ortada kalsın diye eşit — üstten
+   kazanılan her piksel iki kat sayıyor. Boşluklar daralıyor. */
 @media (max-width: 767px) and (max-height: 760px) {
   .frame {
     grid-template-rows: 1fr calc(var(--prism-box, 200px) + 2 * var(--space-4)) 1fr;

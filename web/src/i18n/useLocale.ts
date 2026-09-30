@@ -55,7 +55,7 @@ export function setLocale(next: Locale): void {
   listeners.forEach((fn) => fn())
 }
 
-export function getLocale(): Locale {
+function getLocale(): Locale {
   return current
 }
 

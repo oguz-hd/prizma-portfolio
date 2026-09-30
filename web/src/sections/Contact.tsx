@@ -91,7 +91,7 @@ export function Contact({ id, heading }: SectionProps) {
             </g>
 
             {email && (
-              <g className="ring-links ring-mail" data-reveal data-i18n-fade>
+              <g className="ring-links" data-reveal data-i18n-fade>
                 <text ref={mailRef} style={{ fontSize: mail }}>
                   <textPath href={`#${ids.bottom}`} startOffset="50%" textAnchor="middle">
                     <a href={email.href}>

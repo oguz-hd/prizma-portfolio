@@ -38,11 +38,10 @@ değer yelpazeyi 40°'ye açıyordu. Gelme açısı **40–62°** aralığında 
 dışında mor uç tam iç yansımaya giriyor (ölçüldü).
 
 **Soğurma çizgileri**: Fraunhofer'in gerçek çizgileri — Hα 656 · Na D 589 · E 527 ·
-Hβ 486 · G 431 · Ca II H+K 397/393. Aynı konumlar CSS maskesinde (`--fraunhofer`),
-panel ve ayraçlardaki kısa tayf şeritlerinde.
-⚠️ Oturum 4: ana sahnedeki prizma tayfından çizgiler ve etiketler **kalktı**
-(kullanıcı: sadelik) — yalnızca renk. Panel/ayraç şeritlerindeki maske duruyor;
-prizmada çizgi yalnızca 404'te. → § 12
+Hβ 486 · G 431 · Ca II H+K 397/393.
+⚠️ Oturum 4: prizma tayfından çizgiler ve etiketler **kalktı** (kullanıcı: sadelik),
+kartların köşesindeki maskeli kısa tayf şeridi de — `--fraunhofer` maskesi silindi.
+Soğurma çizgisi yalnızca 404'te ("404 nm"). → § 12
 
 **Renk**: `accents` mor → kırmızı sıralı; i. ton 400–680 nm arasına eşit dağılıyor
 (`accentNm`). Ön ayar değişince tonlar değişir, yerleri değişmez.

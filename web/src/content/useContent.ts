@@ -80,11 +80,6 @@ export function useContent(): SiteContent {
   return resolveContent(raw, locale)
 }
 
-/** React dışından okumak gerekirse (Faz 9: meta etiketleri, OG görseli). */
-export function getContent(locale: Locale): SiteContent {
-  return resolveContent(raw, locale)
-}
-
 /** Tema ön ayarı dile bağlı değil — main.tsx mount öncesi buna ihtiyaç duyuyor. */
 export function getPreset(): RawSiteContent['settings']['preset'] {
   return raw.settings.preset

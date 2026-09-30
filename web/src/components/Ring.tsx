@@ -33,8 +33,22 @@ const snap11 = (v: number, min: number, max: number) =>
 
 /** Tahmin ölçülen değere yakın ki ilk karede yay zıplamasın. */
 const ADV_GUESS = 0.65
+const FONT = '100px "Departure Mono"'
+/** Ölçülen harf genişliği — font yüklendikten sonra bir kez; iki daire ortak. */
+let advMeasured: number | null = null
+
+/** Departure Mono'nun harf genişliği (em). Font henüz gelmediyse tahmin. */
+function measureAdv(): number {
+  if (advMeasured) return advMeasured
+  if (!document.fonts?.check(FONT)) return ADV_GUESS
+  const ctx = document.createElement('canvas').getContext('2d')
+  if (!ctx) return ADV_GUESS
+  ctx.font = FONT
+  advMeasured = ctx.measureText('M').width / 100 || ADV_GUESS
+  return advMeasured
+}
 /** Başlığın harf aralığı (em) — theme.css → .ring-title ile aynı. */
-export const TITLE_TRACKING = 0.06
+const TITLE_TRACKING = 0.06
 /**
  * Başlık harfleri yatayda bu kat geniş (Oturum 3: "harflerin genişliği artsın").
  * Departure Mono'nun tek genişliği var; `textLength` + `spacingAndGlyphs` geriyor.
@@ -60,7 +74,7 @@ function geometry(W: number, H: number, sizeChars: number, adv: number): RingGeo
 }
 
 /** Başlığın yaydaki boyu: son harfin ardındaki aralık sayılmıyor. */
-export function titleLength(geo: RingGeo, chars: number): number {
+function titleLength(geo: RingGeo, chars: number): number {
   return geo.title * (chars * (geo.adv * TITLE_STRETCH + TITLE_TRACKING) - TITLE_TRACKING)
 }
 
@@ -73,37 +87,26 @@ export function titleLength(geo: RingGeo, chars: number): number {
  */
 export function useRing(box: RefObject<HTMLElement | null>, sizeChars: number): RingGeo {
   const [geo, setGeo] = useState<RingGeo>(() =>
-    geometry(window.innerWidth, window.innerHeight, sizeChars, ADV_GUESS),
+    geometry(window.innerWidth, window.innerHeight, sizeChars, measureAdv()),
   )
 
   useLayoutEffect(() => {
     const el = box.current
     if (!el) return
-    let adv = ADV_GUESS
     // Etki yeniden kurulunca eski çalıştırmanın font geri çağrısı yeni ölçünün
     // üstüne eski değerlerle yazmasın (ya da sökülmüş bileşene yazmasın).
     let alive = true
-
-    const measure = () => {
-      const ctx = document.createElement('canvas').getContext('2d')
-      if (!ctx) return
-      ctx.font = '100px "Departure Mono"'
-      adv = ctx.measureText('M').width / 100 || adv
-    }
     const update = () => {
       const W = el.clientWidth
       const H = el.clientHeight
       if (!W || !H) return
-      setGeo(geometry(W, H, sizeChars, adv))
+      setGeo(geometry(W, H, sizeChars, measureAdv()))
     }
 
-    measure()
     update()
     // Font geldiğinde harf genişliği değişir → yeniden ölç.
     document.fonts?.ready.then(() => {
-      if (!alive) return
-      measure()
-      update()
+      if (alive) update()
     })
     const ro = new ResizeObserver(update)
     ro.observe(el)

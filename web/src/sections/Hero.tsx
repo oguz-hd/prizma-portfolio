@@ -50,7 +50,7 @@ export function Hero() {
   return (
     <section
       id="ust"
-      className="slide slide-hero"
+      className="slide slide-ring"
       data-slide
       data-prism="bright"
       aria-labelledby="ust-title"
