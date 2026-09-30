@@ -40,12 +40,6 @@ const SECTION_COMPONENTS = {
  *   SiteHeader   sabit üst çubuk
  *   SlideRail    sağ kenarda tayf rayı
  */
-/**
- * Deneme (Oturum 4, kullanıcı kararsız): `?lines=0` → tayfta soğurma çizgileri ve
- * etiketleri yok, yalnızca renk. ⚠️ Kullanıcı seçince sabitlenecek.
- */
-const PLAIN_SPECTRUM = new URLSearchParams(window.location.search).get('lines') === '0'
-
 export function App() {
   const { sections, settings } = useContent()
 
@@ -77,7 +71,7 @@ export function App() {
   return (
     <>
       <Starfield />
-      <PrismStage lines={PLAIN_SPECTRUM ? [] : undefined} />
+      <PrismStage />
       <SiteHeader />
       <Deck>
         <Hero />

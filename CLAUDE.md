@@ -85,7 +85,9 @@ kapanış karesi kısa ekranda sığıyor, kaydırma çubuğu yeri sabit
 seçenekler artifact'taydı (https://claude.ai/artifact/LN9aUxFhh1JwEP9kEBX7zi, A7+A5).
 
 ✅ **Oturum 4** (30.09.2026) — sığmayan slayt alt sayfalara bölünüyor (A1,
-`deck/paginate.ts`; birimler `data-page-unit`) · İletişim kısa telefona sığıyor. → `DESIGN.md` § 12
+`deck/paginate.ts`; birimler `data-page-unit`) · İletişim kısa telefona sığıyor ·
+geçiş dalgası (`scene.surge`, hafif) · tayfta çizgi/etiket yok (yalnızca 404'te) ·
+navbar'da akan tayflı "INTRO" · çözülme süresi her yerde 900 ms. → `DESIGN.md` § 12
 
 ⏭ **Sırada (kullanıcı): genel düzenleme/temizlik, sonra back-end** (panel, content.json).
 

@@ -40,6 +40,9 @@ dışında mor uç tam iç yansımaya giriyor (ölçüldü).
 **Soğurma çizgileri**: Fraunhofer'in gerçek çizgileri — Hα 656 · Na D 589 · E 527 ·
 Hβ 486 · G 431 · Ca II H+K 397/393. Aynı konumlar CSS maskesinde (`--fraunhofer`),
 panel ve ayraçlardaki kısa tayf şeritlerinde.
+⚠️ Oturum 4: ana sahnedeki prizma tayfından çizgiler ve etiketler **kalktı**
+(kullanıcı: sadelik) — yalnızca renk. Panel/ayraç şeritlerindeki maske duruyor;
+prizmada çizgi yalnızca 404'te. → § 12
 
 **Renk**: `accents` mor → kırmızı sıralı; i. ton 400–680 nm arasına eşit dağılıyor
 (`accentNm`). Ön ayar değişince tonlar değişir, yerleri değişmez.
@@ -207,3 +210,12 @@ yazı küçültmekle kapanacak fark değil. Seçenekler bir örnek sayfasında g
 Hakkımda 2. Dokunmayla ileri-geri `ust → hakkimda 1/3 … 3/3 → deneyim 1/3 … 3/3 →
 iletisim` ve geri aynı sırayla. İletişim 6 telefon boyutu × 2 dilde taşmıyor
 (320×568 EN'de 2 px, SLACK altında), metin prizmadan ≥ 7 px uzakta.
+
+### Oturum 4 · geçiş dalgası, sade tayf, INTRO
+
+| İstek | Karşılığı |
+|---|---|
+| Geçişte tayf daha hareketli ve büyük olsun | `scene.surge` (0 → 1 → 0, prismFocus'un): yelpaze orta çizgisinden ~2 kat açılır, darbeler hızlanır, salınım genişler, kısık sahne bir an parlar. Sitede `?fx=0…3` ile dört güç denendi; kullanıcı **hafifi (fx=1)** seçti → `SURGE` sabit |
+| Tayftaki çizgiler ve yazılar olmasa mı? | `?lines=0` denemesiyle görüldü, **kaldırıldı**: ana sahnede Fraunhofer çizgisi ve etiketi yok, yalnızca renk. § 2'deki soğurma çizgileri artık yalnızca 404'te ("404 nm"). Etiket yeri boşalınca şerit rayın ~30 px yakınına uzadı |
+| Navbar'da üçgen yerine "intro", ama efektli | "INTRO / GİRİŞ": harfler akan tayfla dolu (`--spectrum-stops`, 200 % genişlik, kayan), ışımalı; dil geçişinde çözülüyor. Dar telefonda (≤ 420 px) aralıklar sıkılaştı |
+| Açılış ve dil efektinin süresi aynı olsun (uzun olan) | `SCRAMBLE_MS = 900` her yerde; hızlı açılışta çözülme kesilmiyor |

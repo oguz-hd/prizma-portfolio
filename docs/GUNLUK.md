@@ -29,4 +29,6 @@ seçildi (Katakana + tayf renkli harf çözülmesi); açılışta da çalışıy
 ölçülerek alt sayfalara bölünüyor (kullanıcı seçimi A1): her kaydırma bir adım, başlık
 kalıyor, sayaç ve rayda alt sayfa çizgileri var. İş başka bir oturumda başlamış ve yarım
 kalmıştı (derlenmiyordu, işaretler ve CSS yoktu); tamamlandı. İletişim kısa telefonlara
-boşluklar daraltılarak sığdırıldı. Sırada: genel temizlik, sonra back-end.
+boşluklar daraltılarak sığdırıldı. Geçişte tayf büyüyüp küçülen bir dalga yapıyor (dört güç
+sitede `?fx` ile denendi, hafifi seçildi); tayftaki çizgi ve yazılar sadelik için kalktı;
+navbar'daki üçgenin yerine akan tayflı "INTRO" geldi. Sırada: genel temizlik, sonra back-end.

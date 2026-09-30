@@ -62,25 +62,15 @@ export function darkenScene(): void {
 
 /**
  * Geçiş dalgası (Oturum 4, kullanıcı: "bölümler arası geçerken tayf daha
- * hareketli ve büyük bir efekt yapsın"). Seçenekler sitede denenebilsin diye
- * adresten okunuyor: `?fx=0` (eski) · `1` hafif · `2` büyük (varsayılan) ·
- * `3` büyük + açı hedefini aşıp geri gelir. ⚠️ Kullanıcı seçince sabitlenecek.
- *   spread  tayf yelpazesinin açılma payı (1 = iki katı); dalgada soğurma
- *           çizgileri ve etiketleri söner — yalnızca renk bantları kalır
+ * hareketli ve büyük bir efekt yapsın"). Sitede `?fx=0…3` ile dört seçenek
+ * denendi; kullanıcı hafif olanı seçti (fx=1).
+ *   spread  tayf yelpazesinin açılma payı (0.9 → yaklaşık iki katı); dalgada
+ *           soğurma çizgileri söner (yalnızca 404'te var)
  *   pulse   ışık darbelerinin hızlanma payı
  *   sway    salınım genliğinin artma payı
  *   flash   kısık sahnenin (içerik slaytı) parlama payı
  */
-// Kullanıcı (fx=2'yi görünce): "ışın aralıkları güzel, daha açık ve fark
-// edilir olsun; çizgiler o sırada olmasın" → açılma 1.1 → 1.8, çizgiler dalgada sönüyor.
-const SURGES = [
-  { spread: 0, pulse: 0, sway: 0, flash: 0, overshoot: false },
-  { spread: 0.9, pulse: 1.5, sway: 0.5, flash: 0.4, overshoot: false },
-  { spread: 1.8, pulse: 3.5, sway: 1.5, flash: 1, overshoot: false },
-  { spread: 1.8, pulse: 3.5, sway: 2.5, flash: 1, overshoot: true },
-]
-const fxParam = Number(new URLSearchParams(window.location.search).get('fx'))
-export const SURGE = SURGES[Number.isInteger(fxParam) && SURGES[fxParam] ? fxParam : 2]
+export const SURGE = { spread: 0.9, pulse: 1.5, sway: 0.5, flash: 0.4 }
 
 let focusTl: gsap.core.Timeline | null = null
 
@@ -101,7 +91,7 @@ export function prismFocus(index: number, total: number, bright: boolean, instan
 
   focusTl = gsap
     .timeline()
-    .to(scene, { base, duration: 1.1, ease: SURGE.overshoot ? 'back.inOut(2.2)' : 'power3.inOut' }, 0)
+    .to(scene, { base, duration: 1.1, ease: 'power3.inOut' }, 0)
     // Dalga: hızla yükselir (slayt değişirken), yavaşça söner (yeni slayt yerleşirken).
     .fromTo(scene, { surge: 0 }, { surge: 1, duration: 0.35, ease: 'power2.out' }, 0)
     .to(scene, { surge: 0, duration: 0.95, ease: 'power2.inOut' }, 0.4)

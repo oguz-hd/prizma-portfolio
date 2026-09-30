@@ -18,22 +18,14 @@ export const L_MIN = 390
 export const L_MAX = 700
 
 /**
- * Soğurma çizgileri — Fraunhofer'in 1814'te Güneş tayfında saydığı çizgiler.
- * Dalga boyları gerçek. Etiketler tayfsal simge, arayüz metni değil: her dilde
- * aynı (skills.items'ın mantığı — React her dilde React, Hα her dilde Hα).
- * `label` boşsa çizgi çizilir ama etiketlenmez (sıkışmasın diye).
+ * Soğurma çizgisi — tayfta karanlık bir çizgi ve etiketi (dalga boyu gerçek).
+ * Etiket tayfsal simge, arayüz metni değil: her dilde aynı.
+ * `label` boşsa çizgi çizilir ama etiketlenmez.
+ *
+ * Oturum 4 (kullanıcı seçimi, `?lines=0` denemesi): ana sahnede Fraunhofer
+ * çizgileri ve etiketleri YOK — yalnızca renk. Tek kullanan 404 ("404 nm").
  */
 export type AbsorptionLine = { nm: number; label: string }
-
-export const FRAUNHOFER: AbsorptionLine[] = [
-  { nm: 656.3, label: 'Hα 656' },
-  { nm: 589.3, label: 'Na D 589' },
-  { nm: 527.0, label: '' },
-  { nm: 486.1, label: 'Hβ 486' },
-  { nm: 430.8, label: 'G 431' },
-  { nm: 396.8, label: 'Ca II H+K' },
-  { nm: 393.4, label: '' },
-]
 
 /* ── Kırılma ───────────────────────────────────────────────────────────────── */
 

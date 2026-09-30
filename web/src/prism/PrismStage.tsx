@@ -7,7 +7,6 @@ import {
   BL,
   BR,
   DEPTH,
-  FRAUNHOFER,
   L_MAX,
   L_MIN,
   P,
@@ -50,8 +49,11 @@ import { DIM, SURGE, accentCount, scene } from './scene'
  * Renk KODU yok: tonlar `--accent-*`, çizgiler `--ink`/`--ground`.
  */
 
+/** Varsayılan: çizgisiz. Sabit bir dizi — her render'da yeni [] gelmesin. */
+const NO_LINES: AbsorptionLine[] = []
+
 type Props = {
-  /** Soğurma çizgileri. Varsayılan Fraunhofer; 404 kendi çizgisini veriyor. */
+  /** Soğurma çizgileri. Varsayılan yok (sade tayf, Oturum 4); 404 kendi çizgisini veriyor. */
   lines?: AbsorptionLine[]
   /** Çizgileri vurgula (404: tek, kalın, lider renkli etiket). */
   mark?: boolean
@@ -96,7 +98,7 @@ function scaleFor(W: number, H: number): number {
   return W < 768 ? Math.min(W * 0.15, H * 0.085) : Math.min(W * 0.085, H * 0.135)
 }
 
-export function PrismStage({ lines = FRAUNHOFER, mark = false }: Props) {
+export function PrismStage({ lines = NO_LINES, mark = false }: Props) {
   const id = useId().replace(/:/g, '')
   const rootRef = useRef<HTMLDivElement>(null)
   const svgRef = useRef<SVGSVGElement>(null)
@@ -404,7 +406,7 @@ export function PrismStage({ lines = FRAUNHOFER, mark = false }: Props) {
       gsap.ticker.remove(tick)
       window.removeEventListener('resize', onResize)
     }
-    // `lines` bağımlılık değil: içeriği sabit (FRAUNHOFER ya da 404'ün tek çizgisi),
+    // `lines` bağımlılık değil: içeriği sabit (boş ya da 404'ün tek çizgisi),
     // her render'da yeni dizi gelse döngü boşuna yeniden kurulurdu.
   }, [count])
 
