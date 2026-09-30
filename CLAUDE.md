@@ -166,7 +166,7 @@ kalktı; proje kayıtları içerikte duruyor). Silinsin mi? Kullanıcıya soruld
 
 **GitHub:** özel depo `github.com/oguz-hd/prizma-portfolio`; `master` →
 `origin/master`. `git push` doğrudan çalışıyor (kimlik Git Credential Manager'da).
-Kullanıcı her iş sonunda commit + push istiyor.
+Kullanıcı her iş sonunda **commit** istiyor; **push yalnızca isteyince** (Oturum 5: "her seferinde push etme").
 
 ⏸ **Beyaz tema** (kullanıcı "daha sonra" dedi) — presets.ts'e açık bir ön
 ayar + seçici; theme.css renk kodu içermediği için bileşenlere dokunulmaz.
