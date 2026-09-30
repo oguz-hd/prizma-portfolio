@@ -57,9 +57,17 @@ const TITLE_STRETCH = 1.3
 /** Yay ile küçük yazıların (iç yaylar) arası (px). */
 export const INNER_GAP = 30
 
+/**
+ * Masaüstünde daire eskisinin %80'i (Oturum 5, kullanıcı: "çapı %20 azalsın").
+ * Başlık boyu yarıçaptan türüyor, yani isim de bir basamak küçülebilir
+ * (1440×900: 44 → 33 px). Telefonda yok: orada daire zaten ekranın eninden
+ * sınırlı; küçülünce isim 33 → 22 px'e iniyordu (hesaplandı, 390×844).
+ */
+const DESKTOP_SCALE = 0.8
+
 function geometry(W: number, H: number, sizeChars: number, adv: number): RingGeo {
   const mobile = W < 768
-  const r = mobile ? Math.min(W * 0.46, H * 0.3) : Math.min(W * 0.3, H * 0.37)
+  const r = mobile ? Math.min(W * 0.46, H * 0.3) : Math.min(W * 0.3, H * 0.37) * DESKTOP_SCALE
   /*
     Başlığın kapladığı yay ~100° (telefonda ~110°). ⚠️ 110°'de ekranda ~150°
     gibi okunuyordu: harfler yarıçapa göre iri, uçtakiler dikleşiyordu (ölçüldü).

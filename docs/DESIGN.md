@@ -223,3 +223,9 @@ iletisim` ve geri aynı sırayla. İletişim 6 telefon boyutu × 2 dilde taşmı
 | Mobilde unvan · konum büyük | Telefonda daire iç yazıları 11 × 2/3 = 7.33 px: 3x ekranda her font pikseli tam 2 cihaz pikseli, keskin (390×844 @3x'te ölçüldü); 2x ekranda hafif yumuşar |
 | Kartların sol üstündeki renkler silinsin | `.panel::before` (Fraunhofer maskeli kısa tayf çizgisi) kalktı |
 | İletişim'deki yazı kalksın, bölüm intro gibi dairesel olsun | Müsaitlik cümlesi içerikten (site.ts + seed.py) kalktı. `components/Ring.tsx` Giriş'le ortak: üst yay İLETİŞİM (ismin boyunda, geniş, kalın), üst iç yay BANA YAZ, alt yay e-posta (22 px, sığmazsa 11), alt iç yay GitHub · LinkedIn, dipte altbilgi. ⚠️ İlk sürümde daire altbilgiye yer açmak için küçülüyordu; kod incelemesi buldu: kısa masaüstünde başlık Giriş'ten bir basamak küçük kalıyor (1366×650: 33 → 22 px), çok kısa pencerede yarıçap eksiye düşüyordu. Artık daire Giriş'inkiyle birebir; altbilgi e-posta yayının altına ölçülerek yerleşiyor, sığmazsa gizleniyor (`usePlaceBelow`, KAYDIR ipucuyla ortak) — 1280×720 ve üstünde görünür. Eski kapanış ızgarasının kuralları silindi; `.frame` 404 için duruyor |
+
+## 13. Oturum 5 — kullanıcı geri bildirimi
+
+| İstek | Karşılığı |
+|---|---|
+| Prizmanın etrafındaki daire (isim ve bağlantıların dizildiği) %20 küçülsün | `components/Ring.tsx` → `DESKTOP_SCALE = 0.8`: masaüstünde yarıçap eskisinin %80'i, Giriş ve İletişim birlikte. Başlık boyu yarıçaptan türüyor → isim bir basamak küçüldü: **44 → 33 px** (1440×900 ve 1366×768'de ölçüldü). İletişim'de e-posta 22 px'te yaya sığıyor, altbilgi görünür. Telefonda uygulanmadı: orada daire ekranın eninden sınırlı, küçülünce isim 33 → 22 px'e iniyordu (390×844, hesap) |
