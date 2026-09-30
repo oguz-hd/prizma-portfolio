@@ -21,7 +21,7 @@ import {
   type AbsorptionLine,
   type Pt,
 } from './optics'
-import { DIM, accentCount, scene } from './scene'
+import { DIM, SURGE, accentCount, scene } from './scene'
 
 /**
  * ★ Sitenin merkezi: kalıcı prizma sahnesi.
@@ -166,6 +166,22 @@ export function PrismStage({ lines = FRAUNHOFER, mark = false }: Props) {
       const { s, vx, screenX: sc, stripW: sw } = L
       const bright = clamp01((scene.dim - DIM) / (1 - DIM))
 
+      // Geçiş dalgasında tayf orta çizgisinden açılır. Bütün tayf noktaları bu
+      // yardımcıdan geçiyor (yelpaze, şerit, ışınlar, darbeler, etiketler): ölçek
+      // doğrusal olduğu için gradyan oranları ve tonların sırası bozulmuyor.
+      const spread = 1 + scene.surge * SURGE.spread
+      // Dalgada çizgiler ve etiketler söner: açılan renk bantları sade görünsün.
+      const lineAlpha = SURGE.spread ? 1 - scene.surge : 1
+      const Y = (nm: number, x: number): number | null => {
+        const y = yAt(theta, nm, x)
+        if (y === null || spread === 1) return y
+        const a = yAt(theta, L_MAX, x)
+        const b = yAt(theta, L_MIN, x)
+        if (a === null || b === null) return y
+        const mid = (a + b) / 2
+        return mid + (y - mid) * spread
+      }
+
       // ── Prizma: kenarlar çizilerek belirir, arka yüz sonra ──────────────
       const face = faceRef.current
       if (face) {
@@ -216,8 +232,8 @@ export function PrismStage({ lines = FRAUNHOFER, mark = false }: Props) {
 
       const fr = clamp01((scene.fan - 0.2) / 0.8)
       const xe = Q.x + (sc - Q.x) * fr
-      const yTop = yAt(theta, L_MAX, xe)
-      const yBot = yAt(theta, L_MIN, xe)
+      const yTop = Y(L_MAX, xe)
+      const yBot = Y(L_MIN, xe)
       if (yTop === null || yBot === null) return
       const fanPts = fr <= 0 ? '' : pts([Q, { x: xe, y: yTop }, { x: xe, y: yBot }])
       fanRef.current?.setAttribute('points', fanPts)
@@ -235,9 +251,9 @@ export function PrismStage({ lines = FRAUNHOFER, mark = false }: Props) {
         g.setAttribute('y1', String(sy(yBot)))
         g.setAttribute('y2', String(sy(yTop)))
       }
-      const sTop = yAt(theta, L_MAX, sc)!
-      const sBot = yAt(theta, L_MIN, sc)!
-      const off = (nm: number) => ((yAt(theta, nm, sc) ?? sBot) - sBot) / (sTop - sBot)
+      const sTop = Y(L_MAX, sc)!
+      const sBot = Y(L_MIN, sc)!
+      const off = (nm: number) => ((Y(nm, sc) ?? sBot) - sBot) / (sTop - sBot)
       for (let i = 0; i < count; i++) {
         stopRefs.current[i]?.setAttribute('offset', String(off(accentNm(i, count))))
       }
@@ -266,38 +282,38 @@ export function PrismStage({ lines = FRAUNHOFER, mark = false }: Props) {
       lines.forEach(({ nm }, i) => {
         const ray = rayRefs.current[i]
         const gap = gapRefs.current[i]
-        const yr = yAt(theta, nm, xe)
-        const ys = yAt(theta, nm, sc)
+        const yr = Y(nm, xe)
+        const ys = Y(nm, sc)
         if (ray && yr !== null) {
           ray.setAttribute('x2', String(xe))
           ray.setAttribute('y2', String(sy(yr)))
-          ray.style.opacity = fr > 0 ? '' : '0'
+          ray.style.opacity = fr > 0 ? String(lineAlpha) : '0'
         }
         if (gap && ys !== null) {
           gap.setAttribute('x1', String(sc))
           gap.setAttribute('x2', String(sc + sw))
           gap.setAttribute('y1', String(sy(ys)))
           gap.setAttribute('y2', String(sy(ys)))
-          gap.style.opacity = String(scene.labels)
+          gap.style.opacity = String(scene.labels * lineAlpha)
         }
       })
 
       const fl = focusRef.current
       if (fl) {
-        const yf = yAt(theta, accentNm(scene.accent - 1, count), xe)
+        const yf = Y(accentNm(scene.accent - 1, count), xe)
         if (yf !== null) {
           fl.setAttribute('x2', String(xe))
           fl.setAttribute('y2', String(sy(yf)))
         }
         fl.style.stroke = `var(--accent-${scene.accent})`
-        fl.style.opacity = String(scene.focus * fr)
+        fl.style.opacity = String(scene.focus * fr * lineAlpha)
       }
 
       // ── Işık darbeleri ───────────────────────────────────────────────────
       // Tur: önce huzmede parlak bir parçacık prizmaya koşar (hızlanarak),
       // sonra tayfın üstünden dikey bir ışık dalgası olarak şeride akar.
       const on = pulsing && scene.beam >= 1 && fr >= 1
-      const alpha = on ? 0.55 + 0.35 * bright : 0
+      const alpha = on ? Math.min(1, (0.55 + 0.35 * bright) * (1 + 0.6 * scene.surge)) : 0
       for (let k = 0; k < PULSES; k++) {
         const bp = beamPulseRefs.current[k]
         const fp = fanPulseRefs.current[k]
@@ -315,8 +331,8 @@ export function PrismStage({ lines = FRAUNHOFER, mark = false }: Props) {
         } else {
           const v = (ph - PULSE_BEAM_SHARE) / (1 - PULSE_BEAM_SHARE)
           const x = Q.x + (sc - Q.x) * v
-          const y1 = yAt(theta, L_MAX, x)
-          const y2 = yAt(theta, L_MIN, x)
+          const y1 = Y(L_MAX, x)
+          const y2 = Y(L_MIN, x)
           if (y1 !== null && y2 !== null) {
             fp.setAttribute('x1', String(x))
             fp.setAttribute('x2', String(x))
@@ -334,7 +350,7 @@ export function PrismStage({ lines = FRAUNHOFER, mark = false }: Props) {
       // Yukarıdan aşağı sırayla, yakın olan bir alttakini en az labelStep iter.
       let prev = -Infinity
       labelled
-        .map(({ nm }, i) => ({ el: labelRefs.current[i], y: yAt(theta, nm, sc) }))
+        .map(({ nm }, i) => ({ el: labelRefs.current[i], y: Y(nm, sc) }))
         .filter((l): l is { el: HTMLSpanElement; y: number } => !!l.el && l.y !== null)
         .map((l) => ({ el: l.el, top: py(l.y) }))
         .sort((a, b) => a.top - b.top)
@@ -344,14 +360,17 @@ export function PrismStage({ lines = FRAUNHOFER, mark = false }: Props) {
           el.style.transform = `translate(${px(sc + sw) + LABEL_GAP}px, ${y}px) translateY(-50%)`
         })
 
-      root!.style.opacity = String(scene.dim)
+      // Dalgada kısık sahne (içerik slaytı) bir an tam parlaklığa yaklaşır.
+      root!.style.opacity = String(scene.dim + (1 - scene.dim) * scene.surge * SURGE.flash)
       // Etiketler yalnızca parlak slaytta: içerik slaytlarında panelin kenarından
       // yarım harfler taşıyordu ("+K", "9"). Kısılma ne kadar ilerlediyse o kadar söner.
-      if (labelsRef.current) labelsRef.current.style.opacity = String(scene.labels * bright)
+      if (labelsRef.current) labelsRef.current.style.opacity = String(scene.labels * bright * lineAlpha)
     }
 
     const reduced = reducedMotion()
     let theta = scene.base
+    /** Darbelerin kendi saati: dalgada hızlanıyor, sıçramadan (zaman çarpılmıyor, toplanıyor). */
+    let pulseClock = 0
 
     const tick = (time: number, dt: number) => {
       if (reduced) {
@@ -364,11 +383,12 @@ export function PrismStage({ lines = FRAUNHOFER, mark = false }: Props) {
       // Kendi hâlinde salınım: iki yavaş dalga üst üste — düzenli bir sarkaç
       // değil, canlı bir ışık. İçerik slaytında daha sakin (okuma sürüyor).
       const bright = clamp01((scene.dim - DIM) / (1 - DIM))
-      const amp = 0.6 + 0.4 * bright
+      const amp = (0.6 + 0.4 * bright) * (1 + scene.surge * SURGE.sway)
       const sway = amp * (deg(3.6) * Math.sin(time * 0.42) + deg(1.1) * Math.sin(time * 1.07 + 1.3))
       const target = scene.base + sway
       theta += (target - theta) * (1 - Math.pow(0.9, dt / 16.67))
-      draw(theta, time, true)
+      pulseClock += (dt / 1000) * (1 + scene.surge * SURGE.pulse)
+      draw(theta, pulseClock, true)
     }
 
     const onResize = () => {

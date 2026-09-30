@@ -37,10 +37,8 @@ export function applyTheme(
   // Tüm tonlardan tek bir tayf şeridi: soldan mor, sağa kırmızı (accents sırası).
   // "Gökkuşağını gradyan olarak kullan, palet olarak değil" (docs/DESIGN.md § F/5)
   s.setProperty('--spectrum', `linear-gradient(90deg, ${tokens.accents.join(', ')})`)
-  // Yalnızca duraklar — açısı öğede değişen gradyanlar için (üst çubuktaki
-  // dönen prizma işareti: conic-gradient(from var(--spin), var(--spectrum-stops))).
-  // Açı değişkeni kök değerin İÇİNE yazılamıyor: özel özellikteki var() kökte
-  // çözülür, öğedeki animasyon ona ulaşmaz.
+  // Yalnızca duraklar — öğede kendi gradyanını kuranlar için (üst çubuktaki
+  // akan tayflı "INTRO" yazısı: linear-gradient(90deg, var(--spectrum-stops), …)).
   s.setProperty('--spectrum-stops', tokens.accents.join(', '))
   // Tarayıcı arayüzü (kaydırma çubuğu, form denetimleri) de koyu tarafta kalsın.
   s.setProperty('color-scheme', 'dark')

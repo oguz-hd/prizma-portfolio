@@ -1,4 +1,4 @@
-import { useContent } from '../content/useContent'
+import { useStrings } from '../i18n/strings'
 import { LocaleSwitch } from './LocaleSwitch'
 import { Nav } from './Nav'
 
@@ -8,17 +8,19 @@ import { Nav } from './Nav'
  * Oturum 2 (kullanıcı isteği): isim çubuktan kalktı — isim girişte zaten
  * dairenin üstünde; alt çizgi (slayt ilerlemesi) kalktı — konum sağdaki rayda.
  *
- * İşaret merkezdeki prizmanın küçük kopyası: içi yavaşça dönen tayfla dolu
- * (theme.css → .brand-mark). Bağlantının erişilebilir adı içerikteki isim.
+ * Oturum 4 (kullanıcı isteği): üçgen işaretin yerine "INTRO / GİRİŞ" yazısı —
+ * ne olduğu daha anlaşılır. Üçgenin göz alıcılığı yazıda sürüyor: harfler
+ * akan tayfla dolu, etrafında aynı ışıma (theme.css → .brand). Dil geçişinde
+ * harfleri çözülüyor (data-i18n-fade).
  */
 export function SiteHeader() {
-  const { profile } = useContent()
+  const t = useStrings()
 
   return (
     <header className="site-header" data-reveal-chrome>
       <div className="site-header-inner container">
-        <a className="brand" href="#ust" aria-label={profile.name}>
-          <span className="brand-mark" aria-hidden="true" />
+        <a className="brand" href="#ust" data-i18n-fade>
+          {t('slideIntro')}
         </a>
         <Nav />
         <LocaleSwitch />

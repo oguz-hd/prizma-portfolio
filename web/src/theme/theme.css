@@ -18,13 +18,6 @@
      .rail          z 10  slayt rayı
 */
 
-/* Üst çubuktaki prizma işaretinin dönen tayfı için animasyonlanabilir açı. */
-@property --spin {
-  syntax: '<angle>';
-  inherits: false;
-  initial-value: 0deg;
-}
-
 :root {
   /* --- Tipografi ------------------------------------------------------
      ★ İki font (Oturum 3): Departure Mono kimlik ve arayüz, Atkinson
@@ -525,32 +518,36 @@ html[data-intro='pending'] :is([data-reveal], [data-reveal-panel], [data-reveal-
   gap: var(--space-2) var(--space-8);
 }
 
-/* Prizma işareti: içi yavaşça dönen tayf, etrafında o tayfın ışıması. */
+/* Girişe dönüş: "INTRO / GİRİŞ" — harfler akan tayfla dolu, etrafında ışıma
+   (Oturum 4; eskiden aynı tayfla dolu dönen bir üçgendi). Tayf yazının iki
+   katı genişlikte ve kayıyor: renkler harflerin üstünden akıyor. */
 .brand {
-  display: inline-flex;
-  padding: var(--space-1);
-  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--accent-3, var(--lead)) 70%, transparent))
-    drop-shadow(0 0 2px color-mix(in srgb, var(--ink) 60%, transparent));
+  position: relative;
+  padding: var(--space-1) 0;
+  font-size: var(--label-size);
+  letter-spacing: var(--label-tracking);
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+  color: transparent;
+  background: linear-gradient(90deg, var(--spectrum-stops), var(--accent-1)) 0 0 / 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: brand-flow 5s linear infinite;
+  filter: drop-shadow(0 0 5px color-mix(in srgb, var(--accent-3, var(--lead)) 70%, transparent))
+    drop-shadow(0 0 1px color-mix(in srgb, var(--ink) 50%, transparent));
   transition: filter var(--duration-base) var(--ease-out);
 }
 
-.brand-mark {
-  display: block;
-  width: 24px;
-  height: 21px;
-  clip-path: polygon(50% 0, 100% 100%, 0 100%);
-  background: conic-gradient(from var(--spin) at 50% 66%, var(--spectrum-stops), var(--accent-1));
-  animation: brand-spin 7s linear infinite;
+.brand:hover,
+.brand:focus-visible {
+  filter: drop-shadow(0 0 9px color-mix(in srgb, var(--accent-3, var(--lead)) 90%, transparent))
+    drop-shadow(0 0 2px var(--ink));
 }
 
-.brand:hover {
-  filter: drop-shadow(0 0 10px color-mix(in srgb, var(--accent-3, var(--lead)) 90%, transparent))
-    drop-shadow(0 0 3px var(--ink));
-}
-
-@keyframes brand-spin {
+@keyframes brand-flow {
   to {
-    --spin: 360deg;
+    background-position: -200% 0;
   }
 }
 
@@ -638,9 +635,31 @@ html[data-intro='pending'] :is([data-reveal], [data-reveal-panel], [data-reveal-
     padding-inline: var(--space-1);
   }
 
-  .brand-mark {
-    width: 20px;
-    height: 18px;
+}
+
+/* Oturum 4: üçgenin yerine "INTRO" yazısı (42 px, üçgen 28 px) geldi; dar
+   telefonda menü 4–32 px taşıyordu. Aralıklar sıkılaşıyor. */
+@media (max-width: 420px) {
+  .site-header-inner,
+  .nav {
+    gap: var(--space-2);
+  }
+
+  .nav-link {
+    letter-spacing: 0.02em;
+  }
+
+  .brand {
+    letter-spacing: 0.06em;
+  }
+
+  /* Yalnızca üst çubuk: sayfa içeriğinin kenar payı değişmiyor. */
+  .site-header-inner {
+    width: calc(100% - 2 * var(--space-3));
+  }
+
+  .locale-btn {
+    padding-inline: 2px;
   }
 }
 
