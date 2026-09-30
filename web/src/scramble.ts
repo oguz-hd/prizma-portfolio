@@ -19,6 +19,11 @@ import { accentCount } from './prism/scene'
  * Katakana'da Departure Mono yok, yedek fontla çiziliyor ve genişliği farklı:
  *   HTML → dönen harf, gerçek harfin genişliğinde bir kutuda (ölçülüyor)
  *   SVG  → yay metninin boyu `textLength` ile sabitleniyor (isim zaten sabit)
+ *
+ * ⚠️ Sabitlenen yay ortalanıyorsa (`text-anchor="middle"`) sabitleme süresince
+ * elle ortalanıyor: WebKit (iPhone Safari) ortalamayı `textLength`'ten ÖNCEKİ
+ * — Katakana'yla daha geniş — boyla yapıyor, yazı sola kayıp bitişte yerine
+ * sıçrıyordu (ölçüldü, 30.09.2026). Hero'daki isim de aynı sebeple elle ortalı.
  */
 
 const KATAKANA = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワン'
@@ -64,6 +69,23 @@ function freePaths(root: Element): Element[] {
 
 const pathLength = (p: Element) => (p as SVGTextContentElement).getComputedTextLength()
 
+type Lock = {
+  path: Element
+  /** Başlangıç ve bitiş boyu — sabitleme aradan akıyor. */
+  a: number
+  b: number
+  /** Ortalanan yay: izlediği yolun boyu + React'in `startOffset`'i (bitişte geri). */
+  center: { track: number; offset: string } | null
+}
+
+/** `startOffset="50%"` + `text-anchor="middle"` yayı mı? Öyleyse yolunun boyu. */
+function centerOf(path: Element): Lock['center'] {
+  if (path.getAttribute('text-anchor') !== 'middle') return null
+  const ref = path.getAttribute('href')
+  const track = ref ? document.querySelector<SVGPathElement>(ref)?.getTotalLength() : undefined
+  return track ? { track, offset: path.getAttribute('startOffset') ?? '50%' } : null
+}
+
 /** Dil değişmeden ÖNCE çağrılır — önce `settleScramble()`: süren çözülmede düğümler boş. */
 export function snapshot(roots: Element[]): Snapshot {
   const snap: Snapshot = new Map()
@@ -100,7 +122,7 @@ export function scramble(
   if (reducedMotion() || !roots.length) return
 
   const units: Unit[] = []
-  const locks: { path: Element; a: number; b: number }[] = []
+  const locks: Lock[] = []
 
   roots.forEach((root, ri) => {
     const nodes = textNodes(root, true)
@@ -110,7 +132,7 @@ export function scramble(
 
     freePaths(root).forEach((path) => {
       const b = pathLength(path)
-      locks.push({ path, a: prev?.lengths.get(path) ?? b, b })
+      locks.push({ path, a: prev?.lengths.get(path) ?? b, b, center: centerOf(path) })
     })
 
     nodes.forEach((node, ni) => {
@@ -168,9 +190,13 @@ export function scramble(
       u.box.remove()
       u.node.nodeValue = u.to
     })
-    locks.forEach(({ path }) => {
+    locks.forEach(({ path, center }) => {
       path.removeAttribute('textLength')
       path.removeAttribute('lengthAdjust')
+      if (center) {
+        path.setAttribute('startOffset', center.offset)
+        path.setAttribute('text-anchor', 'middle')
+      }
     })
   }
 
@@ -187,9 +213,14 @@ export function scramble(
 
   function draw(t: number) {
     const p = Math.min(1, t / total)
-    locks.forEach(({ path, a, b }) => {
-      path.setAttribute('textLength', String(a + (b - a) * p))
+    locks.forEach(({ path, a, b, center }) => {
+      const len = a + (b - a) * p
+      path.setAttribute('textLength', String(len))
       path.setAttribute('lengthAdjust', 'spacingAndGlyphs')
+      if (center) {
+        path.setAttribute('text-anchor', 'start')
+        path.setAttribute('startOffset', String((center.track - len) / 2))
+      }
     })
     let g = 0
     for (const u of units) {
