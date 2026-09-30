@@ -70,6 +70,8 @@ function build(): gsap.core.Timeline {
 
   const skipEvents = ['keydown', 'pointerdown', 'wheel', 'touchstart'] as const
   let safety = 0
+  /** Girdiyle ya da emniyet zamanlayıcısıyla atlatıldı mı (kendi bitmedi). */
+  let skipped = false
 
   const finish = () => {
     if (!pending) return
@@ -79,7 +81,8 @@ function build(): gsap.core.Timeline {
     delete root.dataset.intro
     gsap.set(all, { clearProps: 'opacity,transform' })
     // Atlatıldıysa yazılar da son karede: yarım çözülmüş metin kalmasın.
-    settleScramble()
+    // Kendi bittiyse çözülme sürsün — hızlı açılış ondan kısa.
+    if (skipped) settleScramble()
     if (stars) gsap.set(stars, { clearProps: 'opacity' })
     Object.assign(scene, { frame: 1, beam: 1, fan: 1, labels: 1, focus: 1, dirty: true })
     unlockDeck(400)
@@ -110,16 +113,18 @@ function build(): gsap.core.Timeline {
   if (chrome.length)
     t.fromTo(chrome, { opacity: 0 }, { opacity: 1, duration: 0.6, ease: 'power1.out', stagger: 0.1 }, 2.7)
 
-  // Çözülme GSAP'ın dışında, kendi saatinde; hızlı açılışta o da kısalıyor.
+  // Çözülme GSAP'ın dışında, kendi saatinde ve süresi hep SCRAMBLE_MS — dil
+  // geçişindekiyle aynı. Hızlı açılışta (tekrar ziyaret) yalnızca başlangıcı öne gelir.
   const speed = seen() ? 3 : 1
   if (blocks.length)
-    t.call(() => { if (pending) scramble(blocks, { duration: 900 / speed, stagger: 80 / speed }) }, undefined, 2.35)
+    t.call(() => { if (pending) scramble(blocks, { stagger: 80 / speed }) }, undefined, 2.35)
   if (chrome.length)
-    t.call(() => { if (pending) scramble(chrome, { duration: 700 / speed, stagger: 100 / speed }) }, undefined, 2.7)
+    t.call(() => { if (pending) scramble(chrome, { stagger: 100 / speed }) }, undefined, 2.7)
 
   if (speed > 1) t.timeScale(speed)
 
   function skip() {
+    skipped = true
     t.progress(1)
   }
   // Yakalama evresinde: deck'in dinleyicilerinden ÖNCE çalışsın ki kilidi o açsın.

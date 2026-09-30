@@ -40,7 +40,7 @@ export function LocaleSwitch() {
     const before = snapshot(roots)
     // Dil hemen değişsin ki çözülme eski metinden YENİ metne yürüsün.
     flushSync(() => setLocale(next))
-    scramble(roots, { from: before, duration: 800 })
+    scramble(roots, { from: before })
     const prose = proseOf(roots)
     if (prose.length)
       gsap.fromTo(prose, { opacity: 0 }, { opacity: 1, duration: 0.45, ease: 'power1.out', clearProps: 'opacity' })

@@ -28,6 +28,12 @@ import { accentCount } from './prism/scene'
 
 const KATAKANA = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワン'
 const TICK = 45
+/**
+ * Bir çözülmenin süresi (ms) — açılışta da dil geçişinde de AYNI (kullanıcı
+ * isteği: "ikisi aynı olsun, uzun olan"). Eskiden dil 800, açılış 900 (üst
+ * çubuk 700), tekrar ziyarette açılışla birlikte 3× kısalıyordu (300).
+ */
+export const SCRAMBLE_MS = 900
 const SVG_NS = 'http://www.w3.org/2000/svg'
 
 type Unit = {
@@ -117,7 +123,7 @@ export function settleScramble(): void {
  */
 export function scramble(
   roots: Element[],
-  { from, duration = 800, stagger = 0 }: { from?: Snapshot; duration?: number; stagger?: number } = {},
+  { from, duration = SCRAMBLE_MS, stagger = 0 }: { from?: Snapshot; duration?: number; stagger?: number } = {},
 ): void {
   if (reducedMotion() || !roots.length) return
 
