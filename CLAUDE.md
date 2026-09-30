@@ -62,6 +62,9 @@ docker exec prizma-portfolio-web-1 npm run build       # asıl derleme
     11px'in katı (11/22/33/44/55/88), tek ağırlık, kalın yazma (`font-synthesis: none`).
     **Atkinson Hyperlegible Next** yalnızca düzyazı (theme.css → düzyazı seçici listesi;
     yeni paragraf bloğu oraya eklenir), `--text-prose` ölçeği.
+    İstisnalar (Oturum 4): daire başlığı "kalın" ama sahte kalın değil, kendi
+    renginde miter kontur (`.ring-title`); telefonda daire iç yazısı 11 × 2/3 px
+    (3x ekranda keskin, ölçüldü).
 12. **Verimsiz kod yazma.** Bir sonraki faz için önden kod yazma.
 13. **Prizma fareye bağlı DEĞİL** — hareketi kendi hâlinde (salınım + ışık darbeleri);
     mobilde de aynı görünmeli (kullanıcı kararı, Oturum 2).
@@ -87,7 +90,9 @@ seçenekler artifact'taydı (https://claude.ai/artifact/LN9aUxFhh1JwEP9kEBX7zi, 
 ✅ **Oturum 4** (30.09.2026) — sığmayan slayt alt sayfalara bölünüyor (A1,
 `deck/paginate.ts`; birimler `data-page-unit`) · İletişim kısa telefona sığıyor ·
 geçiş dalgası (`scene.surge`, hafif) · tayfta çizgi/etiket yok (yalnızca 404'te) ·
-navbar'da akan tayflı "INTRO" · çözülme süresi her yerde 900 ms. → `DESIGN.md` § 12
+navbar'da akan tayflı "INTRO" · çözülme süresi her yerde 900 ms · İletişim girişin
+dairesinde (`components/Ring.tsx` ortak), müsaitlik cümlesi yok · isim kalın ·
+kartların sol üstündeki tayf çizgisi kalktı. → `DESIGN.md` § 12
 
 ⏭ **Sırada (kullanıcı): genel düzenleme/temizlik, sonra back-end** (panel, content.json).
 

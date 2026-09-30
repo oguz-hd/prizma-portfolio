@@ -1,74 +1,115 @@
+import { Fragment, useRef } from 'react'
+
+import { INNER_GAP, RingTitle, arc, useRing } from '../components/Ring'
+import { SiteFooter } from '../components/SiteFooter'
 import { useContent } from '../content/useContent'
 import { useStrings } from '../i18n/strings'
-import { SiteFooter } from '../components/SiteFooter'
 import type { SectionProps } from './Section'
 
 /**
- * İletişim — kapanış karesi (Oturum 2, kullanıcı: "en altta daha iyi bir
- * tasarım olsun, sitenin temasına uysun").
+ * İletişim — kapanış karesi, girişin aynası (Oturum 4, kullanıcı: "iletişimdeki
+ * yazıyı kaldıralım, bu bölüm intro gibi dairesel olsun").
  *
- * Açılışın aynası: cam panel yok, prizma tam parlaklıkta ortada. Üstte bölüm
- * başlığı ve müsaitlik cümlesi, altta e-posta ve bağlantılar, en dipte altbilgi.
- * Site bir ışıkla açılıyor, aynı ışığın önünde kapanıyor.
+ * Aynı görünmez daire (components/Ring.tsx), aynı başlık boyu:
+ *   üst yay       İLETİŞİM — geniş, kalın
+ *   üst iç yay    BANA YAZ
+ *   alt yay       e-posta adresi (sayfanın asıl bağlantısı)
+ *   alt iç yay    GitHub · LinkedIn
+ *   dip           altbilgi — daire ona çarpmasın diye yarıçap küçülebiliyor
  *
- * curious.page kuralı 4: iletişim BARİZ — e-posta sayfanın en büyük yazılarından.
+ * Müsaitlik cümlesi (bölüm gövdesi) kalktı; içerikte de boş. curious.page
+ * kuralı 4: iletişim bariz — e-posta alt yayda, başlıktan sonra en iri yazı.
  *
- * Kabuk Section değil (o cam panel kuruyor); slayt işaretleri aynı:
- * data-slide · data-slide-scroll · data-slide-focus · data-reveal.
+ * Başlık ekran okuyucu için ayrıca görünmez bir <h2>'de; yaydaki kopya
+ * aria-hidden. Bağlantılar gerçek SVG <a> — klavyeyle odaklanıyor.
  */
-export function Contact({ id, index, heading, body }: SectionProps) {
-  const { links } = useContent()
+
+/** Alt yaydaki e-posta: 22 px, yayın ~85°'sinden fazlasını kaplayacaksa 11 px. */
+const MAIL = { big: 22, small: 11 }
+/** Alt iç yaydaki GitHub · LinkedIn. */
+const SOCIAL = 11
+/** Dairenin altında altbilgiye ayrılan yer (px): altbilgi + nefes. */
+const FOOTER_ROOM = 72
+
+export function Contact({ id, heading }: SectionProps) {
+  const { profile, links } = useContent()
   const t = useStrings()
+  const boxRef = useRef<HTMLDivElement>(null)
   const titleId = `${id}-title`
 
   const email = links.find((l) => l.href.startsWith('mailto:'))
   const others = links.filter((l) => !l.href.startsWith('mailto:'))
+  const address = email?.href.replace('mailto:', '') ?? ''
+
+  // Altta büyük e-postaya yetecek yer ayrılıyor; adres yaya sığmazsa küçülüyor.
+  const geo = useRing(boxRef, profile.name.length, FOOTER_ROOM + MAIL.big * 1.75)
+  const mail = (address.length * geo.adv * MAIL.big) / geo.r < 1.5 ? MAIL.big : MAIL.small
+
+  const ids = {
+    top: `${id}-ring-top`,
+    inner: `${id}-ring-inner`,
+    bottom: `${id}-ring-bottom`,
+    innerBottom: `${id}-ring-inner-bottom`,
+  }
 
   return (
-    <section id={id} className="slide" data-slide data-prism="bright" aria-labelledby={titleId}>
+    <section id={id} className="slide slide-ring" data-slide data-prism="bright" aria-labelledby={titleId}>
       <div className="slide-scroll" data-slide-scroll>
-        <div className="frame container">
-          <div className="frame-top">
-            <p className="label section-index" data-reveal>
-              {String(index).padStart(2, '0')}
-            </p>
-            <h2 id={titleId} className="closing-heading" data-slide-focus tabIndex={-1} data-reveal data-i18n-fade>
-              {heading}
-            </h2>
-            {body.length > 0 && (
-              <div className="closing-intro" data-reveal data-i18n-fade>
-                {body.map((p, i) => (
-                  <p key={i}>{p}</p>
-                ))}
-              </div>
-            )}
-          </div>
+        <div className="ring-box" ref={boxRef}>
+          <h2 id={titleId} className="sr-only" data-slide-focus tabIndex={-1}>
+            {heading}
+          </h2>
 
-          <div className="frame-gap" aria-hidden="true" />
+          <svg className="ring" viewBox={`0 0 ${geo.W} ${geo.H}`} width={geo.W} height={geo.H} focusable="false">
+            <defs>
+              <path id={ids.top} d={arc(geo, geo.r, 1)} />
+              <path id={ids.inner} d={arc(geo, geo.r - INNER_GAP, 1)} />
+              {/* Alt yaylar soldan dipten sağa: harfler dairenin üstünde duruyor, dik. */}
+              <path id={ids.bottom} d={arc(geo, geo.r + mail * 0.75, 0)} />
+              <path id={ids.innerBottom} d={arc(geo, geo.r - INNER_GAP, 0)} />
+            </defs>
 
-          <div className="frame-bottom">
+            <g aria-hidden="true" data-reveal data-i18n-fade>
+              <RingTitle geo={geo} path={ids.top} text={heading} />
+            </g>
+
+            <g className="ring-eyebrow" aria-hidden="true" data-reveal data-i18n-fade>
+              <text>
+                <textPath href={`#${ids.inner}`} startOffset="50%" textAnchor="middle">
+                  {t('emailMe')}
+                </textPath>
+              </text>
+            </g>
+
             {email && (
-              <div className="closing-mail" data-reveal data-i18n-fade>
-                {/* mailto: önekini kırpıp adresi olduğu gibi göster — tıklanacak şey bu. */}
-                <a className="contact-email" href={email.href}>
-                  {email.href.replace('mailto:', '')}
-                </a>
-                <p className="label contact-cta">{t('emailMe')}</p>
-              </div>
+              <g className="ring-links ring-mail" data-reveal data-i18n-fade>
+                <text style={{ fontSize: mail }}>
+                  <textPath href={`#${ids.bottom}`} startOffset="50%" textAnchor="middle">
+                    <a href={email.href}>
+                      <tspan>{address}</tspan>
+                    </a>
+                  </textPath>
+                </text>
+              </g>
             )}
 
-            <ul className="closing-links" data-reveal data-i18n-fade>
-              {others.map((l) => (
-                <li key={l.id}>
-                  <a href={l.href} target="_blank" rel="noreferrer noopener" className="hero-link">
-                    {l.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
+            <g className="ring-links" data-reveal data-i18n-fade>
+              <text style={{ fontSize: SOCIAL }}>
+                <textPath href={`#${ids.innerBottom}`} startOffset="50%" textAnchor="middle">
+                  {others.map((l, i) => (
+                    <Fragment key={l.id}>
+                      {i > 0 && <tspan className="ring-sep"> · </tspan>}
+                      <a href={l.href} target="_blank" rel="noreferrer noopener">
+                        <tspan>{l.label}</tspan>
+                      </a>
+                    </Fragment>
+                  ))}
+                </textPath>
+              </text>
+            </g>
+          </svg>
 
-            <SiteFooter />
-          </div>
+          <SiteFooter />
         </div>
       </div>
     </section>

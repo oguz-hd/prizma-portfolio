@@ -208,8 +208,7 @@ def seed(session: Session) -> bool:
     # ── Bölümler ────────────────────────────────────────────────────────────
     # `body` = başlığın altına düşen serbest metin. Hakkımda ve Deneyim'de boş:
     # içerikleri bileşenlerde (bio, zaman çizelgesi, linkler) üretiliyor.
-    # İletişim'deki müsaitlik cümlesi bilerek burada — iş bulununca panelden
-    # silinecek bir satır, koda gömülü bir dize değil.
+    # İletişim'in müsaitlik cümlesi kullanıcı isteğiyle kalktı (Oturum 4).
     # Projeler bölümü kullanıcı isteğiyle kalktı (Oturum 2); proje KAYITLARI
     # duruyor — bölüm geri eklenirse ön yüzde bileşeni hazır.
     # `nav_label` = üst menüdeki kısa ad; yoksa menü başlığı kullanır.
@@ -217,11 +216,7 @@ def seed(session: Session) -> bool:
         ("hakkimda", "hakkimda", 1, ("Hakkımda", "About"), None, None),
         ("deneyim", "deneyim", 2, ("Deneyim ve Eğitim", "Experience & Education"),
          ("Deneyim", "Experience"), None),
-        ("iletisim", "iletisim", 3, ("İletişim", "Contact"), None,
-         ("Mezun oldum, şu an yeni bir rol arıyorum. Uçtan uca sorumluluk aldığım "
-          "— arayüzü de servisi de yazdığım — işler ilgimi çekiyor.",
-          "I’ve graduated and I’m looking for a new role. I’m drawn to work where "
-          "I own things end to end — writing both the interface and the service.")),
+        ("iletisim", "iletisim", 3, ("İletişim", "Contact"), None, None),
     ]:
         rows.append(Section(id=sid, slug=slug, order=order))
         rows += _t("section", sid, "heading", heading[0], heading[1])

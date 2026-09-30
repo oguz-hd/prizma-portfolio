@@ -213,7 +213,6 @@ a {
    buraya ekle. */
 .section-intro,
 .about-bio,
-.closing-intro,
 .not-found-body,
 .skill-note,
 .timeline-note {
@@ -686,8 +685,7 @@ html[data-intro='pending'] :is([data-reveal], [data-reveal-panel], [data-reveal-
 }
 
 .hero-link::after,
-.nav-link::after,
-.contact-email::after {
+.nav-link::after {
   content: '';
   position: absolute;
   left: 0;
@@ -706,18 +704,11 @@ html[data-intro='pending'] :is([data-reveal], [data-reveal-panel], [data-reveal-
     opacity var(--duration-base) var(--ease-out);
 }
 
-.contact-email::after {
-  height: 2px;
-  bottom: -2px;
-}
-
 .hero-link:hover::after,
 .hero-link:focus-visible::after,
 .nav-link:hover::after,
 .nav-link:focus-visible::after,
-.nav-link[aria-current]::after,
-.contact-email:hover::after,
-.contact-email:focus-visible::after {
+.nav-link[aria-current]::after {
   opacity: 1;
   transform: scaleX(1);
 }
@@ -843,47 +834,69 @@ html[data-intro='pending'] :is([data-reveal], [data-reveal-panel], [data-reveal-
   padding-block: 0;
 }
 
-.hero {
+.hero,
+.ring-box {
   position: relative;
   flex: 1 0 auto;
   min-height: 100%;
 }
 
-.hero-arc {
+/* İletişim de girişin dairesinde (Oturum 4): kapanış karesinin kabı tam ekran. */
+.slide-ring .slide-scroll {
+  padding-block: 0;
+}
+
+.ring {
   position: absolute;
   inset: 0;
   overflow: visible;
   pointer-events: none;
 }
 
-.hero-arc text {
+.ring text {
   font-family: var(--font-display);
 }
 
-/* Büyük harf (kullanıcı isteği, Oturum 2). İçerikte isim olduğu gibi duruyor;
-   dönüşüm yalnızca burada — <html lang> doğru olduğu için Türkçe büyük harf
-   kuralları (i → İ) tarayıcıdan geliyor. Büyük harf biraz daha nefes istiyor. */
-.hero-arc-name text {
+/* Üst yaydaki büyük başlık (isim, İLETİŞİM). Büyük harf (Oturum 2); <html lang>
+   doğru olduğu için Türkçe büyük harf kuralları (i → İ) tarayıcıdan geliyor.
+   ★ Kalın (Oturum 4, kullanıcı: "ismim daha kalın yazılsın"): Departure Mono'nun
+   tek ağırlığı var ve sahte kalın pikselleri bulaştırıyor (kural 11). Onun
+   yerine harfin kendi renginde kontur — köşeler keskin (miter), piksel hissi
+   kalıyor. Kontur dolgunun ALTINDA (paint-order), içi boşalmıyor. */
+.ring-title {
   fill: var(--ink);
+  stroke: var(--ink);
+  stroke-width: 0.07em;
+  stroke-linejoin: miter;
+  paint-order: stroke fill;
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
 
-.hero-arc-eyebrow text {
+.ring-eyebrow text {
   fill: var(--ink-faint);
   font-size: var(--label-size);
   letter-spacing: var(--label-tracking);
   text-transform: uppercase;
 }
 
-.hero-arc-links text {
+/* Telefonda küçük yazı (Oturum 4, kullanıcı: "unvan ve konum mobilde büyük").
+   11'in 2/3'ü: 3x ekranda her font pikseli tam 2 cihaz pikseli — keskin kalıyor
+   (390×844 @3x'te ölçüldü; kural 11'in tek istisnası, 2x ekranda hafif yumuşar). */
+@media (max-width: 767px) {
+  .ring-eyebrow text {
+    font-size: calc(var(--label-size) * 2 / 3);
+  }
+}
+
+.ring-links text {
   fill: var(--ink-faint);
   letter-spacing: 0.04em;
 }
 
 /* Görünmez kalın çerçeve = dokunma alanı: 11px yazı parmağa küçük. Saydam
    çizgi de isabet testine giriyor (pointer-events: visible). */
-.hero-arc-links a {
+.ring-links a {
   pointer-events: visible;
   fill: var(--lead);
   stroke: transparent;
@@ -891,8 +904,8 @@ html[data-intro='pending'] :is([data-reveal], [data-reveal-panel], [data-reveal-
   transition: fill var(--duration-base) var(--ease-out);
 }
 
-.hero-arc-links a:hover,
-.hero-arc-links a:focus-visible {
+.ring-links a:hover,
+.ring-links a:focus-visible {
   fill: var(--ink);
   text-decoration: underline;
   outline: none;
@@ -977,13 +990,6 @@ html[data-intro='pending'] :is([data-reveal], [data-reveal-panel], [data-reveal-
     grid-template-rows: 1fr calc(var(--prism-box, 200px) + 2 * var(--space-6)) 1fr;
   }
 
-  .frame .closing-links {
-    margin-top: var(--space-4);
-  }
-
-  .frame .site-footer {
-    padding-top: var(--space-4);
-  }
 }
 
 @media (min-width: 768px) and (max-height: 740px) {
@@ -1024,73 +1030,15 @@ html[data-intro='pending'] :is([data-reveal], [data-reveal-panel], [data-reveal-
     padding-top: var(--header-h);
   }
 
-  .closing-heading {
-    font-size: var(--text-title);
-  }
-
-  /* Kapanış karesinin numarası süs; SE'de (553 px) sığmak için ilk giden o. */
-  .frame .section-index {
-    display: none;
-  }
-
-  .closing-intro {
-    line-height: 1.35;
-  }
-
-  .frame .closing-links {
-    margin-top: var(--space-3);
-  }
-
-  .frame .site-footer {
-    padding-top: var(--space-3);
-  }
 }
 
-.closing-heading {
-  font-size: var(--text-heading);
-}
-
-.closing-intro {
-  /* 44ch'te İngilizce cümle üç satıra düşüp kısa ekranda kareyi taşırıyordu. */
-  max-width: 56ch;
-  margin-top: var(--space-2);
-  color: var(--ink-dim);
-}
-
-.closing-mail {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.contact-email {
-  position: relative;
-  display: inline-block;
-  font-size: var(--text-display);
-  line-height: var(--leading-tight);
-  text-decoration: none;
-  border-bottom: 2px solid var(--line);
-  word-break: break-word;
-}
-
-.contact-cta {
-  margin-top: var(--space-3);
-}
-
-.closing-links {
-  list-style: none;
-  padding: 0;
-  margin-top: var(--space-6);
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: var(--space-6);
-}
-
-/* Altbilgi: kapanış karesinin en dibinde tek ince satır. */
+/* Altbilgi: kapanış karesinin (İletişim) en dibinde tek ince satır. Daire
+   ona çarpmasın diye yarıçap küçülebiliyor (Contact.tsx → FOOTER_ROOM). */
 .site-footer {
-  margin-top: auto;
-  padding-top: var(--space-8);
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: var(--space-6);
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -1118,18 +1066,6 @@ html[data-intro='pending'] :is([data-reveal], [data-reveal-panel], [data-reveal-
   .panel {
     background: var(--surface);
   }
-}
-
-.panel::before {
-  content: '';
-  position: absolute;
-  top: -1px;
-  left: clamp(var(--space-6), 3.4vw, var(--space-12));
-  width: 128px;
-  height: 2px;
-  background: var(--spectrum);
-  -webkit-mask-image: var(--fraunhofer);
-  mask-image: var(--fraunhofer);
 }
 
 .section-head {

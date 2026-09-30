@@ -248,16 +248,9 @@ export const SITE: RawSiteContent = {
       id: 'iletisim',
       slug: 'iletisim',
       heading: { tr: 'İletişim', en: 'Contact' },
-      // ★ Müsaitlik sinyali. Bilerek İÇERİK (arayüz metni değil): iş bulunca
-      // panelden silinecek tek satır bu olsun, kod değişmesin.
-      body: {
-        tr: [
-          'Mezun oldum, şu an yeni bir rol arıyorum. Uçtan uca sorumluluk aldığım — arayüzü de servisi de yazdığım — işler ilgimi çekiyor.',
-        ],
-        en: [
-          'I’ve graduated and I’m looking for a new role. I’m drawn to work where I own things end to end — writing both the interface and the service.',
-        ],
-      },
+      // Müsaitlik cümlesi kullanıcı isteğiyle kalktı (Oturum 4): İletişim artık
+      // girişin dairesinde, yalnızca başlık, e-posta ve bağlantılar.
+      body: { tr: [], en: [] },
       order: 3,
     },
   ],
