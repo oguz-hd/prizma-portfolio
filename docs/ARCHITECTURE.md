@@ -204,6 +204,24 @@ güvenlik kazancı.
 
 ## 8. Açık konular
 
+### ★ Panel gereksinimi: içerik değişince yerleşim kendiliğinden uymalı (kullanıcı, Oturum 3)
+
+> "Yönetimden yeni bir sayfa oluşturduğumda veya bir sayfanın uzunluğunu
+> arttırdığımda bunun otomatik olabilmesini sağlamalıyız — yönetimi yaparken düşünürüz."
+
+Oturum 3'te bazı sığma sorunları **elle ayarlanmış eşiklerle** çözüldü; içerik
+panelden değişince bunlar kendiliğinden işlemeyebilir. Panel (Faz 6-8) yazılırken ele alınacak:
+
+| Bugün elle | Neden kırılabilir | Panelde |
+|---|---|---|
+| Kapanış karesi `max-height: 820 / 740 px` kademeleri (theme.css) + `.closing-intro` 56ch | Müsaitlik cümlesi uzarsa kısa ekranda yine taşar | Kareyi ölçüp sığdıran bir yerleşim (boşlukları `clamp()` ile yüksekliğe bağla) ya da kaydetmeden önce "bu metin 1366×768'de taşıyor" uyarısı |
+| Menüde kısa ad (`navLabel`) | Yeni bölümün adı uzunsa telefonda menü yine kayar | Yeni bölüm eklerken `navLabel` alanı; uzunluk sınırı / önizleme |
+| Yeni slayt | Bölüm ↔ bileşen eşlemesi `App.tsx`'te elle | Bölüm türü (serbest metin / zaman çizelgesi / kapanış) seçilerek genel bir bileşen |
+
+Kendiliğinden işleyenler (ölçüme dayalı, dokunmaya gerek yok): kaydırma çubuğu yeri
+(`scrollbar-gutter`), taşan slaytın içinde kayma (deck), tayf uzunluğu (etiket
+genişliği ölçülüyor), etiket çakışması, "SCROLL" ipucunun yeri, isim yayının boyutu.
+
 - Barındırma nerede? (backend bir sunucu istiyor — Railway / Render / Fly.io / VPS)
 - Domain
 - Görsel yükleme: diskte mi, bir nesne depolamada mı?

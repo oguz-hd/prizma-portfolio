@@ -174,5 +174,10 @@ dil seçiciyi ekran dışına itiyordu → menü yatay kayıyor. Alt yay bağlan
 
 Ölçüm (Playwright, gerçek tekerlek/dokunma): tekerlek `0→1→2→1` (geçiş sürerken
 çentik sıraya giriyor, 40 olaylık atalet akışı tek adım); dokunma `0→1→2→3→2`.
-1024 px'te görülen, bu oturumdan önce de var olan iki çakışma: "Hα 656" ile "Na D 589"
-etiketleri üst üste biniyor; "SCROLL" ipucu alt yaydaki "GitHub"a değiyor.
+Oturumdan önce de var olan iki çakışma (ölçüm geniş çıktı, yalnız 1024 değil):
+- **Tayf etiketleri** (1024'te 14 px, 1280–1440'ta 3–5 px üst üste) → PrismStage her
+  karede yukarıdan aşağı sıralıyor; yakın olan alttakini en az `font-size × 1.3` itiyor.
+- **"SCROLL" ipucu** (1024×768, 1280×720, 1366×768'de alt yaya 7–13 px biniyordu) →
+  ekranın dibine sabit değil, Hero.tsx bağlantı yayının `getBBox()`'ından 16 px altına
+  koyuyor; sığmazsa önce hareketli çizgi kalkıyor (`is-compact`), o da sığmazsa gizleniyor.
+İkisi de ölçüme dayalı — içerik panelden değişse de çalışır (→ ARCHITECTURE § 8).

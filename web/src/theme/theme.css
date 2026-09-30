@@ -860,8 +860,13 @@ html[data-intro='pending'] :is([data-reveal], [data-reveal-panel], [data-reveal-
   position: absolute;
   left: 0;
   right: 0;
+  /* Yedek; asıl `top` Hero.tsx'te bağlantı yayının altından ölçülüyor. */
   bottom: var(--space-6);
   text-align: center;
+}
+
+.hero-hint.is-compact::after {
+  display: none;
 }
 
 .hero-hint::after {

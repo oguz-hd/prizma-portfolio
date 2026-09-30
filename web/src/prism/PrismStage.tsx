@@ -58,7 +58,17 @@ type Props = {
 }
 
 /** Görünür alanın dünya birimi cinsinden kutusu (y aşağı — SVG uzayı). */
-type Layout = { W: number; H: number; s: number; vx: number; vy: number; screenX: number; stripW: number }
+type Layout = {
+  W: number
+  H: number
+  s: number
+  vx: number
+  vy: number
+  screenX: number
+  stripW: number
+  /** İki etiketin merkezleri arasındaki en küçük uzaklık (px). */
+  labelStep: number
+}
 
 /** Prizmanın sınırlayıcı kutusunun merkezi (dünya y'si). Ekranın ortasına bu oturuyor. */
 const BOX_CY = (AP.y + BL.y) / 2
@@ -137,13 +147,15 @@ export function PrismStage({ lines = FRAUNHOFER, mark = false }: Props) {
       // raya değmeden sığabilecek en sağa gidiyor. Önceki W×0.33, 1440'ta sağda
       // ~80px boş bırakıyor, 1024'te ise etiketi rayın 4px yanına kadar itiyordu (ölçüldü).
       const labelW = Math.max(0, ...labelRefs.current.map((el) => el?.offsetWidth ?? 0))
+      const first = labelRefs.current[0]
+      const labelStep = first ? parseFloat(getComputedStyle(first).fontSize) * 1.3 : 0
       const room = W / 2 - RAIL_ROOM - LABEL_GAP - labelW - STRIP_PX
       const screenX = W < 768 ? (W / 2 - 52) / s : Math.min(room / s, 7)
       // Yerleşim prizmanın boyunu bilsin (giriş ızgarası ortadaki boşluğu buna göre açıyor).
       const rs = document.documentElement.style
       rs.setProperty('--prism-box', `${Math.round(PRISM_HEIGHT * s)}px`)
       rs.setProperty('--prism-w', `${Math.round(2 * s)}px`)
-      return { W, H, s, vx, vy, screenX, stripW: STRIP_PX / s }
+      return { W, H, s, vx, vy, screenX, stripW: STRIP_PX / s, labelStep }
     }
 
     /** Dünya noktası → sahne kutusuna göre piksel (etiketler için). */
@@ -317,12 +329,20 @@ export function PrismStage({ lines = FRAUNHOFER, mark = false }: Props) {
       }
 
       // ── Etiketler (HTML) ─────────────────────────────────────────────────
-      labelled.forEach(({ nm }, i) => {
-        const el = labelRefs.current[i]
-        const y = yAt(theta, nm, sc)
-        if (!el || y === null) return
-        el.style.transform = `translate(${px(sc + sw) + LABEL_GAP}px, ${py(y)}px) translateY(-50%)`
-      })
+      // Çizgiler şeritte birbirine yakın düşebiliyor (Hα 656 ↔ Na D 589): şerit
+      // kısaldıkça etiketler üst üste biniyordu (1024 px'te 14 px, ölçüldü).
+      // Yukarıdan aşağı sırayla, yakın olan bir alttakini en az labelStep iter.
+      let prev = -Infinity
+      labelled
+        .map(({ nm }, i) => ({ el: labelRefs.current[i], y: yAt(theta, nm, sc) }))
+        .filter((l): l is { el: HTMLSpanElement; y: number } => !!l.el && l.y !== null)
+        .map((l) => ({ el: l.el, top: py(l.y) }))
+        .sort((a, b) => a.top - b.top)
+        .forEach(({ el, top }) => {
+          const y = Math.max(top, prev + L.labelStep)
+          prev = y
+          el.style.transform = `translate(${px(sc + sw) + LABEL_GAP}px, ${y}px) translateY(-50%)`
+        })
 
       root!.style.opacity = String(scene.dim)
       // Etiketler yalnızca parlak slaytta: içerik slaytlarında panelin kenarından
