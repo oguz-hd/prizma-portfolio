@@ -4,6 +4,7 @@
 #  prizma-portfolio · web
 #
 #  Üç aşama: deps → dev (Vite sunucusu) · deps → build → prod (Caddy)
+#  Yayına yönetim paneli de giriyor: admin-build → prod (/srv/admin).
 #
 #  ⚠️ Node sürümü: Vite 8, Node ^20.19 || >=22.12 istiyor. node:22-alpine
 #  bu aralığın içinde. Yerel makinede Node 26 var; fark sorun değil çünkü
@@ -37,9 +38,24 @@ COPY . .
 RUN npm run build
 
 
+# --- Aşama 3b: yönetim paneli (admin/, Faz 7b) -----------------------------
+# Kaynağı ayrı bir bağlamdan: compose'un `additional_contexts: admin`
+# (docker-compose.prod.yml). Panel sözleşmeyi ve paletleri sitenin kaynağından
+# import ediyor (@site → ../web/src) — o yüzden `src` de yanına, /web/src'ye.
+FROM node:22-alpine AS admin-build
+WORKDIR /admin
+COPY --from=admin package.json package-lock.json ./
+RUN npm ci
+COPY --from=admin . .
+COPY src /web/src
+RUN npm run build
+
+
 # --- Aşama 4: yayın --------------------------------------------------------
 # Statik çıktıyı Caddy servis ediyor. Node imajı yayına hiç çıkmıyor —
-# hem küçük hem saldırı yüzeyi dar.
+# hem küçük hem saldırı yüzeyi dar. Panel sitenin altında: /admin/ (Caddyfile);
+# ayrı build olduğu için ziyaretçi panel kodunu hiç indirmiyor.
 FROM caddy:2-alpine AS prod
 COPY --from=build /app/dist /srv
+COPY --from=admin-build /admin/dist /srv/admin
 EXPOSE 80 443

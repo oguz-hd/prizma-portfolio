@@ -12,6 +12,9 @@ services:
     image: prizma-portfolio-web:prod
     build:
       target: prod
+      # Yönetim paneli de bu imaja derleniyor (web/Dockerfile → admin-build).
+      additional_contexts:
+        admin: ./admin
     ports:
       - '80:80'
       - '443:443'

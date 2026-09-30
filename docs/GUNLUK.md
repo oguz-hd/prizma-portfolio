@@ -47,3 +47,8 @@ Ardından Faz 7a: yönetim API'si. Girdi çıktının şekliyle aynı (iki dil y
 çevrilmiş alan reddediliyor; parola değişince token'daki parola izi eski oturumları
 düşürüyor. Uçtan uca bir betik her uç noktayı hatalı ve doğru girdiyle denedi, sonunda
 içeriği başlangıçtakiyle birebir karşılaştırdı (83/83).
+Sonra Faz 7b: yönetim paneli ayrı bir build olarak kuruldu, sözleşmeyi ve paletleri
+sitenin kaynağından import ediyor. Kullanıcı testler sürerken paneli kendisi de
+kullandı (paleti Turbo'ya, sonra Aurora'ya aldı) — panelin seçili paleti izlemesi o
+sırada bozuldu: Aurora'da kırmızı ton yok, hata yazısı camgöbeği çıktı; panel hep Tayf'a
+sabitlendi. Kullanıcı iki şey istedi: giriş ekranında prizma teması ve büyüyen içerik testleri.

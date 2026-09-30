@@ -235,11 +235,26 @@ prizma-portfolio/
 │     ├─ lab/             token laboratuvarı (/?lab)
 │     └─ scramble.ts      harf çözülmesi (açılış + dil geçişi)
 ├─ api/                   FastAPI + SQLite (içerik, çeviriler, tohum verisi, yayın → content.json)
-└─ admin/                 (henüz yok) yönetim paneli — ayrı build
+└─ admin/                 yönetim paneli (Faz 7b) — ayrı build, React + Vite + TS
+   └─ src/
+      ├─ api.ts           sunucuyla konuşulan TEK yer (token, hatalar Türkçe)
+      ├─ panel.tsx        ortak durum: içerik + reload, taslak, kaydedilmemiş değişiklik
+      ├─ fields.tsx       TR/EN yan yana alan, form, kaydetme satırı, slug
+      ├─ collection.tsx   sıralı kayıt listesi (kart, sırala, sil, yeni)
+      └─ pages/           Genel · Profil · Yetenekler · Deneyim/Eğitim · Bağlantılar · Bölümler · Hesap
 ```
 
-**Not:** `admin/` ayrı bir build. Ziyaretçi panel kodunu asla indirmez — hem hız hem
-güvenlik kazancı.
+**`admin/` ayrı bir build.** Ziyaretçi panel kodunu asla indirmez — hem hız hem
+güvenlik kazancı. Yayında web imajı onu da derleyip `/srv/admin`'e koyuyor
+(`web/Dockerfile` → `admin-build`, compose `additional_contexts`); Caddy `/admin/`
+altında sunuyor, çerçeveye alınmasını yasaklıyor (`X-Frame-Options: DENY`).
+
+**Panel sitenin kaynağını import ediyor** (`@site` → `web/src`): içerik sözleşmesi
+(`content/types.ts`), paletler (`theme/presets.ts`), `applyTheme`, favicon, fontlar.
+Üçüncü bir kopya yok — site değişince panel derlenmez hâle gelir, fark edilir.
+Panel hep **Tayf**'la boyanıyor, sitenin seçili paletiyle değil: panelin anlamlı
+renkleri her ön ayarda yok (Aurora'da kırmızı yok, hata rengi camgöbeği oluyordu).
+Panel tek dilli (Türkçe) — iki dillilik içerik için, panelin kendi yazıları için değil.
 
 ---
 

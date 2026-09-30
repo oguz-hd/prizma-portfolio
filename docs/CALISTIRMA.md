@@ -50,7 +50,13 @@ docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
 docker compose -f docker-compose.yml -f docker-compose.dev.yml up
 ```
 
-→ **http://localhost:5174** (site) · **http://localhost:8001/docs** (API)
+→ **http://localhost:5174** (site) · **http://localhost:5175/admin/** (yönetim paneli,
+dev: `admin@localhost` / `degistir`) · **http://localhost:8001/docs** (API)
+
+Panel sitenin kaynağını import ediyor: compose `web/src`'yi panelin konteynerine
+salt okunur bağlıyor (`/web/src`), fontları da sitenin sunucusundan alıyor (`/fonts`
+yönlendirmesi). Panel sayfası 403 alan font gösteriyorsa: yönlendirme `changeOrigin`
+açık kalmış olabilir — sitenin Vite'ı "web" adını tanımıyor (`admin/vite.config.ts`).
 
 **İçerik API'den geliyor** (Faz 6): site açılırken `/content.json`'ı çekiyor, Vite
 bunu API'ye yönlendiriyor (`vite.config.ts` → proxy; meta etiketleri de API'den).

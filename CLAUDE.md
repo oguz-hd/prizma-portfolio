@@ -19,6 +19,7 @@ Rolldown native binary'sini engelliyor. **Kod hatası değil, düzeltmeye çalı
 ```
 docker compose -f docker-compose.yml -f docker-compose.dev.yml up
 → http://localhost:5174          site (token laboratuvarı: /?lab)
+→ http://localhost:5175/admin/   yönetim paneli (dev: admin@localhost / degistir)
 → http://localhost:8001/docs     API (OpenAPI arayüzü)
 ```
 Portlar trex-portfolio'dan (5173/8000) **farklı** — iki site aynı anda çalışabilsin.
@@ -34,11 +35,15 @@ arkada kalınca rAF duruyor ve açılış `pending`'de takılı görünüyor (ha
 **Testler dizüstü görünümünde** (1440×900, 1366×768) — kullanıcı tercihi; mobil
 yalnızca değişiklik mobile özgüyse.
 
-### Doğrulama — **test yok, kapı bu ikisi**
+### Doğrulama — **test yok, kapı bu ikisi** (panel için de aynısı)
 ```
 docker exec prizma-portfolio-web-1 npm run typecheck   # tsc --noEmit
 docker exec prizma-portfolio-web-1 npm run build       # asıl derleme
+docker exec prizma-portfolio-admin-1 npm run typecheck
+docker exec prizma-portfolio-admin-1 npm run build
 ```
+⚠️ Panel `web/src`'yi import ediyor (@site: `content/types.ts`, `theme/*`): sitede
+bunlar değişince panelin kapıları da çalıştırılır.
 
 ## ⚠️ Bozulmaz kurallar
 
@@ -114,10 +119,20 @@ yetenekler, deneyim/eğitim (`milestones`), bağlantılar, bölümler (yalnızca
 + sıra), parola değiştirme (eski oturumlar düşer). Her yazma → `publish()`. Uçtan uca
 83 kontrol geçti. Swagger ile denemek → CALISTIRMA. Kararlar → ARCHITECTURE § 6.
 
-⏭ **Sırada: Faz 7b · Admin paneli** — `admin/` ayrı build (5175), `@site` alias'ıyla
-`types.ts` + `presets.ts` doğrudan; TR/EN yan yana formlar. Plan:
+✅ **Oturum 5 · Faz 7b** — yönetim paneli (`admin/`, ayrı build; dev 5175, yayında
+`/admin/` — web imajı derliyor). Sözleşme ve paletler `@site` alias'ıyla sitenin
+kaynağından. Sayfalar: Genel (palet + meta) · Profil · Yetenekler · Deneyim · Eğitim ·
+Bağlantılar · Bölümler (yalnızca düzenleme + sıra) · Hesap. TR/EN yan yana, yarım
+çeviri uyarısı, kaydedilmemiş değişiklik uyarısı, kart başına kaydet. Panel hep Tayf'ta
+(Aurora'da kırmızı yok → hata rengi kayboluyordu). → ARCHITECTURE § 7
+
+⏭ **Sırada (kullanıcı isteği, Oturum 5):** (1) büyüyen içerik testleri — ör. Hakkımda'ya
+10 yetenek grubu; sitenin yerleşimi nasıl tepki veriyor (ARCHITECTURE § 8), sonuçlar
+kullanıcıya · (2) panelin giriş ekranı sade kaldı: prizma/tayf teması ve animasyon —
+önce seçenek sayfası, kullanıcı seçer. Plan:
 `C:\Users\drn49\.claude\plans\hadi-back-and-e-hidden-puddle.md`.
-Panelin karşılaması gereken yerleşim gereksinimleri → ARCHITECTURE § 8.
+Kullanıcı notu (Claude Docs, API'yi denerken bilinmesi gerekenler):
+https://claude.ai/code/artifact/8a071f83-aa54-4eb2-a4a7-592661b51c62
 
 ❓ **Açık karar:** `sections/Projects.tsx` kullanılmıyor (Projeler slaytı Oturum 2'de
 kalktı; proje kayıtları içerikte duruyor). Silinsin mi? Kullanıcıya soruldu, yanıt yok.

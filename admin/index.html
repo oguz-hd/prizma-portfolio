@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+
+    <!--
+      Boyanmadan önceki zemin — sitenin index.html'iyle aynı istisna (kural 1):
+      JS çalışmadan önce beyaz flaş olmasın. Değer presets.ts → tayf.ground.
+    -->
+    <meta name="color-scheme" content="dark" />
+    <style>
+      html { background: #070A12; }
+    </style>
+
+    <!-- Gerçek ikonu main.tsx token'lardan üretiyor (sitenin favicon.ts'i). -->
+    <link rel="icon" href="data:," />
+
+    <title>Yönetim paneli</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
