@@ -1,4 +1,4 @@
-import { useLayoutEffect, useState, type RefObject } from 'react'
+import { useLayoutEffect, useState, type DependencyList, type RefObject } from 'react'
 
 /**
  * Prizmayı çevreleyen görünmez daire — Giriş ve İletişim aynı yerleşimde
@@ -9,8 +9,12 @@ import { useLayoutEffect, useState, type RefObject } from 'react'
  * Üst yayda büyük başlık, iç yaylarda küçük yazılar, alt yayda bağlantılar.
  *
  * Boyutlar ekrandan: yarıçap pencereye, başlık boyu isme göre; sonuç Departure
- * Mono'nun keskin kaldığı 11 px'in katına yuvarlanıyor. İki slaytın başlığı
- * AYNI boyda — ikisi de ismin uzunluğundan hesaplanıyor.
+ * Mono'nun keskin kaldığı 11 px'in katına yuvarlanıyor. İki slaytın dairesi
+ * ve başlığı AYNI — ikisi de pencereden ve ismin uzunluğundan hesaplanıyor.
+ * Dairenin altındaki öğe (ipucu, altbilgi) daireye yer açtırmaz, kendisi
+ * sığarsa altına yerleşir (`placeBelow`). ⚠️ Eskiden İletişim altbilgiye yer
+ * açmak için daireyi küçültüyordu: kısa masaüstünde başlığı bir basamak
+ * küçülüyor, çok kısa pencerede yarıçap eksiye düşüyordu (kod incelemesi).
  */
 
 export type RingGeo = {
@@ -39,11 +43,9 @@ const TITLE_STRETCH = 1.3
 /** Yay ile küçük yazıların (iç yaylar) arası (px). */
 export const INNER_GAP = 30
 
-function geometry(W: number, H: number, sizeChars: number, adv: number, reserve: number): RingGeo {
+function geometry(W: number, H: number, sizeChars: number, adv: number): RingGeo {
   const mobile = W < 768
-  let r = mobile ? Math.min(W * 0.46, H * 0.3) : Math.min(W * 0.3, H * 0.37)
-  // Altta başka bir şey duruyorsa (İletişim'in altbilgisi) daire ona çarpmasın.
-  if (reserve) r = Math.min(r, H / 2 - reserve)
+  const r = mobile ? Math.min(W * 0.46, H * 0.3) : Math.min(W * 0.3, H * 0.37)
   /*
     Başlığın kapladığı yay ~100° (telefonda ~110°). ⚠️ 110°'de ekranda ~150°
     gibi okunuyordu: harfler yarıçapa göre iri, uçtakiler dikleşiyordu (ölçüldü).
@@ -64,21 +66,23 @@ export function titleLength(geo: RingGeo, chars: number): number {
 
 /**
  * `sizeChars`: başlık boyunun hesaplandığı harf sayısı (ismin uzunluğu).
- * `reserve`: dairenin altında boş kalması gereken yer (px), geo'dan.
  *
  * ⚠️ İlk değer pencereden, HEMEN: yay ilk karede DOM'da olmalı. Açılış
  * (intro.ts) gösterilecek öğeleri App'in ilk etkisinde topluyor; yay bir ölçüm
  * sonrasına kalırsa o listeye girmiyor, açılışın sonunda birden beliriyordu.
  */
-export function useRing(box: RefObject<HTMLElement | null>, sizeChars: number, reserve = 0): RingGeo {
+export function useRing(box: RefObject<HTMLElement | null>, sizeChars: number): RingGeo {
   const [geo, setGeo] = useState<RingGeo>(() =>
-    geometry(window.innerWidth, window.innerHeight, sizeChars, ADV_GUESS, reserve),
+    geometry(window.innerWidth, window.innerHeight, sizeChars, ADV_GUESS),
   )
 
   useLayoutEffect(() => {
     const el = box.current
     if (!el) return
     let adv = ADV_GUESS
+    // Etki yeniden kurulunca eski çalıştırmanın font geri çağrısı yeni ölçünün
+    // üstüne eski değerlerle yazmasın (ya da sökülmüş bileşene yazmasın).
+    let alive = true
 
     const measure = () => {
       const ctx = document.createElement('canvas').getContext('2d')
@@ -90,20 +94,24 @@ export function useRing(box: RefObject<HTMLElement | null>, sizeChars: number, r
       const W = el.clientWidth
       const H = el.clientHeight
       if (!W || !H) return
-      setGeo(geometry(W, H, sizeChars, adv, reserve))
+      setGeo(geometry(W, H, sizeChars, adv))
     }
 
     measure()
     update()
     // Font geldiğinde harf genişliği değişir → yeniden ölç.
     document.fonts?.ready.then(() => {
+      if (!alive) return
       measure()
       update()
     })
     const ro = new ResizeObserver(update)
     ro.observe(el)
-    return () => ro.disconnect()
-  }, [box, sizeChars, reserve])
+    return () => {
+      alive = false
+      ro.disconnect()
+    }
+  }, [box, sizeChars])
 
   return geo
 }
@@ -141,3 +149,37 @@ export function RingTitle({ geo, path, text }: { geo: RingGeo; path: string; tex
     </text>
   )
 }
+
+/** Dairenin altındaki öğenin yaydan ve ekranın dibinden uzaklığı (px). */
+const BELOW_GAP = 16
+
+/**
+ * Öğeyi (ipucu, altbilgi) alt yaydaki yazının hemen altına koy. Sığmazsa önce
+ * `compact` sınıfıyla kısalt (varsa), o da sığmazsa gizle — daireyi küçültme.
+ * Yer ölçülüyor: yazılar panelden değişse de doğru kalsın.
+ * getBBox: açılışın kaydırması (üst <g>'deki transform) ölçüme girmiyor.
+ */
+export function usePlaceBelow(
+  text: RefObject<SVGTextElement | null>,
+  el: RefObject<HTMLElement | null>,
+  geo: RingGeo,
+  compact: string | null,
+  deps: DependencyList,
+): void {
+  useLayoutEffect(() => {
+    const t = text.current
+    const e = el.current
+    if (!t || !e) return
+    const bb = t.getBBox()
+    const top = bb.y + bb.height + BELOW_GAP
+    e.style.bottom = 'auto'
+    e.style.top = `${top}px`
+    const fits = () => top + e.offsetHeight <= geo.H - BELOW_GAP
+    if (compact) {
+      e.classList.remove(compact)
+      if (!fits()) e.classList.add(compact)
+    }
+    e.style.visibility = fits() ? '' : 'hidden'
+  }, [geo, ...deps])
+}
+

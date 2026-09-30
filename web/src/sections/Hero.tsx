@@ -1,6 +1,6 @@
-import { Fragment, useLayoutEffect, useRef } from 'react'
+import { Fragment, useRef } from 'react'
 
-import { INNER_GAP, RingTitle, arc, useRing } from '../components/Ring'
+import { INNER_GAP, RingTitle, arc, usePlaceBelow, useRing } from '../components/Ring'
 import { useContent } from '../content/useContent'
 import { useStrings } from '../i18n/strings'
 
@@ -28,9 +28,6 @@ import { useStrings } from '../i18n/strings'
  * (theme.css → .ring-links a).
  */
 const LINK = 11
-/** İpucunun bağlantı yayından ve ekranın dibinden uzaklığı (px). */
-const HINT_GAP = 16
-
 export function Hero() {
   const { profile, links } = useContent()
   const t = useStrings()
@@ -38,31 +35,15 @@ export function Hero() {
   const linksRef = useRef<SVGTextElement>(null)
   const hintRef = useRef<HTMLParagraphElement>(null)
 
-  const linkChars = links.reduce((n, l) => n + l.label.length, 0) + (links.length - 1) * 3
 
   const geo = useRing(boxRef, profile.name.length)
 
   /*
     İpucu bağlantı yayının hemen ALTINDA (Oturum 3). Ekranın dibine sabitken
-    1024×768, 1280×720, 1366×768'de yaya biniyordu (ölçüldü). Yer ölçülüyor —
-    bağlantılar panelden değişse de doğru kalsın. Sığmazsa önce kısalır, sonra gizlenir.
-    getBBox: açılışın kaydırması (üst <g>'deki transform) ölçüme girmiyor.
+    1024×768, 1280×720, 1366×768'de yaya biniyordu (ölçüldü). Sığmazsa önce
+    hareketli çizgisi kalkar, o da sığmazsa gizlenir → Ring.tsx usePlaceBelow.
   */
-  useLayoutEffect(() => {
-    const links = linksRef.current
-    const hint = hintRef.current
-    if (!links || !hint) return
-    const bb = links.getBBox()
-    const top = bb.y + bb.height + HINT_GAP
-    hint.style.bottom = 'auto'
-    hint.style.top = `${top}px`
-    // Önce tam hâli; sığmazsa hareketli çizgisiz (dizüstü 768/720 px), o da
-    // sığmazsa gizli.
-    const fits = () => top + hint.offsetHeight <= geo.H - HINT_GAP
-    hint.classList.remove('is-compact')
-    if (!fits()) hint.classList.add('is-compact')
-    hint.style.visibility = fits() ? '' : 'hidden'
-  }, [geo, linkChars])
+  usePlaceBelow(linksRef, hintRef, geo, 'is-compact', [links])
 
   const ids = { top: 'hero-ring-top', inner: 'hero-ring-inner', bottom: 'hero-ring-bottom' }
 

@@ -1032,8 +1032,8 @@ html[data-intro='pending'] :is([data-reveal], [data-reveal-panel], [data-reveal-
 
 }
 
-/* Altbilgi: kapanış karesinin (İletişim) en dibinde tek ince satır. Daire
-   ona çarpmasın diye yarıçap küçülebiliyor (Contact.tsx → FOOTER_ROOM). */
+/* Altbilgi: kapanış karesinin (İletişim) dibinde tek ince satır. Asıl `top`
+   e-posta yayının altından ölçülüyor (Ring.tsx → usePlaceBelow); bu yedek. */
 .site-footer {
   position: absolute;
   left: 0;

@@ -1,6 +1,6 @@
 import { Fragment, useRef } from 'react'
 
-import { INNER_GAP, RingTitle, arc, useRing } from '../components/Ring'
+import { INNER_GAP, RingTitle, arc, usePlaceBelow, useRing } from '../components/Ring'
 import { SiteFooter } from '../components/SiteFooter'
 import { useContent } from '../content/useContent'
 import { useStrings } from '../i18n/strings'
@@ -15,7 +15,8 @@ import type { SectionProps } from './Section'
  *   üst iç yay    BANA YAZ
  *   alt yay       e-posta adresi (sayfanın asıl bağlantısı)
  *   alt iç yay    GitHub · LinkedIn
- *   dip           altbilgi — daire ona çarpmasın diye yarıçap küçülebiliyor
+ *   dip           altbilgi — e-posta yayının altında; sığmazsa gizlenir
+ *                 (daire Giriş'inkiyle birebir aynı kalsın, küçülmesin)
  *
  * Müsaitlik cümlesi (bölüm gövdesi) kalktı; içerikte de boş. curious.page
  * kuralı 4: iletişim bariz — e-posta alt yayda, başlıktan sonra en iri yazı.
@@ -26,24 +27,30 @@ import type { SectionProps } from './Section'
 
 /** Alt yaydaki e-posta: 22 px, yayın ~85°'sinden fazlasını kaplayacaksa 11 px. */
 const MAIL = { big: 22, small: 11 }
+/** E-postanın harf aralığı (em) — theme.css → .ring-links text ile aynı. */
+const MAIL_TRACKING = 0.04
 /** Alt iç yaydaki GitHub · LinkedIn. */
 const SOCIAL = 11
-/** Dairenin altında altbilgiye ayrılan yer (px): altbilgi + nefes. */
-const FOOTER_ROOM = 72
 
 export function Contact({ id, heading }: SectionProps) {
   const { profile, links } = useContent()
   const t = useStrings()
   const boxRef = useRef<HTMLDivElement>(null)
+  const mailRef = useRef<SVGTextElement>(null)
+  const footerRef = useRef<HTMLElement>(null)
   const titleId = `${id}-title`
 
   const email = links.find((l) => l.href.startsWith('mailto:'))
   const others = links.filter((l) => !l.href.startsWith('mailto:'))
   const address = email?.href.replace('mailto:', '') ?? ''
 
-  // Altta büyük e-postaya yetecek yer ayrılıyor; adres yaya sığmazsa küçülüyor.
-  const geo = useRing(boxRef, profile.name.length, FOOTER_ROOM + MAIL.big * 1.75)
-  const mail = (address.length * geo.adv * MAIL.big) / geo.r < 1.5 ? MAIL.big : MAIL.small
+  const geo = useRing(boxRef, profile.name.length)
+  // Büyük boyda adres, ÇİZİLDİĞİ yayın (r + boy × 0.75) ~85°'sinden fazlasını
+  // kaplıyorsa küçük boy — uçtaki harfler dikleşmesin.
+  const span = (size: number) =>
+    (address.length * (geo.adv + MAIL_TRACKING) * size) / (geo.r + size * 0.75)
+  const mail = span(MAIL.big) < 1.5 ? MAIL.big : MAIL.small
+  usePlaceBelow(mailRef, footerRef, geo, null, [mail, address])
 
   const ids = {
     top: `${id}-ring-top`,
@@ -59,6 +66,8 @@ export function Contact({ id, heading }: SectionProps) {
           <h2 id={titleId} className="sr-only" data-slide-focus tabIndex={-1}>
             {heading}
           </h2>
+          {/* Yaydaki "Bana yaz" aria-hidden — ekran okuyucu bunu okusun. */}
+          <p className="sr-only">{t('emailMe')}</p>
 
           <svg className="ring" viewBox={`0 0 ${geo.W} ${geo.H}`} width={geo.W} height={geo.H} focusable="false">
             <defs>
@@ -83,7 +92,7 @@ export function Contact({ id, heading }: SectionProps) {
 
             {email && (
               <g className="ring-links ring-mail" data-reveal data-i18n-fade>
-                <text style={{ fontSize: mail }}>
+                <text ref={mailRef} style={{ fontSize: mail }}>
                   <textPath href={`#${ids.bottom}`} startOffset="50%" textAnchor="middle">
                     <a href={email.href}>
                       <tspan>{address}</tspan>
@@ -99,7 +108,12 @@ export function Contact({ id, heading }: SectionProps) {
                   {others.map((l, i) => (
                     <Fragment key={l.id}>
                       {i > 0 && <tspan className="ring-sep"> · </tspan>}
-                      <a href={l.href} target="_blank" rel="noreferrer noopener">
+                      <a
+                        href={l.href}
+                        {...(l.href.startsWith('http')
+                          ? { target: '_blank', rel: 'noreferrer noopener' }
+                          : {})}
+                      >
                         <tspan>{l.label}</tspan>
                       </a>
                     </Fragment>
@@ -109,7 +123,7 @@ export function Contact({ id, heading }: SectionProps) {
             </g>
           </svg>
 
-          <SiteFooter />
+          <SiteFooter ref={footerRef} />
         </div>
       </div>
     </section>
