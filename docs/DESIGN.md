@@ -228,4 +228,5 @@ iletisim` ve geri aynı sırayla. İletişim 6 telefon boyutu × 2 dilde taşmı
 
 | İstek | Karşılığı |
 |---|---|
-| Prizmanın etrafındaki daire (isim ve bağlantıların dizildiği) %20 küçülsün | `components/Ring.tsx` → `DESKTOP_SCALE = 0.8`: masaüstünde yarıçap eskisinin %80'i, Giriş ve İletişim birlikte. Başlık boyu yarıçaptan türüyor → isim bir basamak küçüldü: **44 → 33 px** (1440×900 ve 1366×768'de ölçüldü). İletişim'de e-posta 22 px'te yaya sığıyor, altbilgi görünür. Telefonda uygulanmadı: orada daire ekranın eninden sınırlı, küçülünce isim 33 → 22 px'e iniyordu (390×844, hesap) |
+| Prizmanın etrafındaki daire (isim ve bağlantıların dizildiği) %20 küçülsün → görünce "%10 geri büyüsün" | `components/Ring.tsx` → `DESKTOP_SCALE = 0.9`: masaüstünde yarıçap eskisinin %90'ı, Giriş ve İletişim birlikte. Başlık boyu yarıçaptan türüyor: %80'de isim her dizüstü boyunda 44 → 33 px'e iniyordu; **%90'da 1440×900'de 44, 1366×768'de 33** (ölçüldü; tam boyda ikisi de 44'tü). Telefonda uygulanmadı: orada daire ekranın eninden sınırlı, küçülünce isim 33 → 22 px'e iniyordu (390×844, hesap) |
+| Girişteki bağlantılar biraz büyüsün, çok görünmüyorlar | Masaüstünde 11 → **16.5 px** (11 × 1.5; Oturum 4'te 22 fazla bulunmuştu, ortası). Kural 11'in istisnası: 2x ekranda keskin, 1x'te hafif yumuşak. Telefonda 11 kaldı (Oturum 4: "mobilde çok büyük") |

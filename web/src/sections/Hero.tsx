@@ -22,12 +22,18 @@ import { useStrings } from '../i18n/strings'
  */
 
 /**
- * Bağlantılar alt yayda 11 px (Oturum 4, kullanıcı: "e-posta, github, linkedin
- * daha küçük olmalı, özellikle mobilde çok büyük"). Eskiden masaüstünde 22 px.
+ * Alt yaydaki bağlantıların boyu (px).
+ *
+ * Oturum 4 (kullanıcı: "daha küçük olmalı, özellikle mobilde çok büyük"): her
+ * yerde 22 → 11. Oturum 5 (kullanıcı: "biraz büyüsün, çok görünmüyorlar"):
+ * masaüstünde 16.5 = 11 × 1.5 — iki basamağın ortası. 11'in katı değil (kural 11'in
+ * istisnası, telefondaki 11 × 2/3 gibi): 2x ekranda her font pikseli tam 3 cihaz
+ * pikseli, keskin; 1x ekranda hafif yumuşar. Telefonda 11 kaldı.
  * Dokunma alanı küçülmesin diye harflerin görünmez kalın bir çerçevesi var
  * (theme.css → .ring-links a).
  */
-const LINK = 11
+const linkSize = (W: number) => (W < 768 ? 11 : 16.5)
+
 export function Hero() {
   const { profile, links } = useContent()
   const t = useStrings()
@@ -37,6 +43,7 @@ export function Hero() {
 
 
   const geo = useRing(boxRef, profile.name.length)
+  const link = linkSize(geo.W)
 
   /*
     İpucu bağlantı yayının hemen ALTINDA (Oturum 3). Ekranın dibine sabitken
@@ -76,7 +83,7 @@ export function Hero() {
                 <path id={ids.top} d={arc(geo, geo.r, 1)} />
                 <path id={ids.inner} d={arc(geo, geo.r - INNER_GAP, 1)} />
                 {/* Alt yay soldan dipten sağa: harfler dairenin üstünde duruyor, dik. */}
-                <path id={ids.bottom} d={arc(geo, geo.r + LINK * 0.75, 0)} />
+                <path id={ids.bottom} d={arc(geo, geo.r + link * 0.75, 0)} />
               </defs>
 
               <g className="ring-eyebrow" aria-hidden="true" data-reveal data-i18n-fade>
@@ -95,7 +102,7 @@ export function Hero() {
 
               {/* curious.page kuralı 4: iletişim bariz olmalı, aranmamalı. */}
               <g className="ring-links" data-reveal data-i18n-fade>
-                <text ref={linksRef} style={{ fontSize: LINK }}>
+                <text ref={linksRef} style={{ fontSize: link }}>
                   <textPath href={`#${ids.bottom}`} startOffset="50%" textAnchor="middle">
                     {links.map((l, i) => (
                       <Fragment key={l.id}>

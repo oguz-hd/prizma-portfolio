@@ -58,12 +58,13 @@ const TITLE_STRETCH = 1.3
 export const INNER_GAP = 30
 
 /**
- * Masaüstünde daire eskisinin %80'i (Oturum 5, kullanıcı: "çapı %20 azalsın").
- * Başlık boyu yarıçaptan türüyor, yani isim de bir basamak küçülebilir
- * (1440×900: 44 → 33 px). Telefonda yok: orada daire zaten ekranın eninden
+ * Masaüstünde daire eskisinin %90'ı (Oturum 5, kullanıcı: önce "çapı %20
+ * azalsın", görünce "%10 geri büyüsün"). Başlık boyu yarıçaptan türüyor:
+ * %80'de isim her dizüstü boyunda 44 → 33 px'e iniyordu; %90'da 1440×900'de
+ * 44 kalıyor, 1366×768'de 33. Telefonda yok: orada daire zaten ekranın eninden
  * sınırlı; küçülünce isim 33 → 22 px'e iniyordu (hesaplandı, 390×844).
  */
-const DESKTOP_SCALE = 0.8
+const DESKTOP_SCALE = 0.9
 
 function geometry(W: number, H: number, sizeChars: number, adv: number): RingGeo {
   const mobile = W < 768
