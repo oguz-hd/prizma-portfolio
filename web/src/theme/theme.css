@@ -867,6 +867,14 @@ html[data-lite] .panel {
   font-size: var(--text-heading);
 }
 
+/* Zaman çizelgesi bölümü (Faz 9): tek liste, geniş ekranda iki sütun. */
+@media (min-width: 768px) {
+  .timeline-wide .timeline {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--space-16);
+  }
+}
+
 /* ── Alt sayfalar (Oturum 4 · A1, deck/paginate.ts) ─────────────────────────
    İlk sayfadan sonra başlık küçülür ama kalır;
    bölüm numarasının yanında sayaç. Öznitelikleri paginate.ts yazıyor. */

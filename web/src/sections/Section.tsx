@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react'
 
+import type { Section as SectionData } from '../content/types'
+
 /**
  * İçerik slaytının kabuğu — Hakkımda, Projeler, İletişim aynı iskeleti paylaşıyor.
  *
@@ -23,6 +25,8 @@ export type SectionProps = {
   index: number
   heading: string
   body: string[]
+  /** Bölümün tamamı — türe özgü alanlar (maddeler, galeri, duyuru) için. */
+  section: SectionData
 }
 
 export function Section({
@@ -32,7 +36,7 @@ export function Section({
   body,
   children,
   after,
-}: SectionProps & { children: ReactNode; after?: ReactNode }) {
+}: Omit<SectionProps, 'section'> & { children?: ReactNode; after?: ReactNode }) {
   const titleId = `${id}-title`
 
   return (

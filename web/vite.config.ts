@@ -60,6 +60,8 @@ export default defineConfig({
     // burada API aynı içeriği canlı üretiyor (api/app/content.py → read_content).
     proxy: {
       '/content.json': { target: API_ORIGIN, rewrite: () => '/api/content' },
+      // Yüklenen görseller (Faz 9) — yayında Caddy sunuyor.
+      '/uploads': API_ORIGIN,
     },
     watch: {
       // Windows'ta bind mount üzerinden dosya değişikliği bildirimleri konteynere

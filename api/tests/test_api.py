@@ -66,6 +66,14 @@ def test_text_section_lifecycle(client: TestClient, auth: dict, data_dir: str) -
     assert section(published(data_dir), "hobiler") is None
 
 
+def test_new_section_goes_before_contact(client: TestClient, auth: dict, data_dir: str) -> None:
+    client.post("/api/admin/sections", headers=auth,
+                json={"id": "araya", "kind": "text", "heading": T("Araya")})
+    ids = [s["id"] for s in published(data_dir)["sections"]]
+    assert ids[-1] == "iletisim" and ids[-2] == "araya"
+    client.delete("/api/admin/sections/araya", headers=auth)
+
+
 def test_reserved_and_builtin_kinds_rejected(client: TestClient, auth: dict) -> None:
     ust = {"id": "ust", "kind": "text", "heading": T("Üst")}
     assert client.post("/api/admin/sections", json=ust, headers=auth).status_code == 409

@@ -1,4 +1,4 @@
-import type { RawSiteContent } from '@site/content/types'
+import type { RawMedia, RawSiteContent } from '@site/content/types'
 
 /**
  * API istemcisi — panelin sunucuyla konuştuğu TEK yer.
@@ -7,7 +7,9 @@ import type { RawSiteContent } from '@site/content/types'
  * kökte sunuyor; geliştirmede Vite yönlendiriyor (vite.config.ts). CORS yok.
  *
  * Yazmalar gövdesiz 204 döner (api/app/admin.py); panel kaydettikten sonra
- * içeriği `GET /api/content`'ten yeniden çeker — tek doğruluk kaynağı sunucu.
+ * içeriği `GET /api/admin/content`'ten yeniden çeker — tek doğruluk kaynağı sunucu.
+ * O çıktı herkese açık içerikle aynı şekil + gizli bölümler, yayında olmayan
+ * projeler ve medya kitaplığı (Faz 9).
  */
 
 // ── Oturum ──────────────────────────────────────────────────────────────────
@@ -88,6 +90,18 @@ const FIELD_LABELS: Record<string, string> = {
   heading: 'Başlık',
   navLabel: 'Menü adı',
   body: 'Bölüm metni',
+  summary: 'Özet',
+  description: 'Açıklama',
+  tech: 'Teknolojiler',
+  repoUrl: 'Kaynak kodu',
+  liveUrl: 'Canlı adres',
+  link: 'Bağlantı',
+  startsOn: 'Başlangıç',
+  endsOn: 'Bitiş',
+  mediaId: 'Görsel',
+  caption: 'Altyazı',
+  alt: 'Alt metin',
+  kind: 'Tür',
   ids: 'Sıra',
   currentPassword: 'Mevcut parola',
   newPassword: 'Yeni parola',
@@ -142,7 +156,9 @@ async function readErrors(res: Response): Promise<string[]> {
 
 async function request<T>(method: string, path: string, body?: unknown): Promise<T> {
   const headers: Record<string, string> = {}
-  if (body !== undefined) headers['Content-Type'] = 'application/json'
+  // FormData (görsel yükleme): Content-Type'ı tarayıcı sınırıyla birlikte koyar.
+  const form = body instanceof FormData
+  if (body !== undefined && !form) headers['Content-Type'] = 'application/json'
   if (token) headers.Authorization = `Bearer ${token}`
 
   let res: Response
@@ -150,7 +166,7 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
     res = await fetch(`/api${path}`, {
       method,
       headers,
-      body: body === undefined ? undefined : JSON.stringify(body),
+      body: body === undefined ? undefined : form ? body : JSON.stringify(body),
       cache: 'no-store',
     })
   } catch {
@@ -176,8 +192,15 @@ export const api = {
   changePassword: (currentPassword: string, newPassword: string) =>
     request<TokenOut>('PUT', '/auth/password', { currentPassword, newPassword }),
 
-  /** Sitenin içeriği — ziyaretçinin gördüğüyle aynı şekil (content/types.ts). */
-  content: () => request<RawSiteContent>('GET', '/content'),
+  /** Sitenin içeriği + gizliler + medya kitaplığı (content/types.ts → RawSiteContent). */
+  content: () => request<RawSiteContent>('GET', '/admin/content'),
+
+  /** Görsel yükle: sunucu WebP'lere çevirir, EXIF/GPS'i siler (api/app/media.py). */
+  upload: (file: File) => {
+    const form = new FormData()
+    form.append('file', file)
+    return request<RawMedia>('POST', '/admin/media', form)
+  },
 
   post: (path: string, body: unknown) => request<void>('POST', `/admin${path}`, body),
   put: (path: string, body: unknown) => request<void>('PUT', `/admin${path}`, body),

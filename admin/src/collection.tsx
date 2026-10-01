@@ -7,7 +7,8 @@ import { Form, SLUG, StatusLine, TextInput } from './fields'
 import { useAction, useDraft, usePanel } from './panel'
 
 /**
- * Sıralı kayıt listesi — yetenekler, deneyim/eğitim, bağlantılar, bölümler.
+ * Sıralı kayıt listesi — yetenekler, deneyim/eğitim, bağlantılar, bölümler,
+ * projeler, zaman çizelgesi bölümünün maddeleri.
  *
  * Her kayıt kendi kartında, kendi taslağıyla: bir kart kaydedilince içerik
  * yeniden çekilir ama öteki kartların kaydedilmemiş yazıları kaybolmaz (kart
@@ -31,7 +32,13 @@ export type CollectionConfig<Item extends { id: string }, Draft> = {
   anchor?: (item: Item | null) => string
   /** Yoksa liste yalnızca düzenlenir (bölümler). */
   create?: { label: string; empty: Draft; suggestId: (draft: Draft) => string }
-  canDelete?: boolean
+  /** Varsayılan: hepsi silinir. Bölümlerde yalnızca panelden eklenenler. */
+  canDelete?: boolean | ((item: Item) => boolean)
+  /**
+   * Kartın ALTINDA, kendi formuyla duran düzenleyici (zaman çizelgesi maddeleri,
+   * galeri). Kartın formunun içine konamaz: form içinde form geçersiz HTML.
+   */
+  after?: (item: Item) => ReactNode
 }
 
 export function Collection<Item extends { id: string }, Draft>({ config }: { config: CollectionConfig<Item, Draft> }) {
@@ -102,7 +109,7 @@ function ItemCard<Item extends { id: string }, Draft>({ config, item, moveUp, mo
       <button type="button" className="btn btn-icon" onClick={moveDown} disabled={!moveDown || moving} aria-label="Aşağı taşı">
         ↓
       </button>
-      {config.canDelete !== false &&
+      {(typeof config.canDelete === 'function' ? config.canDelete(item) : config.canDelete !== false) &&
         (confirming ? (
           <span className="confirm">
             <span>Silinsin mi?</span>
@@ -121,7 +128,7 @@ function ItemCard<Item extends { id: string }, Draft>({ config, item, moveUp, mo
     </div>
   )
 
-  return (
+  const form = (
     <Form dirty={dirty} status={status} onSave={save} anchor={config.anchor?.(item)}>
       <div className="card-head">
         <h2 className="card-title">{config.title(draft) || item.id}</h2>
@@ -130,6 +137,14 @@ function ItemCard<Item extends { id: string }, Draft>({ config, item, moveUp, mo
       </div>
       {config.fields(draft, setDraft, item)}
     </Form>
+  )
+  const after = config.after?.(item)
+  if (!after) return form
+  return (
+    <div className="card-group">
+      {form}
+      <div className="card-sub">{after}</div>
+    </div>
   )
 }
 

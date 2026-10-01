@@ -36,6 +36,7 @@ export default defineConfig({
     proxy: {
       // Yayındakiyle aynı adresler: orada ikisi de aynı kökte (Caddy).
       '/api': API_ORIGIN,
+      '/uploads': API_ORIGIN,
       // Fontlar sitenin (theme/fonts.css → /fonts/…). changeOrigin kapalı: açıkken
       // Host "web" gidiyor, sitenin Vite'ı tanımadığı adı reddediyor (403).
       '/fonts': { target: WEB_ORIGIN, changeOrigin: false },

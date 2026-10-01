@@ -3,6 +3,7 @@ from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from sqlmodel import Session, select
 
 from app import admin, auth, content
@@ -68,6 +69,11 @@ app = FastAPI(
 app.include_router(content.router)
 app.include_router(auth.router)
 app.include_router(admin.router)
+
+# Yüklenen görseller. Yayında bu adresi Caddy volume'dan sunuyor (Caddyfile → /uploads),
+# istek API'ye hiç gelmiyor; bu bağlama geliştirme içindir (site ve panelin Vite'ı
+# /uploads'ı buraya yönlendiriyor).
+app.mount("/uploads", StaticFiles(directory=settings.data_dir / "uploads", check_dir=False))
 
 
 @app.get("/api/health", tags=["meta"])

@@ -331,7 +331,18 @@ def create_section(data: SectionCreate, session: SessionDep) -> None:
     if data.id in RESERVED_SECTION_IDS:
         raise HTTPException(status.HTTP_409_CONFLICT, detail=f"'{data.id}' ayrılmış bir ad")
     _ensure_new(session, Section, data.id)
-    order = _next_order(session.exec(select(Section)).all())
+    rows = sorted(session.exec(select(Section)).all(), key=lambda s: s.order)
+    # İletişim kapanış karesi (Oturum 2): yeni bölüm onun ÖNÜNE girer, o sonda kalır.
+    # Panelden sonra elle sona taşınabilir — bu yalnızca varsayılan yer.
+    closing = next((s for s in rows if s.kind == "contact"), None)
+    if closing:
+        order = closing.order
+        for s in rows:
+            if s.order >= order:
+                s.order += 1
+                session.add(s)
+    else:
+        order = _next_order(rows)
     row = Section(id=data.id, slug=data.id, kind=data.kind, order=order)
     _apply_section(session, row, data)
 

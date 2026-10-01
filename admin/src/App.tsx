@@ -9,8 +9,10 @@ import { paintPanel } from './theme'
 import { DirtyProvider, PanelProvider } from './panel'
 import { AccountPage } from './pages/AccountPage'
 import { LinksPage } from './pages/LinksPage'
+import { MediaPage } from './pages/MediaPage'
 import { MilestonesPage } from './pages/MilestonesPage'
 import { ProfilePage } from './pages/ProfilePage'
+import { ProjectsPage } from './pages/ProjectsPage'
 import { SectionsPage } from './pages/SectionsPage'
 import { SettingsPage } from './pages/SettingsPage'
 import { SkillsPage } from './pages/SkillsPage'
@@ -28,6 +30,8 @@ const PAGES = [
   { id: 'egitim', label: 'Eğitim' },
   { id: 'baglantilar', label: 'Bağlantılar' },
   { id: 'bolumler', label: 'Bölümler' },
+  { id: 'projeler', label: 'Projeler' },
+  { id: 'medya', label: 'Medya' },
   { id: 'hesap', label: 'Hesap' },
 ] as const
 
@@ -219,6 +223,10 @@ function CurrentPage({ page, email }: { page: PageId; email: string | null }) {
       return <LinksPage />
     case 'bolumler':
       return <SectionsPage />
+    case 'projeler':
+      return <ProjectsPage />
+    case 'medya':
+      return <MediaPage />
     case 'hesap':
       return <AccountPage email={email} />
   }

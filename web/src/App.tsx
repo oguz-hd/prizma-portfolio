@@ -1,10 +1,14 @@
-import { useEffect } from 'react'
+import { useEffect, type ComponentType } from 'react'
 
+import type { SectionKind } from './content/types'
 import { useContent } from './content/useContent'
 import { Hero } from './sections/Hero'
 import { About } from './sections/About'
 import { Experience } from './sections/Experience'
 import { Contact } from './sections/Contact'
+import { TextSection } from './sections/TextSection'
+import { TimelineSection } from './sections/TimelineSection'
+import type { SectionProps } from './sections/Section'
 import { NotFound, NOT_FOUND_LINES } from './sections/NotFound'
 import { SiteHeader } from './components/SiteHeader'
 import { Starfield } from './components/Starfield'
@@ -17,16 +21,23 @@ import { isLab, isNotFound } from './route'
 import { watchFrameRate } from './lite'
 
 /**
- * Bölüm slug'ı → bileşen.
+ * Bölüm TÜRÜ → bileşen (Faz 9; eskiden slug'a göre elle). Panelden eklenen her
+ * bölüm kod değişmeden slayt olur.
  *
  * Başlıklar ve sıra useContent().sections'tan geliyor — nav ve ray ile AYNI
  * kaynak. Bir bölümün adı değişince üçü birlikte değişir, kaymaz.
  */
-const SECTION_COMPONENTS = {
-  hakkimda: About,
-  deneyim: Experience,
-  iletisim: Contact,
-} as const
+const SECTION_COMPONENTS: Record<SectionKind, ComponentType<SectionProps>> = {
+  about: About,
+  experience: Experience,
+  contact: Contact,
+  text: TextSection,
+  timeline: TimelineSection,
+  // Görünüşleri seçenek sayfasından (Faz 9b) — o zamana kadar başlık + metin.
+  projects: TextSection,
+  announcement: TextSection,
+  gallery: TextSection,
+}
 
 /**
  * Katmanlar (arkadan öne):
@@ -74,10 +85,16 @@ export function App() {
       <Deck>
         <Hero />
         {sections.map((s, i) => {
-          const Component = SECTION_COMPONENTS[s.slug as keyof typeof SECTION_COMPONENTS]
-          if (!Component) return null
+          const Component = SECTION_COMPONENTS[s.kind]
           return (
-            <Component key={s.id} id={s.slug} index={i + 1} heading={s.heading} body={s.body} />
+            <Component
+              key={s.id}
+              id={s.slug}
+              index={i + 1}
+              heading={s.heading}
+              body={s.body}
+              section={s}
+            />
           )
         })}
       </Deck>

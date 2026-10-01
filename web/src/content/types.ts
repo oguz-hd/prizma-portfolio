@@ -80,6 +80,20 @@ export type Link = {
   order: number
 }
 
+/**
+ * Yüklenen görsel (Faz 9). Dosyalar `/uploads/{id}-{w}.webp`, `widths`'teki her
+ * genişlik için — `content/media.ts` srcset'i buradan kuruyor. Orijinal saklanmıyor.
+ */
+export type Media = {
+  id: string
+  width: number
+  height: number
+  widths: number[]
+  alt: string
+}
+
+export type SectionMedia = Media & { caption?: string }
+
 export type Project = {
   id: string
   slug: string
@@ -98,16 +112,40 @@ export type Project = {
   liveUrl?: string
   order: number
   published: boolean
+  cover?: Media
 }
+
+/**
+ * Bölüm türü = hangi bileşen çizer (Faz 9, App.tsx). Hazırlar (about, experience,
+ * contact) silinmez; diğerleri panelden eklenir. api/app/schemas.py → SectionKind.
+ */
+export type SectionKind =
+  | 'about'
+  | 'experience'
+  | 'contact'
+  | 'text'
+  | 'timeline'
+  | 'projects'
+  | 'announcement'
+  | 'gallery'
 
 export type Section = {
   id: string
   slug: string
+  kind: SectionKind
   heading: string
   /** Üst menüdeki ad. İçerikte yoksa `heading` (telefonda uzun başlık sığmıyor). */
   navLabel: string
   body: string[]
   order: number
+  /** timeline */
+  items?: Milestone[]
+  /** gallery */
+  media?: SectionMedia[]
+  /** announcement — bağlantı ve yayın aralığı (aralık dışındaysa bölüm hiç gelmez). */
+  link?: { label: string; href: string }
+  startsOn?: string
+  endsOn?: string
 }
 
 export type SiteContent = {
@@ -178,15 +216,35 @@ export type RawProject = {
   liveUrl?: string
   order: number
   published: boolean
+  cover?: RawMedia
 }
+
+export type RawMedia = {
+  id: string
+  width: number
+  height: number
+  widths: number[]
+  alt: Localized<string>
+}
+
+export type RawSectionMedia = RawMedia & { caption?: Localized<string> }
 
 export type RawSection = {
   id: string
   slug: string
+  kind: SectionKind
   heading: Localized<string>
   navLabel?: Localized<string>
   body: Localized<string[]>
   order: number
+  /** Yalnızca panelin içeriğinde (GET /api/admin/content); gizliler content.json'da yok. */
+  visible?: boolean
+  items?: RawMilestone[]
+  media?: RawSectionMedia[]
+  link?: { label: Localized<string>; href: string }
+  /** ISO tarih (YYYY-MM-DD), gün dahil. */
+  startsOn?: string
+  endsOn?: string
 }
 
 export type RawSiteContent = {
@@ -195,4 +253,6 @@ export type RawSiteContent = {
   links: RawLink[]
   projects: RawProject[]
   sections: RawSection[]
+  /** Yalnızca panelin içeriğinde: medya kitaplığı. */
+  media?: RawMedia[]
 }

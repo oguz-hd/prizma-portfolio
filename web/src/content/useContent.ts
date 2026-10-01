@@ -1,6 +1,14 @@
 import type { Locale } from '../i18n/types'
 import { useLocale } from '../i18n/useLocale'
-import type { Milestone, RawMilestone, RawSiteContent, SiteContent } from './types'
+import type {
+  Media,
+  Milestone,
+  RawMedia,
+  RawMilestone,
+  RawSection,
+  RawSiteContent,
+  SiteContent,
+} from './types'
 
 /**
  * ★ İÇERİĞİN OKUNDUĞU TEK NOKTA.
@@ -44,7 +52,27 @@ function resolveMilestones(list: RawMilestone[], locale: Locale): Milestone[] {
     .sort((a, b) => a.order - b.order)
 }
 
+function resolveMedia<M extends RawMedia>(m: M, locale: Locale): Media {
+  return { id: m.id, width: m.width, height: m.height, widths: m.widths, alt: m.alt[locale] }
+}
+
+/** Bugün (ziyaretçinin yerel günü) ISO biçiminde — duyurunun aralığıyla karşılaştırılır. */
+function today(): string {
+  const d = new Date()
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
+/**
+ * Duyurunun yayın aralığı SİTEDE değerlendiriliyor: yayın (content.json) her gün
+ * yeniden yazılmıyor, tarih geçince duyuru kendiliğinden düşmeli. ISO tarihler
+ * metin olarak doğru sıralanıyor.
+ */
+function inWindow(s: RawSection, day: string): boolean {
+  return (!s.startsOn || s.startsOn <= day) && (!s.endsOn || day <= s.endsOn)
+}
+
 function resolveContent(source: RawSiteContent, locale: Locale): SiteContent {
+  const day = today()
   return {
     settings: {
       preset: source.settings.preset,
@@ -75,14 +103,19 @@ function resolveContent(source: RawSiteContent, locale: Locale): SiteContent {
         title: p.title[locale],
         summary: p.summary[locale],
         description: p.description[locale],
+        cover: p.cover && resolveMedia(p.cover, locale),
       }))
       .sort((a, b) => a.order - b.order),
     sections: source.sections
+      .filter((s) => s.kind !== 'announcement' || inWindow(s, day))
       .map((s) => ({
         ...s,
         heading: s.heading[locale],
         navLabel: (s.navLabel ?? s.heading)[locale],
         body: s.body[locale],
+        items: s.items && resolveMilestones(s.items, locale),
+        media: s.media?.map((m) => ({ ...resolveMedia(m, locale), caption: m.caption?.[locale] })),
+        link: s.link && { label: s.link.label[locale], href: s.link.href },
       }))
       .sort((a, b) => a.order - b.order),
   }

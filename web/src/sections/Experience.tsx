@@ -27,10 +27,11 @@ export function Experience(props: SectionProps) {
   )
 }
 
-function Timeline({ label, items }: { label: string; items: Milestone[] }) {
+/** Zaman çizelgesi listesi — Deneyim ve panelden eklenen zaman çizelgesi bölümleri ortak. */
+export function Timeline({ label, items }: { label?: string; items: Milestone[] }) {
   return (
     <>
-      <p className="label">{label}</p>
+      {label && <p className="label">{label}</p>}
       <ul className="timeline">
         {items.map((m) => (
           <li key={m.id} className="timeline-item" data-page-unit>
