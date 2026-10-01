@@ -35,3 +35,9 @@
     animation: none;
   }
 }
+
+/* Açık zeminde yıldız değil, ışıkta süzülen toz: aynı tonlar, çok daha soluk. */
+[data-scheme='light'] .starfield {
+  opacity: 0.35;
+}
+

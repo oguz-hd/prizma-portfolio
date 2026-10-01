@@ -144,3 +144,17 @@
     filter: blur(14px) saturate(1.8) brightness(1.15);
   }
 }
+
+/* ── Açık zemin (beyaz tema, types.ts → scheme) ─────────────────────────────
+   Koyu gökte ışık parlar (screen); açık zeminde tayf kâğıda düşmüş renk gibi
+   davranır — Newton'un duvarı. Işıklar `multiply`, hale daha sakin ve parlatmasız. */
+[data-scheme='light'] .prism-glow {
+  filter: blur(22px) saturate(1.4);
+  opacity: 0.55;
+}
+
+[data-scheme='light'] .prism-pulse,
+[data-scheme='light'] .prism-wave {
+  mix-blend-mode: multiply;
+}
+

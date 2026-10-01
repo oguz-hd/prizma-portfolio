@@ -52,6 +52,14 @@ export function applyTheme(
   // Yalnızca duraklar — öğede kendi gradyanını kuranlar için (üst çubuktaki
   // akan tayflı "INTRO" yazısı: linear-gradient(90deg, var(--spectrum-stops), …)).
   s.setProperty('--spectrum-stops', tokens.accents.join(', '))
-  // Tarayıcı arayüzü (kaydırma çubuğu, form denetimleri) de koyu tarafta kalsın.
-  s.setProperty('color-scheme', 'dark')
+  // Tarayıcı arayüzü (kaydırma çubuğu, form denetimleri) zeminin tarafında kalsın;
+  // açık/koyu ETKİLER `data-scheme` üstünden CSS'te (types.ts → scheme).
+  const scheme = tokens.scheme ?? 'dark'
+  s.setProperty('color-scheme', scheme)
+  root.dataset.scheme = scheme
+  // Telefonun üst çubuğu da zemin renginde (index.html'deki ilk değer koyu).
+  if (root === document.documentElement) {
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', tokens.ground)
+    document.querySelector('meta[name="color-scheme"]')?.setAttribute('content', scheme)
+  }
 }

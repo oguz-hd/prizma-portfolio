@@ -44,6 +44,14 @@ export type ThemeTokens = {
    * Sayfada rozet/küçük vurgu olarak da kullanılır ama asla lead ile eşit ağırlıkta.
    */
   accents: string[]
+
+  /**
+   * Zeminin tarafı (beyaz tema, Oturum 6). Renkler token olduğu için çoğu şey
+   * kendiliğinden döner; dönmeyen ETKİLER: koyu zeminde ışık `screen` ile parlar,
+   * açık zeminde kâğıda düşen renk gibi `multiply` olur; hale ve yıldızlar sakinleşir.
+   * `html[data-scheme]` üstünden CSS'te (prism.css, starfield.css). Yoksa koyu.
+   */
+  scheme?: 'dark' | 'light'
 }
 
 export type Preset = {
