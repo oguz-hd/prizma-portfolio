@@ -35,13 +35,16 @@ arkada kalınca rAF duruyor ve açılış `pending`'de takılı görünüyor (ha
 **Testler dizüstü görünümünde** (1440×900, 1366×768) — kullanıcı tercihi; mobil
 yalnızca değişiklik mobile özgüyse.
 
-### Doğrulama — **test yok, kapı bu ikisi** (panel için de aynısı)
+### Doğrulama — kapılar (site, panel, API)
 ```
 docker exec prizma-portfolio-web-1 npm run typecheck   # tsc --noEmit
 docker exec prizma-portfolio-web-1 npm run build       # asıl derleme
 docker exec prizma-portfolio-admin-1 npm run typecheck
 docker exec prizma-portfolio-admin-1 npm run build
+docker exec prizma-portfolio-api-1 pytest           # API (Faz 9'dan beri; geçici veri klasöründe)
 ```
+API şeması değişince: `api/app/migrations.py`'ye adım ekle — açılışta uygulanır, önce
+`/data/site.db.bak-v<n>` yedeği alınır. `down -v` artık gerekmez.
 ⚠️ Panel `web/src`'yi import ediyor (@site: `content/types.ts`, `theme/*`): sitede
 bunlar değişince panelin kapıları da çalıştırılır.
 
@@ -183,8 +186,9 @@ dev'in veri volume'u sunuluyor (meta şablonu ve content.json için) — adres h
 başlatmada değişir, bilgisayar uyuyunca kopar. → `docs/CALISTIRMA.md` "Telefonda deneme".
 Kalıcı yayın için Cloudflare Pages önerildi, hesap gerekir.
 
-🛑 **Bir sonraki faza kendiliğinden geçme — önce sor.** Kullanıcı her faz sonunda
-durmak istiyor.
+🛑 **Yeni bir faza kendiliğinden geçme — önce sor.** Ama ONAYLANMIŞ bir planın alt
+fazları arasında onay sorma (kullanıcı, Oturum 6: "yapayım mı diye sorma, seçmem gereken
+yerde sor"): kapılar → commit → devam; soru yalnızca gerçek seçimde (görsel, kapsam).
 
 ### Ertelenenler
 - OG görseli (`web/public/og.png`, 1200×630) — tasarım oturunca çekilecek; `index.html`'e eklenecek (not: `api/app/content.py` → `render_meta`)

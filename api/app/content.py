@@ -9,10 +9,12 @@ from app.db import SessionDep
 from app.models import (
     AdminUser,  # noqa: F401  (SQLModel tablo kaydı için import ediliyor)
     Link,
+    Media,
     Milestone,
     Profile,
     Project,
     Section,
+    SectionMedia,
     SiteSettings,
     SkillGroup,
     Translation,
@@ -21,9 +23,12 @@ from app.schemas import (
     LinkOut,
     LocalizedList,
     LocalizedText,
+    MediaOut,
     MilestoneOut,
     ProfileOut,
     ProjectOut,
+    SectionLinkOut,
+    SectionMediaOut,
     SectionOut,
     SiteContentOut,
     SiteSettingsOut,
@@ -73,28 +78,44 @@ class Translations:
         )
 
 
-def build_content(session: Session) -> SiteContentOut:
-    """Veritabanındaki satırları ön yüzün beklediği tek JSON'a çevirir."""
+def build_content(session: Session, *, admin: bool = False) -> SiteContentOut:
+    """
+    Veritabanındaki satırları ön yüzün beklediği tek JSON'a çevirir.
+
+    `admin=True` → panelin çıktısı (GET /api/admin/content): gizli bölümler, yayında
+    olmayan projeler, her bölümün `visible`'ı ve medya kitaplığı da var. Herkese açık
+    çıktıda (content.json) bunlar yok.
+    """
     tr = Translations(session)
 
     settings_row = session.get(SiteSettings, "settings") or SiteSettings()
     profile_row = session.get(Profile, "profile") or Profile(name="")
 
+    def milestone_out(m: Milestone) -> MilestoneOut:
+        return MilestoneOut(
+            id=m.id,
+            org=m.org,
+            role=tr.text("milestone", m.id, "role"),
+            period=m.period,
+            note=tr.maybe_text("milestone", m.id, "note"),
+            order=m.order,
+        )
+
+    all_milestones = session.exec(select(Milestone).order_by(Milestone.order)).all()
+
     def milestones(kind: str) -> list[MilestoneOut]:
-        rows = session.exec(
-            select(Milestone).where(Milestone.kind == kind).order_by(Milestone.order)
-        ).all()
-        return [
-            MilestoneOut(
-                id=m.id,
-                org=m.org,
-                role=tr.text("milestone", m.id, "role"),
-                period=m.period,
-                note=tr.maybe_text("milestone", m.id, "note"),
-                order=m.order,
-            )
-            for m in rows
-        ]
+        return [milestone_out(m) for m in all_milestones if m.kind == kind and not m.section_id]
+
+    media_rows = {m.id: m for m in session.exec(select(Media).order_by(Media.created_at)).all()}
+
+    def media_out(media_id: str | None) -> MediaOut | None:
+        m = media_rows.get(media_id or "")
+        if m is None:
+            return None
+        return MediaOut(
+            id=m.id, width=m.width, height=m.height, widths=json.loads(m.widths),
+            alt=tr.text("media", m.id, "alt"),
+        )
 
     skills = [
         SkillGroupOut(
@@ -117,6 +138,10 @@ def build_content(session: Session) -> SiteContentOut:
         for link in session.exec(select(Link).order_by(Link.order)).all()
     ]
 
+    project_query = select(Project).order_by(Project.order)
+    if not admin:
+        # Yayında olmayanlar herkese açık içerikte görünmez.
+        project_query = project_query.where(Project.published)
     projects = [
         ProjectOut(
             id=p.id,
@@ -129,24 +154,48 @@ def build_content(session: Session) -> SiteContentOut:
             live_url=p.live_url,
             order=p.order,
             published=p.published,
+            cover=media_out(p.cover_media_id),
         )
-        # Yayında olmayanlar public uç noktada görünmez.
-        for p in session.exec(
-            select(Project).where(Project.published).order_by(Project.order)
-        ).all()
+        for p in session.exec(project_query).all()
     ]
 
-    sections = [
-        SectionOut(
+    gallery: dict[str, list[SectionMediaOut]] = {}
+    for row in session.exec(select(SectionMedia).order_by(SectionMedia.order)).all():
+        m = media_out(row.media_id)
+        if m:
+            key = f"{row.section_id}:{row.media_id}"
+            gallery.setdefault(row.section_id, []).append(
+                SectionMediaOut(**m.model_dump(), caption=tr.maybe_text("section_media", key, "caption"))
+            )
+
+    def section_out(s: Section) -> SectionOut:
+        link_label = tr.maybe_text("section", s.id, "link_label")
+        return SectionOut(
             id=s.id,
             slug=s.slug,
+            kind=s.kind,
             heading=tr.text("section", s.id, "heading"),
             nav_label=tr.maybe_text("section", s.id, "nav_label"),
             body=tr.paragraphs("section", s.id, "body"),
             order=s.order,
+            visible=s.visible if admin else None,
+            items=(
+                [milestone_out(m) for m in all_milestones if m.section_id == s.id]
+                if s.kind == "timeline" else None
+            ),
+            media=gallery.get(s.id, []) if s.kind == "gallery" else None,
+            link=(
+                SectionLinkOut(label=link_label, href=s.link_href)
+                if s.kind == "announcement" and s.link_href and link_label else None
+            ),
+            starts_on=s.starts_on if s.kind == "announcement" else None,
+            ends_on=s.ends_on if s.kind == "announcement" else None,
         )
-        for s in session.exec(select(Section).order_by(Section.order)).all()
-    ]
+
+    section_query = select(Section).order_by(Section.order)
+    if not admin:
+        section_query = section_query.where(Section.visible)
+    sections = [section_out(s) for s in session.exec(section_query).all()]
 
     return SiteContentOut(
         settings=SiteSettingsOut(
@@ -167,6 +216,7 @@ def build_content(session: Session) -> SiteContentOut:
         links=links,
         projects=projects,
         sections=sections,
+        media=[m for mid in media_rows if (m := media_out(mid))] if admin else None,
     )
 
 

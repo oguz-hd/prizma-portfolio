@@ -12,10 +12,21 @@ dependencies = [
     # algoritma (docs/ARCHITECTURE.md § 2: argon2/bcrypt ile hash'lenir).
     "pyjwt>=2.10",
     "pwdlib[argon2]>=0.2.1",
+    # Görsel yükleme (Faz 9, app/media.py): WebP'ye çevirme, EXIF/GPS silme.
+    # Çok parçalı form (UploadFile) fastapi[standard] ile geliyor.
+    "pillow>=11",
 ]
+
+[dependency-groups]
+# Testler (api/tests): docker exec prizma-portfolio-api-1 pytest
+dev = ["pytest>=8"]
 
 [tool.fastapi]
 entrypoint = "app.main:app"
 
 [tool.ruff]
 line-length = 100
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

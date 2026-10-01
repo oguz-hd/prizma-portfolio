@@ -221,15 +221,16 @@ def seed(session: Session) -> bool:
     # içerikleri bileşenlerde (bio, zaman çizelgesi, linkler) üretiliyor.
     # İletişim'in müsaitlik cümlesi kullanıcı isteğiyle kalktı (Oturum 4).
     # Projeler bölümü kullanıcı isteğiyle kalktı (Oturum 2); proje KAYITLARI
-    # duruyor — bölüm geri eklenirse ön yüzde bileşeni hazır.
+    # duruyor — panelden "Projeler" türünde bölüm eklenince sitede görünür (Faz 9).
     # `nav_label` = üst menüdeki kısa ad; yoksa menü başlığı kullanır.
-    for sid, slug, order, heading, nav_label, body in [
-        ("hakkimda", "hakkimda", 1, ("Hakkımda", "About"), None, None),
-        ("deneyim", "deneyim", 2, ("Deneyim ve Eğitim", "Experience & Education"),
+    # `kind`: hangi bileşen çizer (Faz 9) — bu üçü hazır tür, silinmez.
+    for sid, slug, kind, order, heading, nav_label, body in [
+        ("hakkimda", "hakkimda", "about", 1, ("Hakkımda", "About"), None, None),
+        ("deneyim", "deneyim", "experience", 2, ("Deneyim ve Eğitim", "Experience & Education"),
          ("Deneyim", "Experience"), None),
-        ("iletisim", "iletisim", 3, ("İletişim", "Contact"), None, None),
+        ("iletisim", "iletisim", "contact", 3, ("İletişim", "Contact"), None, None),
     ]:
-        rows.append(Section(id=sid, slug=slug, order=order))
+        rows.append(Section(id=sid, slug=slug, kind=kind, order=order))
         rows += _t("section", sid, "heading", heading[0], heading[1])
         if nav_label:
             rows += _t("section", sid, "nav_label", nav_label[0], nav_label[1])

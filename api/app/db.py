@@ -5,6 +5,7 @@ from fastapi import Depends
 from sqlmodel import Session, SQLModel, create_engine
 
 from app.config import get_settings
+from app.migrations import migrate
 
 settings = get_settings()
 
@@ -19,7 +20,10 @@ engine = create_engine(
 
 def init_db() -> None:
     settings.data_dir.mkdir(parents=True, exist_ok=True)
+    # Önce eksik tablolar (yeni tablolar burada doğar), sonra var olanlara eksik
+    # sütunlar — migrations.py.
     SQLModel.metadata.create_all(engine)
+    migrate(engine, settings.data_dir / "site.db")
 
 
 def get_session() -> Generator[Session]:

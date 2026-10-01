@@ -72,5 +72,6 @@ services:
     volumes:
       # Kaynak host'tan bağlı → kaydet, fastapi dev yeniden yüklesin.
       - ./api/app:/app/app
+      - ./api/tests:/app/tests
       - data:/data
     restart: 'no'

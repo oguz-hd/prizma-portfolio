@@ -69,10 +69,13 @@ class Milestone(SQLModel, table=True):
     __tablename__ = "milestones"
 
     id: str = Field(primary_key=True)
-    kind: str = Field(index=True)  # "experience" | "education"
+    # "experience" | "education" (profil) · "timeline" (zaman çizelgesi bölümü, Faz 9)
+    kind: str = Field(index=True)
     org: str
     period: str = ""
     order: int = 0
+    # Zaman çizelgesi bölümünün maddesiyse o bölüm; profilin maddelerinde boş.
+    section_id: str | None = Field(default=None, index=True)
 
 
 class Link(SQLModel, table=True):
@@ -94,13 +97,55 @@ class Project(SQLModel, table=True):
     live_url: str | None = None
     order: int = 0
     published: bool = True
+    cover_media_id: str | None = None
 
 
 class Section(SQLModel, table=True):
+    """
+    Bölüm = sitede bir slayt. `kind` hangi bileşenin çizeceğini söyler (Faz 9;
+    eskiden eşleme slug'a göre kodda elleydi). Hazır türler (about, experience,
+    contact) silinmez, gizlenir; panelden eklenenler silinebilir — schemas.py.
+    Çevrilen alanlar: heading, nav_label, body, link_label (duyuru).
+    """
+
     __tablename__ = "sections"
 
     id: str = Field(primary_key=True)
     slug: str = Field(index=True)
+    order: int = 0
+    kind: str = "text"
+    visible: bool = True
+    # Duyuru: isteğe bağlı bağlantı ve yayın aralığı (ISO tarih, gün dahil).
+    # Aralık SİTEDE değerlendiriliyor — yayın her gün yeniden yapılmıyor.
+    link_href: str | None = None
+    starts_on: str | None = None
+    ends_on: str | None = None
+
+
+class Media(SQLModel, table=True):
+    """
+    Yüklenen görsel (Faz 9, media.py). Dosyalar `/data/uploads/{id}-{genişlik}.webp`;
+    orijinal SAKLANMIYOR (EXIF/GPS içerir). `alt` çeviri tablosunda.
+    """
+
+    __tablename__ = "media"
+
+    id: str = Field(primary_key=True)
+    width: int
+    height: int
+    # Üretilen genişlikler, küçükten büyüğe — JSON dizi.
+    widths: str
+    bytes: int
+    created_at: str
+
+
+class SectionMedia(SQLModel, table=True):
+    """Galeri bölümünün görselleri ve sırası. Altyazı çeviri tablosunda (`section_media`)."""
+
+    __tablename__ = "section_media"
+
+    section_id: str = Field(primary_key=True)
+    media_id: str = Field(primary_key=True, index=True)
     order: int = 0
 
 

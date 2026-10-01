@@ -24,6 +24,7 @@ EXPOSE 8000
 
 # --- Geliştirme: yeniden yükleme açık ---
 FROM base AS dev
+RUN uv pip install --group dev -r pyproject.toml
 CMD ["fastapi", "dev", "app/main.py", "--host", "0.0.0.0", "--port", "8000"]
 
 # --- Yayın ---

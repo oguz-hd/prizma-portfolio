@@ -1,7 +1,15 @@
 import re
+from datetime import date
 from typing import Annotated, Literal
 
-from pydantic import AfterValidator, BaseModel, ConfigDict, Field, StringConstraints
+from pydantic import (
+    AfterValidator,
+    BaseModel,
+    ConfigDict,
+    Field,
+    StringConstraints,
+    model_validator,
+)
 from pydantic.alias_generators import to_camel
 
 from app.config import INSECURE_DEFAULT_PASSWORD
@@ -96,15 +104,56 @@ class ProjectOut(CamelModel):
     live_url: str | None = None
     order: int
     published: bool
+    cover: "MediaOut | None" = None
+
+
+#: Bölüm türleri (Faz 9) — hangi bileşen çizer. web/src/content/types.ts → SectionKind.
+#: Hazırlar (about, experience, contact) silinmez, gizlenir; diğerleri panelden eklenir.
+SectionKind = Literal[
+    "about", "experience", "contact", "text", "timeline", "projects", "announcement", "gallery"
+]
+AddableKind = Literal["text", "timeline", "projects", "announcement", "gallery"]
+BUILTIN_KINDS = frozenset({"about", "experience", "contact"})
+
+
+class MediaOut(CamelModel):
+    """
+    Yüklenen görsel. Dosyası `/uploads/{id}-{w}.webp`, `widths`'teki her genişlik için
+    (küçükten büyüğe) — site `srcset`'i buradan kuruyor (media.py).
+    """
+
+    id: str
+    width: int
+    height: int
+    widths: list[int]
+    alt: LocalizedText
+
+
+class SectionMediaOut(MediaOut):
+    caption: LocalizedText | None = None
+
+
+class SectionLinkOut(CamelModel):
+    label: LocalizedText
+    href: str
 
 
 class SectionOut(CamelModel):
     id: str
     slug: str
+    kind: SectionKind
     heading: LocalizedText
     nav_label: LocalizedText | None = None
     body: LocalizedList
     order: int
+    # Yalnızca panelin çıktısında (gizliler herkese açık içerikte hiç yok).
+    visible: bool | None = None
+    # Türe göre — boşsa yazılmaz (exclude_none).
+    items: list[MilestoneOut] | None = None  # timeline
+    media: list[SectionMediaOut] | None = None  # gallery
+    link: SectionLinkOut | None = None  # announcement
+    starts_on: str | None = None  # announcement, ISO tarih (gün dahil)
+    ends_on: str | None = None
 
 
 class SiteContentOut(CamelModel):
@@ -115,6 +164,8 @@ class SiteContentOut(CamelModel):
     links: list[LinkOut]
     projects: list[ProjectOut]
     sections: list[SectionOut]
+    # Yalnızca panelin çıktısında: medya kitaplığı (GET /api/admin/content).
+    media: list[MediaOut] | None = None
 
 
 # ── Yönetim girdileri (Faz 7, admin.py) ──────────────────────────────────────
@@ -251,12 +302,69 @@ class LinkCreate(LinkIn):
     id: Slug
 
 
-class SectionIn(CamelModel):
-    """Bölümler yalnızca düzenlenir: slug ↔ bileşen eşlemesi kodda (web/src/App.tsx)."""
+class SectionLinkIn(CamelModel):
+    label: RequiredText
+    href: Href
 
+
+class SectionIn(CamelModel):
     heading: RequiredText
     nav_label: OptionalText = None
     body: Paragraphs = LocalizedList()
+    # Verilmezse değişmez (eski panel bu alanı göndermiyordu).
+    visible: bool | None = None
+    # Yalnızca duyuru (admin.py diğer türlerde reddediyor).
+    link: SectionLinkIn | None = None
+    starts_on: date | None = None
+    ends_on: date | None = None
+
+    @model_validator(mode="after")
+    def _range(self) -> "SectionIn":
+        if self.starts_on and self.ends_on and self.ends_on < self.starts_on:
+            raise ValueError("bitiş tarihi başlangıçtan önce olamaz")
+        return self
+
+
+class SectionCreate(SectionIn):
+    id: Slug
+    kind: AddableKind
+
+
+class TimelineItemCreate(MilestoneIn):
+    """Zaman çizelgesi bölümünün maddesi — deneyim/eğitimle aynı alanlar."""
+
+    id: Slug
+
+
+class GalleryItemIn(CamelModel):
+    media_id: str
+    caption: OptionalText = None
+
+
+class GalleryIn(CamelModel):
+    """Galerinin görselleri, istenen sırayla — liste baştan yazılır."""
+
+    items: list[GalleryItemIn]
+
+
+class ProjectIn(CamelModel):
+    title: RequiredText
+    summary: RequiredText
+    description: Paragraphs = LocalizedList()
+    # Teknoloji adları çevrilmez.
+    tech: list[NonEmpty] = []
+    repo_url: Href | None = None
+    live_url: Href | None = None
+    published: bool = True
+    cover_media_id: str | None = None
+
+
+class ProjectCreate(ProjectIn):
+    id: Slug
+
+
+class MediaAltIn(CamelModel):
+    alt: OptionalText = None
 
 
 class OrderIn(CamelModel):
@@ -297,3 +405,6 @@ class TokenOut(CamelModel):
 class AdminOut(CamelModel):
     id: int
     email: str
+
+
+ProjectOut.model_rebuild()
