@@ -230,3 +230,24 @@ docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
 içerik `seed.py`'deki ilk hâline döner, panelden yapılan her düzenleme gider.
 Konteynerin anonim `node_modules` volume'u da silinir; yenisi imajdan kurulur
 (imaj eskiyse yukarıdaki typecheck sorunu).
+
+---
+
+## Performans ölçümü
+
+`tools/perf/olcum.mjs` — bağımlılıksız; Chrome'u kendi başlatır (CDP), GPU'yu Windows
+sayaçlarından okur. **Yayın derlemesini** ölç (dev'de React geliştirme kipi şişirir):
+
+```powershell
+docker compose -f docker-compose.yml -f docker-compose.prod.yml build web
+docker rm -f prizma-olcum-web
+docker run -d --name prizma-olcum-web -p 5180:80 `
+  -v prizma-portfolio_data:/srv/data:ro `
+  -v "C:\Users\drn49\Desktop\prizma-portfolio\Caddyfile:/etc/caddy/Caddyfile:ro" `
+  prizma-portfolio-web:prod
+node tools/perf/olcum.mjs http://localhost:5180/ dizustu,orta,telefon,gpusuz   # PowerShell'den
+```
+Sonuçlar `tools/perf/sonuclar/` (git'e girmiyor). Ölçerken Chrome penceresini
+örtme/küçültme — sekme gizlenirse rAF durur, betik o profili "görünür değil" diye atlar.
+⚠️ Chrome bu makinede dahili **Radeon 610M**'yi seçiyor (RTX değil) ve ekranın yenileme
+hızında (60 ya da 240 Hz) çiziyor — GPU yükü yenileme hızıyla orantılı; karşılaştırırken bak.
