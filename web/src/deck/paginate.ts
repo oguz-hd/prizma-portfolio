@@ -68,8 +68,8 @@ export function paginate(slide: HTMLElement): number {
   const units = unitsOf(slide)
   if (!units.length || !overflows(slide)) return 1
 
-  // Bölünen slayt tek sütuna iner (theme.css → [data-paged]): yan sütun ayrı
-  // sayfada kalınca yarısı boş bir ızgara okunuyordu.
+  // Düzen theme.css → [data-paged]: geniş ekranda iki sütun kalır, sütunu biten
+  // sayfada öbürü tam genişliğe yayılır. Ölçüm o CSS'le yapılıyor.
   slide.dataset.paged = ''
   const out: HTMLElement[][] = []
   let cur: HTMLElement[] = []

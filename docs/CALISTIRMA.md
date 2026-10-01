@@ -254,3 +254,24 @@ hızında (60 ya da 240 Hz) çiziyor — GPU yükü yenileme hızıyla orantıl�
 `OLCUM_SINIRSIZ=1` vsync'i kapatır (yüksek yenileme taklidi) ama betiğin kendi rAF döngüsü
 saniyede ~1500 kare ürettirir → CPU/GPU rakamları anlamsızlaşır; yalnızca "prizma saniyede
 kaç kez çiziliyor" gibi sayımlar için (Oturum 6: 1134 rAF'ta 74 çizim).
+
+---
+
+## Büyüyen içerik testi
+
+Düzen içerik büyüyünce dayanıyor mu? Asıl veritabanına dokunmadan, iki ayrı yığın
+(kendi boş veritabanları, yayın imajı). `tools/icerik/buyut.mjs` senaryoları anlatıyor.
+
+```powershell
+foreach ($s in @(@{n='a';api=8011;web=5181},@{n='b';api=8012;web=5182})) { $n=$s.n
+  docker run -d --name "prizma-buyuk-$n-api" -p "$($s.api):8000" -v "prizma-buyuk-${n}:/data" `
+    -e DATA_DIR=/data -e DEBUG=1 prizma-portfolio-api:dev      # DEBUG yoksa varsayılan parolayla açılmaz
+  docker run -d --name "prizma-buyuk-$n-web" -p "$($s.web):80" -v "prizma-buyuk-${n}:/srv/data:ro" `
+    -v "C:\Users\drn49\Desktop\prizma-portfolio\Caddyfile:/etc/caddy/Caddyfile:ro" prizma-portfolio-web:prod }
+node tools/icerik/buyut.mjs A http://localhost:8011    # → http://localhost:5181
+node tools/icerik/buyut.mjs B http://localhost:8012    # → http://localhost:5182
+```
+Senaryo yalnızca boş (yeni tohumlanmış) veritabanına bir kez uygulanır; tekrar için
+`docker rm -f prizma-buyuk-a-api prizma-buyuk-a-web; docker volume rm prizma-buyuk-a`.
+⚠️ Betik dosyalarını PowerShell'in `Get-Content`/`Set-Content`'iyle düzenleme —
+`-Encoding` verilmezse Türkçe karakterler bozulur (Oturum 6'da oldu).

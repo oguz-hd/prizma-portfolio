@@ -868,15 +868,27 @@ html[data-lite] .panel {
 }
 
 /* ── Alt sayfalar (Oturum 4 · A1, deck/paginate.ts) ─────────────────────────
-   Bölünen slayt tek sütuna iner; ilk sayfadan sonra başlık küçülür ama kalır;
+   İlk sayfadan sonra başlık küçülür ama kalır;
    bölüm numarasının yanında sayaç. Öznitelikleri paginate.ts yazıyor. */
 [data-page-off] {
   display: none !important;
 }
 
-.slide[data-paged] .about,
-.slide[data-paged] .timeline-grid {
-  grid-template-columns: minmax(0, 1fr);
+/* Geniş ekranda iki sütun KALIR (Oturum 6, büyüyen içerik testi: tek sütuna inince
+   sağ yarı boş kalıyor, sayfa sayısı artıyordu). Bir sayfada sütunlardan biri
+   bittiyse kalan tam genişliğe yayılır; maddeleri (yetenek grubu, zaman çizelgesi)
+   iki sütuna dizilir. Düzyazı tek sütunda kalır — paragraflar yan yana okunmaz.
+   Dar ekranda zaten tek sütun. */
+@media (min-width: 768px) {
+  .slide[data-paged] :is(.about, .timeline-grid):has(> [data-page-off]) > :not([data-page-off]) {
+    grid-column: 1 / -1;
+  }
+
+  .slide[data-paged] .about:has(> [data-page-off]) > .about-side,
+  .slide[data-paged] .timeline-grid:has(> [data-page-off]) .timeline {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--space-16);
+  }
 }
 
 .slide[data-paged]:not([data-page='0']) .section-heading {
