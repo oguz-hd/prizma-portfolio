@@ -19,6 +19,13 @@ mkdir -p "$dir"
 
 while true; do
   gun=$(date +%F)
+  # İlk kurulumda veritabanını API kuruyor; yedek servisi ondan önce kalkarsa
+  # 24 saat beklemesin, dakikada bir baksın.
+  if [ ! -f /data/site.db ]; then
+    [ "${YEDEK_BIR_KEZ:-}" = "1" ] && exit 1
+    sleep 60
+    continue
+  fi
   if [ -f /data/site.db ]; then
     sqlite3 /data/site.db ".backup '$dir/site-$gun.db'"
     if [ -d /data/uploads ]; then

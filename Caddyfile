@@ -5,6 +5,17 @@
 
 {
 	email {$ADMIN_EMAIL:admin@localhost}
+	# Bağlantıyı tutan yavaş istekler (başlığı/gövdeyi damla damla gönderen) sınırlı
+	# yaşasın — varsayılanda süre yok (güvenlik taraması, Oturum 6). Gövde 2 dk: 15 MB
+	# görsel yavaş bağlantıda da yetişsin.
+	servers {
+		timeouts {
+			read_header 10s
+			read_body 2m
+			write 2m
+			idle 2m
+		}
+	}
 }
 
 {$DOMAIN::80} {
@@ -14,11 +25,18 @@
 	# API — yönetim paneli (Faz 7) ve sağlık kontrolü. Ziyaretçi sitesi API'ye
 	# hiç gitmez; içeriği aşağıdaki dosyadan okur.
 	handle /api/* {
-		# Görsel yükleme API'de 15 MB; sınırın üstü buraya kadar bile gelmesin.
+		# Asıl sınır API'de (16 MB, api/app/limits.py — 413'ü o veriyor). Buradaki
+		# dış pay ondan BÜYÜK olmalı: eşit olunca Caddy gövdeyi tam sınırda kesiyor, API
+		# devamını bekliyor, bağlantı asılı kalıyordu (güvenlik taraması, Oturum 6).
 		request_body {
-			max_size 16MB
+			max_size 20MB
 		}
-		reverse_proxy api:8000
+		reverse_proxy api:8000 {
+			transport http {
+				# API yanıt vermezse (takılan istek) bağlantı sonsuza dek tutulmasın.
+				response_header_timeout 2m
+			}
+		}
 	}
 
 	# ⚠️ Veri volume'u /srv/data'da — meta şablonu (/data/meta.html) kökten okuyor,
@@ -65,6 +83,8 @@
 	}
 	handle /admin/* {
 		header Cache-Control "no-cache"
+		# Panel arama sonuçlarında görünmesin (robots.txt'te engellenmiyor — bkz. orası).
+		header X-Robots-Tag "noindex, nofollow"
 		try_files {path} /admin/index.html
 		file_server
 	}

@@ -26,8 +26,11 @@ Caddy dosyaları `/uploads/` altında sunuyor (Caddyfile); ziyaretçi API'ye hi�
 settings = get_settings()
 
 MAX_BYTES = 15 * 1024 * 1024
-#: Sıkıştırma bombası: küçük dosya, devasa piksel. Pillow bu sınırı aşınca hata veriyor.
-Image.MAX_IMAGE_PIXELS = 40_000_000
+#: Sıkıştırma bombası: küçük dosya, devasa piksel. ⚠️ Pillow'un kendi sınırı yalnızca
+#: 2 KATINI aşınca hata veriyor, arası uyarıyla açılıyordu (40-80 MP → yüzlerce MB bellek;
+#: güvenlik taraması) — sınır aşağıda başlıktan, piksel açılmadan uygulanıyor.
+MAX_PIXELS = 40_000_000
+Image.MAX_IMAGE_PIXELS = MAX_PIXELS
 ACCEPTED = {"JPEG", "PNG", "WEBP"}
 #: Üretilen genişlikler — site `srcset` ile ekrana uygun olanı seçiyor.
 WIDTHS = (640, 1280, 1920)
@@ -53,8 +56,10 @@ def store(data: bytes) -> Media:
     if len(data) > MAX_BYTES:
         raise HTTPException(413, detail="Görsel en fazla 15 MB olabilir")
     try:
-        image = Image.open(io.BytesIO(data))
+        image = Image.open(io.BytesIO(data))  # yalnızca başlık okunuyor
         kind = image.format
+        if image.width * image.height > MAX_PIXELS:
+            raise _bad("Görsel çok büyük: en fazla 40 megapiksel")
         image.load()
     except (UnidentifiedImageError, Image.DecompressionBombError, OSError) as err:
         raise _bad("Görsel okunamadı (JPEG, PNG ya da WebP olmalı)") from err

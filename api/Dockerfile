@@ -28,5 +28,9 @@ RUN uv pip install --group dev -r pyproject.toml
 CMD ["fastapi", "dev", "app/main.py", "--host", "0.0.0.0", "--port", "8000"]
 
 # --- Yayın ---
+# Yetkisiz kullanıcıyla: API'de bir açık bulunsa da konteynerde root olunmasın.
+# /data imajda bu kullanıcıya ait — yeni volume ilk bağlanışta sahipliği buradan alıyor.
 FROM base AS prod
+RUN useradd --uid 10001 --no-create-home --shell /usr/sbin/nologin app     && mkdir -p /data && chown app:app /data
+USER app
 CMD ["fastapi", "run", "app/main.py", "--host", "0.0.0.0", "--port", "8000"]

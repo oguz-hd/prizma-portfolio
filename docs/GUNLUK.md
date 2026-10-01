@@ -69,4 +69,8 @@ Faz 9 (Oturum 6): panelden bölüm ekleme — serbest metin, zaman çizelgesi, p
 galeri; fotoğraf yükleme (EXIF/GPS silinir, WebP). Bileşeni artık tür seçiyor. Şema göç
 düzeni ve ilk kalıcı API testleri geldi; dev veritabanı kopyada denenip sıfırlanmadan yükseldi.
 Görünüş seçenek sayfasıyla (A1 · B2 · L1 · C2 · D2); panel uçtan uca test yığınında denendi.
+Güvenlik taraması (Oturum 6 sonu): kimlik denetiminden önce gövde okunuyordu ve sınırı aşan
+yükleme bağlantıyı askıda bırakıyordu — sınır API'ye (gövde okunmadan) taşındı. Dev portları
+yerele, API yayında root değil, belgeler kapalı. Yayın yığınının kopyasında uçtan uca, tarayıcı ve
+Lighthouse testleri; bulunan gerileme: panel girişi korumalı adrese gidiyordu (düzeldi).
 

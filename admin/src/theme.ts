@@ -39,7 +39,7 @@ const FALLBACK_NAME_CHARS = 14
 export async function paintLogin(): Promise<LoginLook> {
   let look: LoginLook = { tokens: PRESETS.tayf.tokens, nameChars: FALLBACK_NAME_CHARS }
   try {
-    const { settings, profile } = await api.content()
+    const { settings, profile } = await api.publicContent()
     look = { tokens: PRESETS[settings.preset]?.tokens ?? look.tokens, nameChars: profile.name.length }
   } catch {
     // Sunucuya ulaşılamıyor: giriş ekranı Tayf'ta açılır, hatayı form söyler.

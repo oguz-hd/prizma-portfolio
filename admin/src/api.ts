@@ -194,6 +194,12 @@ export const api = {
 
   /** Sitenin içeriği + gizliler + medya kitaplığı (content/types.ts → RawSiteContent). */
   content: () => request<RawSiteContent>('GET', '/admin/content'),
+  /**
+   * Ziyaretçinin gördüğü içerik — oturum gerekmez. Giriş ekranı sitenin paletini
+   * buradan alıyor (theme.ts → paintLogin). ⚠️ `content()` korumalı: giriş ekranında
+   * çağrılırsa 401 alır, giriş ekranı varsayılan palete düşer (Oturum 6'da oldu).
+   */
+  publicContent: () => request<RawSiteContent>('GET', '/content'),
 
   /** Görsel yükle: sunucu WebP'lere çevirir, EXIF/GPS'i siler (api/app/media.py). */
   upload: (file: File) => {

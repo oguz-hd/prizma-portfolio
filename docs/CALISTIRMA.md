@@ -241,7 +241,7 @@ sayaçlarından okur. **Yayın derlemesini** ölç (dev'de React geliştirme kip
 ```powershell
 docker compose -f docker-compose.yml -f docker-compose.prod.yml build web
 docker rm -f prizma-olcum-web
-docker run -d --name prizma-olcum-web -p 5180:80 `
+docker run -d --name prizma-olcum-web -p 127.0.0.1:5180:80 `
   -v prizma-portfolio_data:/srv/data:ro `
   -v "C:\Users\drn49\Desktop\prizma-portfolio\Caddyfile:/etc/caddy/Caddyfile:ro" `
   prizma-portfolio-web:prod
@@ -264,9 +264,9 @@ Düzen içerik büyüyünce dayanıyor mu? Asıl veritabanına dokunmadan, iki a
 
 ```powershell
 foreach ($s in @(@{n='a';api=8011;web=5181},@{n='b';api=8012;web=5182})) { $n=$s.n
-  docker run -d --name "prizma-buyuk-$n-api" -p "$($s.api):8000" -v "prizma-buyuk-${n}:/data" `
+  docker run -d --name "prizma-buyuk-$n-api" -p "127.0.0.1:$($s.api):8000" -v "prizma-buyuk-${n}:/data" `
     -e DATA_DIR=/data -e DEBUG=1 prizma-portfolio-api:dev      # DEBUG yoksa varsayılan parolayla açılmaz
-  docker run -d --name "prizma-buyuk-$n-web" -p "$($s.web):80" -v "prizma-buyuk-${n}:/srv/data:ro" `
+  docker run -d --name "prizma-buyuk-$n-web" -p "127.0.0.1:$($s.web):80" -v "prizma-buyuk-${n}:/srv/data:ro" `
     -v "C:\Users\drn49\Desktop\prizma-portfolio\Caddyfile:/etc/caddy/Caddyfile:ro" prizma-portfolio-web:prod }
 node tools/icerik/buyut.mjs A http://localhost:8011    # → http://localhost:5181
 node tools/icerik/buyut.mjs B http://localhost:8012    # → http://localhost:5182
@@ -280,11 +280,12 @@ C senaryosu (Faz 9 türleri): `node tools/icerik/buyut.mjs C http://localhost:80
 türlerden birer bölüm ve 6 örnek görsel. Test yığınında panel açmak (senin içeriğine dokunmadan):
 ```powershell
 docker network create prizma-c
-docker run -d --name prizma-c-api --network prizma-c -p 8013:8000 -v prizma-buyuk-c:/data `
+# --network-alias api: Caddyfile API'yi `api:8000` diye arıyor (yoksa her istek DNS'te asılı kalır)
+docker run -d --name prizma-c-api --network prizma-c --network-alias api -p 127.0.0.1:8013:8000 -v prizma-buyuk-c:/data `
   -v "C:\Users\drn49\Desktop\prizma-portfolio\api\app:/app/app" -e DATA_DIR=/data -e DEBUG=1 prizma-portfolio-api:dev
-docker run -d --name prizma-c-web --network prizma-c -p 5183:80 -v prizma-buyuk-c:/srv/data:ro `
+docker run -d --name prizma-c-web --network prizma-c -p 127.0.0.1:5183:80 -v prizma-buyuk-c:/srv/data:ro `
   -v "C:\Users\drn49\Desktop\prizma-portfolio\Caddyfile:/etc/caddy/Caddyfile:ro" prizma-portfolio-web:prod
-docker run -d --name prizma-c-admin --network prizma-c -p 5186:5175 -e VITE_USE_POLLING=1 `
+docker run -d --name prizma-c-admin --network prizma-c -p 127.0.0.1:5186:5175 -e VITE_USE_POLLING=1 `
   -e API_ORIGIN=http://prizma-c-api:8000 -e WEB_ORIGIN=http://prizma-c-web:80 -e VITE_SITE_URL=http://localhost:5183/ `
   -v "C:\Users\drn49\Desktop\prizma-portfolio\admin:/app" -v /app/node_modules `
   -v "C:\Users\drn49\Desktop\prizma-portfolio\web\src:/web/src:ro" prizma-portfolio-admin:dev
@@ -323,5 +324,30 @@ DEĞİL. Sunucu dışına kopya, barındırma seçildikten sonra kurulacak.
 - Başlıklar (Caddyfile): CSP (betik yalnızca kendi kökten), nosniff, X-Frame-Options DENY,
   Referrer-Policy, Permissions-Policy, HSTS. Site ve panelde CSP ihlali yok (ölçüldü).
 - Yükleme: Caddy 16 MB'ın üstünü API'ye iletmiyor; API 15 MB + 40 MP sınırı, EXIF/GPS siliniyor.
-- İlk yayından önce: `.env`'de `JWT_SECRET` (uzun rastgele) ve güçlü `ADMIN_PASSWORD`; dev
+- Gövde sınırı API'de (`api/app/limits.py`, 16 MB, gövde okunmadan): token'sız yönetim isteği
+  gövdesi okunmadan 401. Caddy'nin payı (20 MB) bundan BÜYÜK kalmalı — eşitken bağlantı asılı
+  kalıyordu. Caddy zaman aşımları: başlık 10 sn, gövde 2 dk, API yanıtı 2 dk.
+- Yayında API belgeleri (`/docs`, `/openapi.json`) kapalı; API `uid 10001` ile çalışıyor; JWT
+  anahtarı 32 karakterden kısaysa API açılmıyor.
+- Geliştirme portları yalnızca `127.0.0.1` (dev parolası varsayılan) — test yığınlarını da öyle aç.
+- İlk yayından önce: `.env`'de `JWT_SECRET` (`openssl rand -hex 32`) ve güçlü `ADMIN_PASSWORD`; dev
   veritabanı taşınacaksa paneldeki "Hesap"tan parolayı değiştir — API varsayılan parolayla açılmaz.
+- Rapor: https://claude.ai/code/artifact/b63b856b-06fa-4ae0-948f-e70fbed95811 (01.10.2026).
+
+## Yayın öncesi testler
+
+Hepsi yayın yığınının birebir kopyasında (yayın imajları, Caddyfile, yedek servisi), ayrı proje
+adıyla ve yalnızca bu bilgisayarda (8090). `test.env`: `DOMAIN=`, `ADMIN_EMAIL=…`, 64 karakterlik
+`JWT_SECRET`, güçlü `ADMIN_PASSWORD`; `ports.yml`: `services.web.ports: !override ['127.0.0.1:8090:80']`.
+```powershell
+docker compose -p prizma-yayin-test --env-file test.env -f docker-compose.yml -f docker-compose.prod.yml -f ports.yml up -d --build
+$env:ADMIN_EMAIL='…'; $env:ADMIN_PASSWORD='…'
+node tools/yayin/uctan-uca.mjs http://127.0.0.1:8090    # ziyaretçi + yönetici yolu, 26 kontrol
+node tools/yayin/tarayici.mjs  http://127.0.0.1:8090    # gerçek Chrome: site, 404, panel girişi, 13 kontrol
+docker exec prizma-portfolio-api-1 pytest                # API, 23 test
+node tools/guvenlik/yokla.mjs                            # saldırı denemeleri, test yığını C'ye (5183/8013), 37 kontrol
+docker compose -p prizma-yayin-test -f docker-compose.yml -f docker-compose.prod.yml -f ports.yml down -v
+```
+Lighthouse (Chrome DevTools MCP → `lighthouse_audit`, masaüstü + mobil): 01.10.2026'da erişilebilirlik,
+en iyi uygulamalar, SEO 100/100/100. `uctan-uca` ve `tarayici` ilk gerçek yayından hemen sonra canlı
+adreste de çalıştırılır (içerik girilmeden: kayıt açıp siler, parolayı değiştirip geri alır).

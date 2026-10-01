@@ -230,3 +230,50 @@ def test_projects_crud_and_unpublished(client: TestClient, auth: dict, data_dir:
     assert client.delete(f"/api/admin/media/{cover}", headers=auth).status_code == 409
     assert client.delete("/api/admin/projects/yeni-proje", headers=auth).status_code == 204
     assert client.delete(f"/api/admin/media/{cover}", headers=auth).status_code == 204
+
+
+# ── Güvenlik taraması (Oturum 6) ─────────────────────────────────────────────
+
+
+def test_unauthenticated_upload_is_rejected_before_body(client: TestClient) -> None:
+    """Token'sız yükleme gövde okunmadan reddedilir (FastAPI gövdeyi kimlikten önce okuyordu)."""
+    r = client.post("/api/admin/media", files={"file": ("a.jpg", b"x" * 1024, "image/jpeg")})
+    assert r.status_code == 401
+
+
+def test_oversized_body_is_413(client: TestClient, auth: dict) -> None:
+    big = b"x" * (16 * 1024 * 1024 + 10)
+    r = client.post("/api/admin/media", headers=auth, files={"file": ("a.jpg", big, "image/jpeg")})
+    assert r.status_code == 413
+
+
+def test_oversized_chunked_body_is_413(client: TestClient, auth: dict) -> None:
+    """Uzunluk beyan edilmeden (chunked) gönderilen büyük gövde de sayılıp kesilir."""
+    def chunks():
+        for _ in range(17):
+            yield b"x" * (1024 * 1024)
+    r = client.post("/api/admin/sections", headers={**auth, "content-type": "application/json"}, content=chunks())
+    assert r.status_code == 413
+
+
+def test_pixel_bomb_between_limits_is_rejected(client: TestClient, auth: dict) -> None:
+    """40-80 MP arası: Pillow yalnızca uyarıyor — biz başlıktan reddediyoruz."""
+    out = io.BytesIO()
+    Image.new("1", (7100, 7100)).save(out, "PNG")  # 50 MP, birkaç KB
+    r = _upload(client, auth, out.getvalue(), "bomba.png")
+    assert r.status_code == 422 and "megapiksel" in r.json()["detail"]
+
+
+def test_xmp_location_is_not_published(client: TestClient, auth: dict, data_dir: str) -> None:
+    """GPS yalnızca EXIF'te değil XMP'de de olabilir — yayınlanan WebP'de hiçbiri olmamalı."""
+    xmp = (b'<x:xmpmeta xmlns:x="adobe:ns:meta/"><rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">'
+           b'<rdf:Description xmlns:exif="http://ns.adobe.com/exif/1.0/" exif:GPSLatitude="38,25.0N"/>'
+           b"</rdf:RDF></x:xmpmeta>")
+    out = io.BytesIO()
+    Image.new("RGB", (900, 600), (10, 20, 30)).save(out, "JPEG", xmp=xmp)
+    assert b"GPSLatitude" in out.getvalue(), "örnek dosya XMP taşımıyor — test geçersiz"
+    media = _upload(client, auth, out.getvalue()).json()
+    for w in media["widths"]:
+        raw = (Path(data_dir) / "uploads" / f"{media['id']}-{w}.webp").read_bytes()
+        assert b"GPSLatitude" not in raw and b"xmpmeta" not in raw
+    client.delete(f"/api/admin/media/{media['id']}", headers=auth)

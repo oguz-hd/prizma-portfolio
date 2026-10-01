@@ -5,6 +5,9 @@
 #   → http://localhost:5175/admin/   yönetim paneli
 #   → http://localhost:8001/docs     API
 
+# ⚠️ Portlar yalnızca bu bilgisayara (127.0.0.1): geliştirmede admin parolası varsayılan
+# (degistir) — tüm arayüzlere açıkken aynı ağdaki biri paneli açabiliyordu (güvenlik taraması).
+# Telefonda denemek → CALISTIRMA "Telefonda deneme" (tünel).
 services:
   web:
     # ⚠️ Ayrı imaj adı ŞART. Dev ve prod aynı adı kullanırsa en son build edilen
@@ -13,7 +16,7 @@ services:
     build:
       target: dev
     ports:
-      - '5174:5174'
+      - '127.0.0.1:5174:5174'
     environment:
       # Windows'ta bind mount üzerinden dosya değişikliği bildirimleri (inotify)
       # konteynere ulaşmıyor; yoklama olmadan HMR gelmez.
@@ -42,7 +45,7 @@ services:
       context: ./admin
       target: dev
     ports:
-      - '5175:5175'
+      - '127.0.0.1:5175:5175'
     environment:
       VITE_USE_POLLING: '1'
       # /api ve sitenin fontları (/fonts) yönlendiriliyor (admin/vite.config.ts).
@@ -66,7 +69,7 @@ services:
     build:
       target: dev
     ports:
-      - '8001:8000'
+      - '127.0.0.1:8001:8000'
     environment:
       DEBUG: '1'
     volumes:

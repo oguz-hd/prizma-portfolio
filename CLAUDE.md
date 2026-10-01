@@ -41,7 +41,7 @@ docker exec prizma-portfolio-web-1 npm run typecheck   # tsc --noEmit
 docker exec prizma-portfolio-web-1 npm run build       # asıl derleme
 docker exec prizma-portfolio-admin-1 npm run typecheck
 docker exec prizma-portfolio-admin-1 npm run build
-docker exec prizma-portfolio-api-1 pytest           # API (Faz 9'dan beri; geçici veri klasöründe)
+docker exec prizma-portfolio-api-1 pytest           # API, 23 test (geçici veri klasöründe)
 ```
 API şeması değişince: `api/app/migrations.py`'ye adım ekle — açılışta uygulanır, önce
 `/data/site.db.bak-v<n>` yedeği alınır. `down -v` artık gerekmez.
@@ -169,7 +169,12 @@ temadan (`applyTheme` → `appliedTokens`), içerikten değil — panel sahneyi 
    (`throttle.py`, 5/15 dk/IP) · ✅ günlük yedek servisi (`tools/yedek/yedekle.sh`) · ✅ pytest 18.
    ⏸ Barındırma + alan adı: kullanıcı "şimdilik yayınlama" dedi (01.10.2026), alan adı yok.
    Önerilen: Hetzner VPS (compose olduğu gibi) + Cloudflare Registrar. Sonra: sunucu dışı yedek.
-7. ⏭ **Beyaz tema** (kullanıcı: yayın yerine sıradaki iş) → sonra Faz 8 tema paneli.
+7. ✅ (Oturum 6) **Güvenlik taraması + yayın öncesi testler** (kullanıcı isteği) — rapor:
+   https://claude.ai/code/artifact/b63b856b-06fa-4ae0-948f-e70fbed95811 · 1 kritik (/data/site.db,
+   daha önce kapandı), 2 yüksek (kimlikten önce gövde okuma, sınırda asılı kalan yükleme), orta/düşükler;
+   hepsi giderildi. Araçlar: `tools/guvenlik/yokla.mjs` (37), `tools/yayin/uctan-uca.mjs` (26),
+   `tools/yayin/tarayici.mjs` (13), pytest 23, Lighthouse 100/100/100 → CALISTIRMA "Yayın öncesi testler".
+8. ⏸ **Beyaz tema** (yarım: altyapı `scheme` hazır, açık ön ayar yok) → sonra Faz 8 tema paneli.
 Plan: `C:\Users\drn49\.claude\plans\hadi-back-and-e-hidden-puddle.md`.
 Kullanıcı notu (Claude Docs, API'yi denerken bilinmesi gerekenler):
 https://claude.ai/code/artifact/8a071f83-aa54-4eb2-a4a7-592661b51c62
