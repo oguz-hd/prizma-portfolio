@@ -1,0 +1,33 @@
+/*
+  Prizmayı çevreleyen daire (components/Ring.tsx): kap ve üst yaydaki büyük başlık.
+  Bileşenin yanında: yönetim paneli de kullanıyor (giriş ekranındaki ADMIN,
+  admin/src/Login.tsx) — sitenin theme.css'ini almadan. İç yay ve bağlantı yayı
+  sitenin (theme.css).
+*/
+
+.ring {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.ring text {
+  font-family: var(--font-display, var(--font-mono));
+}
+
+/* Üst yaydaki büyük başlık (isim, İLETİŞİM). Büyük harf (Oturum 2); <html lang>
+   doğru olduğu için Türkçe büyük harf kuralları (i → İ) tarayıcıdan geliyor.
+   ★ Kalın (Oturum 4, kullanıcı: "ismim daha kalın yazılsın"): Departure Mono'nun
+   tek ağırlığı var ve sahte kalın pikselleri bulaştırıyor (kural 11). Onun
+   yerine harfin kendi renginde kontur — köşeler keskin (miter), piksel hissi
+   kalıyor. Kontur dolgunun ALTINDA (paint-order), içi boşalmıyor. */
+.ring-title {
+  fill: var(--ink);
+  stroke: var(--ink);
+  stroke-width: 0.07em;
+  stroke-linejoin: miter;
+  paint-order: stroke fill;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}

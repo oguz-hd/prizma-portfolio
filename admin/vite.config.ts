@@ -23,6 +23,9 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: { '@site': SITE_SRC },
+    // Sitenin kaynağındaki `react`/`gsap` importları panelin node_modules'una
+    // çözülsün: /web/src'nin yanında node_modules yok (ve olsa iki React olurdu).
+    dedupe: ['react', 'react-dom', 'gsap'],
   },
   server: {
     host: true,

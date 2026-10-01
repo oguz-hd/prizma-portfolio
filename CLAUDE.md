@@ -134,16 +134,13 @@ Bağlantılar · Bölümler (yalnızca düzenleme + sıra) · Hesap. TR/EN yan y
 temadan (`applyTheme` → `appliedTokens`), içerikten değil — panel sahneyi içeriksiz kullanabilir.
 
 ⏭ **Sırada (kullanıcı, Oturum 5 sonu — yarım kaldı):**
-1. **Giriş ekranı sitenin gerçek prizmasıyla** ("kalite intro sayfamızdaki gibi", "404'te
-   zaten bu prizma var, oradan uydur"): 404'ün düzeni — üstte ADMIN, ortada `PrismStage` +
-   `Starfield` (@site), altta tek satır form (email · password · sign in). Açılış = sitenin
-   `intro.ts` zamanlamaları `scene` üzerinde (frame 0.3/0.9 · beam 1.0/0.7 · fan 1.7/0.8 ·
-   labels 2.3). **Hata:** `lines=[{nm: 401, label: '401 nm'}]` + `mark` (404 gibi; `lines`
-   efekt bağımlılığı değil → `key` ile yeniden kur). **Giriş anı:** `scene.surge` büyür +
-   sahne tayfın içindeki bir noktadan yakınlaşır → tayf ekranı sarar → App düzeyinde tayf
-   örtüsü panelin üstünde söner. Kartın tepesindeki renk şeridi kalktı (kullanıcı).
-   `admin/package.json`'da gsap var, kilit güncel; **admin imajı yeniden kurulmadı** →
-   `build admin` + `up -d --no-deps --renew-anon-volumes admin`.
+1. ✅ (Oturum 6) **Panel girişi sitenin prizmasıyla** — `PrismStage` + `Starfield` + `Ring`
+   (@site), intro zamanlamaları, ADMIN dairenin üst yayında, form alt alta, prizma `--lift`
+   kadar yukarıda, hata = "401 nm", giriş = yakınlaşma + örtü (`.veil`). Giriş ekranı
+   sitenin SEÇİLİ paletinde (`paintLogin`), panel Tayf'ta. `.ring`/`.ring-title` stilleri
+   `components/ring.css`'e taşındı. Panel, sitenin `react`/`gsap` importlarını kendi
+   node_modules'una çözüyor (vite `dedupe`, tsconfig `paths`). Tarayıcı MCP'leri yoksa:
+   başsız Chrome'u **PowerShell'den** başlat (Bash'ten port açmıyor) + CDP betiği.
 2. **Büyüyen içerik testi bulguları** (prod build, ayrı veritabanı; kullanıcıya rapor
    verilmedi): ✅ sığmayan slayt alt sayfalara bölünüyor — 10 yetenek grubu: Hakkımda
    1440×900'de 2, 1366×768'de 3, telefonda 2 sayfa; bölüm gövdesi, uzun e-posta (11 px'e

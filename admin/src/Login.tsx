@@ -1,88 +1,166 @@
-import { useEffect, useId, useMemo, useRef, useState, type FormEvent, type RefObject } from 'react'
+import { useEffect, useId, useRef, useState, type FormEvent } from 'react'
+import gsap from 'gsap'
 
-import { PRESETS } from '@site/theme/presets'
+import { RingTitle, arc, useRing } from '@site/components/Ring'
+import { Starfield } from '@site/components/Starfield'
+import { PrismStage } from '@site/prism/PrismStage'
+import { darkenScene, scene } from '@site/prism/scene'
+import type { AbsorptionLine } from '@site/prism/optics'
 
 import { ApiError, api } from './api'
 import { TextInput } from './fields'
+import { paintLogin, type LoginLook } from './theme'
 
 /**
- * Giriş ekranı — Oturum 5, kullanıcı seçimi "B + E + F", ilk etapta İngilizce.
- * Seçenekler canlı: https://claude.ai/artifact/1CCFheJHSJoFp7dJC7kSBb
+ * Giriş ekranı — sitenin GERÇEK prizması (Oturum 5 sonu, kullanıcı: "kalite intro
+ * sayfamızdaki gibi", "404'te zaten bu prizma var, oradan uydur").
  *
- *   B · Prizma kapı   formun üstünde prizma kendini çizer, ışık kırılır, ADMIN
- *                     sitedeki gibi harf harf çözülür (Katakana + tayf)
- *   E · Giriş anı     parola doğruysa tayf prizmadan taşar, ekranı doldurur, panel belirir
- *   F · Hata          yanlışsa kart hafifçe sallanır, mesaj çıkar. Kartın tepesindeki
- *                     tayf şeridi kullanıcı isteğiyle kalktı; "401 nm" soğurma
- *                     çizgisi sıradaki adımda gerçek tayfa taşınacak (404 gibi,
- *                     PrismStage `lines` + `mark` — CLAUDE.md "Sırada")
+ *   Düzen   ortada prizma (`PrismStage` + `Starfield`), ADMIN onu çevreleyen
+ *           dairenin üst yayında — Giriş slaytındaki isim gibi, aynı `Ring` ve
+ *           aynı boyda (sitedeki ismin uzunluğundan; kullanıcı: "genel bir uyum").
+ *           Altta form, alanlar alt alta. Prizma ve daire ortanın biraz üstünde (--lift).
+ *   Açılış  sitenin intro.ts zamanlamaları, `scene` üzerinde: kenarlar çizilir,
+ *           ışık gelir, tayf açılır; ADMIN harf harf çözülür (Katakana + tayf).
+ *   Hata    yanlış parolada tayfta "401 nm" soğurma çizgisi (404'ün şakası) ve
+ *           form sallanır. Çizgiler PrismStage'in efekt bağımlılığı değil →
+ *           `key` ile yeniden kuruluyor.
+ *   Giriş   tayf dalgalanıp büyür (`scene.surge`), sahne tayfın içindeki bir
+ *           noktaya yakınlaşır, tayf ekranı sarar; panelin üstündeki örtü (App,
+ *           `.veil`) aynı renklerle başlayıp söner.
  *
- * Hareket yalnızca burada; panelin çalışma ekranları sakin (kullanıcıyla konuşuldu).
- * Hareket azaltma tercihinde hiçbiri oynamaz: son kare, girişte doğrudan panel.
+ * Renkler sitenin panelde seçili paletinden (theme.ts → paintLogin); panelin
+ * çalışma ekranları Tayf'ta kalıyor.
+ *
+ * Hareket azaltma tercihinde hiçbiri oynamaz: sahne tam, girişte doğrudan panel.
  */
 
-const ACCENTS = PRESETS.tayf.tokens.accents
 const KATAKANA = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン'
 const BRAND = 'ADMIN'
-/** E: tayfın ekranı doldurma süresi; ardından panel. admin.css → .login-flood ile aynı. */
-const FLOOD_MS = 1000
-/** B: ADMIN'in çözülmeye başladığı an — prizma ve ışık çizildikten sonra. */
-const SCRAMBLE_AT = 1500
 const SCRAMBLE_MS = 900
+/** 401 Unauthorized → 401 nm. Uydurma bir çizgi, ama 404'ünkü gibi tayfın mor ucunda. */
+const ERROR_LINES: AbsorptionLine[] = [{ nm: 401, label: '401 nm' }]
+/** Giriş anı: yakınlaşmanın süresi (sn). Örtü son ~üçte birinde gelir. */
+const ENTER_S = 1.1
 
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
-export function Login({ onSignedIn }: { onSignedIn: (token: string) => void }) {
+type SignedIn = (token: string, accents: string[]) => void
+
+/** Önce sitenin paleti, sonra ekran — açılış yanlış renklerle başlamasın. */
+export function Login({ onSignedIn }: { onSignedIn: SignedIn }) {
+  const [look, setLook] = useState<LoginLook | null>(null)
+  useEffect(() => {
+    let live = true
+    paintLogin().then((next) => live && setLook(next))
+    return () => {
+      live = false
+    }
+  }, [])
+  return look && <LoginScreen accents={look.tokens.accents} nameChars={look.nameChars} onSignedIn={onSignedIn} />
+}
+
+type ScreenProps = { accents: string[]; nameChars: number; onSignedIn: SignedIn }
+
+function LoginScreen({ accents, nameChars, onSignedIn }: ScreenProps) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
-  const [phase, setPhase] = useState<'idle' | 'busy' | 'entering'>('idle')
-  const rootRef = useRef<HTMLElement>(null)
-  const cardRef = useRef<HTMLFormElement>(null)
-  const prismRef = useRef<SVGSVGElement>(null)
-  const brandRef = useRef<HTMLParagraphElement>(null)
-  // Çift gönderim kilidi: `phase` bir sonraki render'a kadar eski kalıyor, aynı
-  // anda gelen iki Enter/tıklama ikisi de geçerdi.
+  const [wrong, setWrong] = useState(false)
+  const [busy, setBusy] = useState(false)
+  const ringRef = useRef<HTMLDivElement>(null)
+  const brandRef = useRef<SVGGElement>(null)
+  const arcId = `login-ring-${useId().replace(/:/g, '')}`
+  const geo = useRing(ringRef, nameChars)
+  const formRef = useRef<HTMLFormElement>(null)
+  const veilRef = useRef<HTMLDivElement>(null)
+  // Çift gönderim kilidi: `busy` bir sonraki render'a kadar eski kalıyor.
   const inFlight = useRef(false)
 
+  // ── Açılış ─────────────────────────────────────────────────────────────────
   useEffect(() => {
     document.title = 'Sign in · Admin'
     const brand = brandRef.current
-    if (!brand || reducedMotion()) return
-    const timer = window.setTimeout(() => scramble(brand, BRAND), SCRAMBLE_AT)
-    return () => window.clearTimeout(timer)
-  }, [])
+    const form = formRef.current
+    if (reducedMotion() || !brand || !form) {
+      Object.assign(scene, { frame: 1, beam: 1, fan: 1, labels: 1, surge: 0, dirty: true })
+      return
+    }
+    darkenScene()
+    const stars = document.querySelector<HTMLElement>('.starfield')
+    const t = gsap.timeline()
+    if (stars) t.fromTo(stars, { opacity: 0 }, { opacity: 1, duration: 1.2, ease: 'power1.out' }, 0)
+    t.to(scene, { frame: 1, duration: 0.9, ease: 'power2.inOut' }, 0.3)
+      .to(scene, { beam: 1, duration: 0.7, ease: 'power2.in' }, 1.0)
+      .to(scene, { fan: 1, duration: 0.8, ease: 'power3.out' }, 1.7)
+      .to(scene, { labels: 1, duration: 0.6, ease: 'power1.out' }, 2.3)
+      .fromTo([brand, form], { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out', stagger: 0.1 }, 2.3)
+      .call(() => scramble(brand.querySelector('textPath'), BRAND, accents), undefined, 2.3)
+
+    // Sitedeki gibi: her girdi atlatır; rAF durursa (gizli sekme) emniyet sarar —
+    // form kalıcı gizli kalamaz.
+    const events = ['keydown', 'pointerdown'] as const
+    const skip = () => t.progress(1)
+    events.forEach((ev) => window.addEventListener(ev, skip, { capture: true, passive: true }))
+    const safety = window.setTimeout(skip, t.duration() * 1000 + 1500)
+    return () => {
+      window.clearTimeout(safety)
+      events.forEach((ev) => window.removeEventListener(ev, skip, true))
+      t.kill()
+      // StrictMode'da efekt iki kez kuruluyor: yarıda kalan sahne karanlık kalmasın.
+      Object.assign(scene, { frame: 1, beam: 1, fan: 1, labels: 1, dirty: true })
+    }
+  }, [accents])
+
+  // ── Giriş anı ──────────────────────────────────────────────────────────────
+  const enter = (token: string) => {
+    const stage = document.querySelector<HTMLElement>('.prism-stage')
+    const fan = stage?.querySelector('.prism-main .prism-fan')?.getBoundingClientRect()
+    if (reducedMotion() || !stage || !fan || fan.height === 0) return onSignedIn(token, accents)
+
+    // Yakınlaşma tayfın içindeki bir noktadan: yelpazenin ortası, prizmadan biraz uzakta.
+    // transform-origin sahnenin kendi kutusuna göre (sahne CSS'te yukarı kaymış).
+    const box = stage.getBoundingClientRect()
+    const ox = fan.left + fan.width * 0.6 - box.left
+    const oy = fan.top + fan.height * 0.5 - box.top
+    const zoom = Math.min(40, Math.max(8, (2.4 * window.innerHeight) / fan.height))
+    gsap
+      .timeline({ onComplete: () => onSignedIn(token, accents) })
+      .to([brandRef.current, formRef.current], { opacity: 0, y: -12, duration: 0.35, ease: 'power2.in' }, 0)
+      .to('.starfield', { opacity: 0, duration: 0.6 }, 0)
+      .to(scene, { surge: 1, duration: 0.5, ease: 'power2.out' }, 0)
+      .fromTo(
+        stage,
+        { transformOrigin: `${ox}px ${oy}px`, scale: 1 },
+        { scale: zoom, duration: ENTER_S, ease: 'power3.in' },
+        0.1,
+      )
+      .to(veilRef.current, { opacity: 1, duration: 0.4, ease: 'power1.in' }, 0.1 + ENTER_S - 0.4)
+  }
 
   const submit = async (e: FormEvent) => {
     e.preventDefault()
     if (inFlight.current) return
     inFlight.current = true
-    setPhase('busy')
+    setBusy(true)
     setError(null)
     try {
       const { accessToken } = await api.login(email.trim(), password)
-      if (reducedMotion()) return onSignedIn(accessToken)
-      // E: tayf prizmanın çıkışından taşsın — daire oradan açılıyor.
-      const box = prismRef.current?.getBoundingClientRect()
-      if (box) {
-        rootRef.current?.style.setProperty('--flood-x', `${box.left + box.width * 0.68}px`)
-        rootRef.current?.style.setProperty('--flood-y', `${box.top + box.height * 0.4}px`)
-      }
-      setPhase('entering')
-      window.setTimeout(() => onSignedIn(accessToken), FLOOD_MS)
+      enter(accessToken)
     } catch (err) {
+      const unauthorized = err instanceof ApiError && err.status === 401
+      setWrong(unauthorized)
       setError(
-        err instanceof ApiError && err.status === 401
+        unauthorized
           ? 'Wrong email or password.'
           : err instanceof ApiError && err.status === 0
             ? 'Can’t reach the server. Is the API running?'
             : `Sign-in failed${err instanceof ApiError ? ` (HTTP ${err.status})` : ''}.`,
       )
       inFlight.current = false
-      setPhase('idle')
-      // F: her yanlış denemede yeniden sallanır (CSS sınıfı ikinci kez tetiklenmezdi).
+      setBusy(false)
+      // Her yanlış denemede yeniden sallanır (CSS sınıfı ikinci kez tetiklenmezdi).
       if (!reducedMotion()) {
-        cardRef.current?.animate(
+        formRef.current?.animate(
           [{ translate: '0' }, { translate: '-6px' }, { translate: '6px' }, { translate: '-4px' }, { translate: '2px' }, { translate: '0' }],
           { duration: 450, easing: 'ease-out' },
         )
@@ -90,153 +168,59 @@ export function Login({ onSignedIn }: { onSignedIn: (token: string) => void }) {
     }
   }
 
-  const className = ['login', error && 'is-error', phase === 'entering' && 'is-entering'].filter(Boolean).join(' ')
-
   return (
-    <main className={className} ref={rootRef} lang="en">
-      <Stars />
-      <div className="login-stack">
-        <PrismScene svgRef={prismRef} />
-        <form className="login-card" ref={cardRef} onSubmit={submit} noValidate>
-          <p className="brand" ref={brandRef}>
-            {BRAND}
-          </p>
-          <TextInput label="Email" type="email" autoComplete="username" value={email} onChange={setEmail} />
-          <TextInput
-            label="Password"
-            type="password"
-            autoComplete="current-password"
-            value={password}
-            onChange={setPassword}
-          />
+    <main className="login" lang="en">
+      <Starfield />
+      <PrismStage key={wrong ? 'wrong' : 'clear'} lines={wrong ? ERROR_LINES : undefined} mark={wrong} />
+      <div className="login-ring" ref={ringRef}>
+        <svg className="ring" viewBox={`0 0 ${geo.W} ${geo.H}`} width={geo.W} height={geo.H} aria-hidden="true">
+          <defs>
+            <path id={arcId} d={arc(geo, geo.r, 1)} />
+          </defs>
+          <g ref={brandRef}>
+            <RingTitle geo={geo} path={arcId} text={BRAND} />
+          </g>
+        </svg>
+      </div>
+      <div className="login-frame">
+        <h1 className="sr-only">Admin</h1>
+        <div className="login-bottom">
+          <form className="login-form" ref={formRef} onSubmit={submit} noValidate>
+            <TextInput label="Email" type="email" autoComplete="username" value={email} onChange={setEmail} />
+            <TextInput
+              label="Password"
+              type="password"
+              autoComplete="current-password"
+              value={password}
+              onChange={setPassword}
+            />
+            <button type="submit" className="btn btn-primary" disabled={busy || !email || !password}>
+              {busy ? 'Signing in…' : 'Sign in'}
+            </button>
+          </form>
           <p className="login-error" role="alert">
             {error}
           </p>
-          <button type="submit" className="btn btn-primary" disabled={phase !== 'idle' || !email || !password}>
-            {phase === 'idle' ? 'Sign in' : 'Signing in…'}
-          </button>
-        </form>
+        </div>
       </div>
-      {/* E: panel açılmadan önce ekranı dolduran tayf. */}
-      <div className="login-flood" aria-hidden="true" />
+      {/* Giriş anının son karesi — App'teki örtünün ilk karesiyle aynı. */}
+      <div className="veil" ref={veilRef} aria-hidden="true" style={{ opacity: 0 }} />
     </main>
-  )
-}
-
-/**
- * B: prizma, ışık ve tayf yelpazesi — sitenin sahnesinin sadeleşmişi.
- *
- * Kutu 240×200; ışık soldan, tayf sağa kutunun DIŞINA taşıyor (overflow: visible)
- * ve ekranın kenarında kırpılıyor. Böylece prizma her ekran oranında formun hemen
- * üstünde; tüm sahneyi tek bir tuvale çizmek dar ve geniş ekranda kaydırıyordu.
- */
-function PrismScene({ svgRef }: { svgRef: RefObject<SVGSVGElement | null> }) {
-  const id = useId().replace(/:/g, '')
-  const s = 196
-  const h = s * 0.866
-  const A: Pt = [120, 12]
-  const L: Pt = [A[0] - s / 2, A[1] + h]
-  const R: Pt = [A[0] + s / 2, A[1] + h]
-  const entry = lerp(A, L, 0.55)
-  const exit = lerp(A, R, 0.45)
-  // Işık ~11° yükselerek gelir (ekranın kenarından); yelpaze -9°…+19° açılır ve
-  // FAN px'te söner. ⚠️ Ekranın kenarına kadar uzasaydı renk geçişinin yalnızca
-  // ortası görünürdü: gradyan yelpazenin tamamına yayılıyor, uçları ekran dışında kalırdı.
-  const FAN = 620
-  const from: Pt = [entry[0] - 1800, entry[1] + 360]
-  const fanTop: Pt = [exit[0] + FAN, exit[1] - FAN * 0.16]
-  const fanBottom: Pt = [exit[0] + FAN, exit[1] + FAN * 0.34]
-  const back = [A, L, R].map(([x, y]): Pt => [x + s * 0.14, y - s * 0.1])
-
-  return (
-    <svg className="login-prism" ref={svgRef} viewBox="0 0 240 200" aria-hidden="true">
-      <defs>
-        {/* Yelpaze: tepede kırmızı, dipte mor — prizma kısa dalga boyunu daha çok kırar. */}
-        <linearGradient id={`${id}fan`} x1="0" y1="0" x2="0" y2="1">
-          {ACCENTS.map((_, i) => (
-            <stop key={i} offset={i / (ACCENTS.length - 1)} style={{ stopColor: `var(--accent-${ACCENTS.length - i})` }} />
-          ))}
-        </linearGradient>
-        <linearGradient id={`${id}beam`} gradientUnits="userSpaceOnUse" x1={from[0]} y1={from[1]} x2={entry[0]} y2={entry[1]}>
-          <stop offset="0" style={{ stopColor: 'var(--ink)', stopOpacity: 0 }} />
-          <stop offset="1" style={{ stopColor: 'var(--ink)', stopOpacity: 0.95 }} />
-        </linearGradient>
-        <linearGradient id={`${id}glass`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" style={{ stopColor: 'var(--lead)', stopOpacity: 0.1 }} />
-          <stop offset="1" style={{ stopColor: 'var(--accent-1)', stopOpacity: 0.16 }} />
-        </linearGradient>
-        <filter id={`${id}blur`} x="-10%" y="-60%" width="120%" height="220%">
-          <feGaussianBlur stdDeviation="18" />
-        </filter>
-        {/* Yelpaze ucunda söner: ışık dağılıyor, sert bir kenar yok. */}
-        <linearGradient id={`${id}fade`} gradientUnits="userSpaceOnUse" x1={exit[0]} y1="0" x2={exit[0] + FAN} y2="0">
-          <stop offset="0.45" style={{ stopColor: 'var(--ink)', stopOpacity: 1 }} />
-          <stop offset="1" style={{ stopColor: 'var(--ink)', stopOpacity: 0 }} />
-        </linearGradient>
-        <mask id={`${id}mask`} maskUnits="userSpaceOnUse" x={exit[0]} y={exit[1] - FAN} width={FAN + 40} height={FAN * 2}>
-          <rect x={exit[0]} y={exit[1] - FAN} width={FAN + 40} height={FAN * 2} fill={`url(#${id}fade)`} />
-        </mask>
-      </defs>
-      <g className="login-fan" mask={`url(#${id}mask)`}>
-        <polygon points={points(exit, fanTop, fanBottom)} fill={`url(#${id}fan)`} filter={`url(#${id}blur)`} opacity={0.5} />
-        <polygon points={points(exit, fanTop, fanBottom)} fill={`url(#${id}fan)`} opacity={0.85} />
-      </g>
-      <line className="login-beam" pathLength={1} x1={from[0]} y1={from[1]} x2={entry[0]} y2={entry[1]} stroke={`url(#${id}beam)`} strokeWidth={3} />
-      <line className="login-pulse" pathLength={1} x1={from[0]} y1={from[1]} x2={entry[0]} y2={entry[1]} strokeWidth={4} strokeLinecap="round" />
-      <polygon className="login-back" points={points(...back)} />
-      <polygon className="login-body" pathLength={1} points={points(A, L, R)} fill={`url(#${id}glass)`} strokeLinejoin="round" />
-      <line className="login-inner" x1={entry[0]} y1={entry[1]} x2={exit[0]} y2={exit[1]} />
-    </svg>
-  )
-}
-
-type Pt = [number, number]
-const lerp = (p: Pt, q: Pt, t: number): Pt => [p[0] + (q[0] - p[0]) * t, p[1] + (q[1] - p[1]) * t]
-const points = (...pts: Pt[]) => pts.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(' ')
-
-/** Gece göğü — sitenin Starfield'ının küçüğü; konumlar bir kez, rastgele. */
-function Stars() {
-  const stars = useMemo(
-    () =>
-      Array.from({ length: 70 }, () => ({
-        left: `${(Math.random() * 100).toFixed(2)}%`,
-        top: `${(Math.random() * 100).toFixed(2)}%`,
-        size: Math.random() < 0.85 ? 1 : 2,
-        opacity: 0.25 + Math.random() * 0.5,
-        duration: `${(3 + Math.random() * 4).toFixed(1)}s`,
-        delay: `${(-Math.random() * 6).toFixed(1)}s`,
-      })),
-    [],
-  )
-  return (
-    <div className="login-stars" aria-hidden="true">
-      {stars.map((st, i) => (
-        <i
-          key={i}
-          style={{
-            left: st.left,
-            top: st.top,
-            width: st.size,
-            height: st.size,
-            opacity: st.opacity,
-            animationDuration: st.duration,
-            animationDelay: st.delay,
-          }}
-        />
-      ))}
-    </div>
   )
 }
 
 /**
  * Harf çözülmesi — sitenin scramble.ts'inin kısası (Katakana + tayf, soldan sağa
  * yerleşir). Sitenin modülü doğrudan alınamıyor: sahnenin durumuna ve içeriğe bağlı.
+ * Hedef dairedeki <textPath>: harfler <tspan>, renk dolgu ve konturda (başlığın
+ * kalınlığı kontur, .ring-title). `textLength` yayda boyu sabit tutuyor.
  */
-function scramble(el: HTMLElement, text: string): void {
+function scramble(el: Element | null, text: string, accents: string[]): void {
+  if (!el) return
   const chars = [...text]
   el.textContent = ''
   const spans = chars.map((c) => {
-    const span = document.createElement('span')
+    const span = document.createElementNS('http://www.w3.org/2000/svg', 'tspan')
     span.textContent = c
     el.append(span)
     return span
@@ -248,14 +232,14 @@ function scramble(el: HTMLElement, text: string): void {
     spans.forEach((span, i) => {
       if (t >= (i + 1) / chars.length) {
         span.textContent = chars[i]
-        span.style.removeProperty('color')
-        span.style.removeProperty('-webkit-text-fill-color')
+        span.style.removeProperty('fill')
+        span.style.removeProperty('stroke')
       } else {
         done = false
         span.textContent = KATAKANA[Math.floor(Math.random() * KATAKANA.length)]
-        const color = ACCENTS[(i + Math.floor(now / 70)) % ACCENTS.length]
-        span.style.color = color
-        span.style.setProperty('-webkit-text-fill-color', color)
+        const color = accents[(i + Math.floor(now / 70)) % accents.length]
+        span.style.fill = color
+        span.style.stroke = color
       }
     })
     if (done) el.textContent = text

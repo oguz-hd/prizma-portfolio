@@ -5,6 +5,7 @@ import type { RawSiteContent } from '@site/content/types'
 import { ApiError, api, getToken, setToken, subscribeToken } from './api'
 import { SITE_URL } from './fields'
 import { Login } from './Login'
+import { paintPanel } from './theme'
 import { DirtyProvider, PanelProvider } from './panel'
 import { AccountPage } from './pages/AccountPage'
 import { LinksPage } from './pages/LinksPage'
@@ -48,18 +49,33 @@ function messageOf(err: unknown): string {
 
 export function App() {
   const token = useSyncExternalStore(subscribeToken, getToken)
-  // Girişten gelindiyse panel tayfın ardından belirsin (E); sayfa yenilenince değil.
-  const [entering, setEntering] = useState(false)
-  const signedIn = (next: string) => {
-    setEntering(true)
+  // Girişten gelindiyse tayf örtüsü panelin üstünde söner; sayfa yenilenince yok.
+  // Örtü giriş ekranının renkleriyle söner: panel Tayf'a geçse de (theme.ts) ilk
+  // karesi girişin son karesiyle aynı.
+  const [veil, setVeil] = useState<string[] | null>(null)
+  const signedIn = (next: string, accents: string[]) => {
+    setVeil(accents)
     setToken(next)
   }
-  return token ? <Panel entering={entering} /> : <Login onSignedIn={signedIn} />
+  if (!token) return <Login onSignedIn={signedIn} />
+  return (
+    <>
+      <Panel />
+      {veil && (
+        <div
+          className="veil is-leaving"
+          aria-hidden="true"
+          style={{ background: `linear-gradient(0deg, ${veil.join(', ')})` }}
+          onAnimationEnd={() => setVeil(null)}
+        />
+      )}
+    </>
+  )
 }
 
 // ── Panel ───────────────────────────────────────────────────────────────────
 
-function Panel({ entering }: { entering: boolean }) {
+function Panel() {
   const page = useSyncExternalStore(subscribePage, readPage)
   const [content, setContent] = useState<RawSiteContent | null>(null)
   const [loadError, setLoadError] = useState<string | null>(null)
@@ -75,6 +91,9 @@ function Panel({ entering }: { entering: boolean }) {
     setLoadError(null)
     reload().catch((err) => setLoadError(messageOf(err)))
   }, [reload])
+
+  // Giriş ekranı sitenin paletindeydi; çalışma ekranları hep Tayf (theme.ts).
+  useEffect(paintPanel, [])
 
   useEffect(() => {
     load()
@@ -121,7 +140,7 @@ function Panel({ entering }: { entering: boolean }) {
   }
 
   return (
-    <div className={entering ? 'shell is-entering' : 'shell'}>
+    <div className="shell">
       <header className="topbar">
         <span className="brand">Yönetim</span>
         <div className="topbar-tools">

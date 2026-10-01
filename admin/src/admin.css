@@ -97,6 +97,16 @@ a {
   justify-self: start;
 }
 
+/* Ekranda yok, ekran okuyucuda var (girişteki başlık: görünen kopya yayda, aria-hidden). */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 .hint {
   font-size: 13px;
   color: var(--ink-faint);
@@ -504,125 +514,70 @@ a {
   color: var(--ink-faint);
 }
 
-/* --- Giriş (Login.tsx — B + E + F) ----------------------------------------
-   Hareket yalnızca burada. Durağan hâl = son kare: animasyonlar yalnızca giriş
-   yönünü (from) tanımlıyor; hareket azaltmada hepsi kapanıyor (en altta). */
+/* --- Giriş (Login.tsx) -----------------------------------------------------
+   Sitenin 404 düzeni: üst/alt sıralar eşit, orta sıra prizmanın gerçek boyu
+   (--prism-box, PrismStage yazıyor) → boşluk tam ekranın ortasında, prizmanın
+   üstünde. Sahne ve yıldızlar sitenin (@site), stilleri bileşenlerin yanında. */
 
 .login {
-  position: relative;
-  display: grid;
-  place-items: center;
   min-height: 100dvh;
-  padding: var(--space-6);
-  overflow: hidden;
-  isolation: isolate;
+  /* Prizma ekranın ortasından bu kadar yukarıda (kullanıcı: "biraz üste"): alttaki
+     form yer bulsun. Sahne `translate` ile kayıyor — GSAP'ın giriş anındaki
+     `transform`'u (ölçek) ondan ayrı. */
+  --lift: 7dvh;
+  --prism-gap: var(--space-12);
 }
 
-.login-stars {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
+.login .prism-stage {
+  translate: 0 calc(-1 * var(--lift));
 }
 
-.login-stars i {
-  position: absolute;
-  border-radius: 50%;
-  background: var(--ink);
-  animation: twinkle 5s ease-in-out infinite;
-}
-
-@keyframes twinkle {
-  50% {
-    opacity: 0.15;
-  }
-}
-
-.login-stack {
-  display: grid;
-  justify-items: center;
-  gap: var(--space-4);
-  width: min(100%, 380px);
-}
-
-/* B: prizma kutusu; ışık ve tayf kutunun dışına taşıyor, .login kırpıyor. */
-.login-prism {
-  width: 240px;
-  height: 200px;
-  overflow: visible;
-}
-
-.login-beam,
-.login-body {
-  stroke-dasharray: 1;
-}
-
-.login-beam {
-  animation: draw 0.7s var(--ease) both;
-}
-
-.login-pulse {
-  stroke: var(--ink);
-  stroke-dasharray: 0.05 1;
-  stroke-dashoffset: 1.05;
-  opacity: 0;
-  animation: pulse 6s 2.4s linear infinite;
-}
-
-.login-back {
-  fill: none;
-  stroke: var(--ink);
-  stroke-opacity: 0.22;
-  stroke-width: 1.5;
-}
-
-.login-body {
-  stroke: var(--ink);
-  stroke-opacity: 0.9;
-  stroke-width: 2;
-  animation:
-    draw 0.9s 0.2s var(--ease) both,
-    fill-in 0.7s 0.8s both;
-}
-
-.login-inner {
-  stroke: var(--ink);
-  stroke-opacity: 0.7;
-  stroke-width: 2;
-  animation: fade 0.4s 1s both;
-}
-
-.login-fan {
-  transform-box: fill-box;
-  transform-origin: 0% 50%;
-  animation: fan-in 0.9s 1s var(--ease) both;
-}
-
-.login-card {
+/* Orta sıra prizmanın boyu + nefes; üst sıra onu kaymış merkezine oturtuyor. */
+.login-frame {
   position: relative;
-  width: 100%;
+  z-index: 2;
+  min-height: 100dvh;
   display: grid;
-  gap: var(--space-4);
-  padding: var(--space-8);
-  background: color-mix(in srgb, var(--surface) 66%, transparent);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  animation: rise 0.8s 1.2s var(--ease) both;
+  grid-template-rows:
+    calc(50dvh - var(--lift) - var(--prism-box, 200px) / 2 - var(--prism-gap))
+    calc(var(--prism-box, 200px) + 2 * var(--prism-gap))
+    1fr;
+  justify-items: center;
+  padding-inline: var(--space-6);
 }
 
-.login-card .brand {
-  margin-bottom: var(--space-2);
-  font-size: 22px;
-  letter-spacing: 0.3em;
+/* Dairenin kutusu: prizmayla birlikte kaymış tam ekran — Ring merkezi onun ortası. */
+.login-ring {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  translate: 0 calc(-1 * var(--lift));
 }
 
-/* Çözülmede harfler kendi rengini alıyor; bitince yeniden tayf gradyanı. */
-.brand span {
-  -webkit-text-fill-color: currentColor;
+/* Alt sıra: üst ikisi prizmanın kaymış yeri (boş), form onun altında. */
+.login-bottom {
+  grid-row: 3;
+  display: grid;
+  align-content: start;
+  gap: var(--space-3);
+  width: min(100%, 340px);
+  padding-bottom: var(--space-6);
 }
 
-.login-card .btn-primary {
+/* Alt alta: email, password, sign in (kullanıcı). */
+.login-form {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.login-form .control {
+  background: color-mix(in srgb, var(--ground) 72%, transparent);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+.login-form .btn-primary {
   justify-content: center;
   padding-block: 11px;
 }
@@ -630,113 +585,50 @@ a {
 .login-error {
   min-height: 20px;
   font-size: 13px;
+  text-align: center;
   color: var(--danger);
 }
 
-/* E: doğru parolada tayf prizmanın çıkışından ekranı doldurur, panel belirir. */
-.login-flood {
+/* Giriş anı: tayfın ekranı sardığı kare. Login'de belirir (GSAP), App'te aynı
+   renklerle başlayıp panelin üstünde söner. Yukarıda kırmızı, aşağıda mor —
+   prizmanın yelpazesi gibi. */
+.veil {
   position: fixed;
   inset: 0;
-  z-index: 20;
+  z-index: 30;
   pointer-events: none;
-  opacity: 0;
-  clip-path: circle(0% at var(--flood-x, 50%) var(--flood-y, 20%));
-  background: linear-gradient(
-    180deg,
-    var(--accent-7),
-    var(--accent-6),
-    var(--accent-5),
-    var(--accent-4),
-    var(--accent-3),
-    var(--accent-2),
-    var(--accent-1)
-  );
+  background: linear-gradient(0deg, var(--spectrum-stops));
 }
 
-.login.is-entering .login-flood {
-  animation: flood 1s ease-in forwards;
+.veil.is-leaving {
+  animation: veil-out 0.9s ease-out forwards;
 }
 
-.login.is-entering .login-stack {
-  animation: away 0.5s forwards;
-}
-
-/* Panel tayfın ardından belirir (App.tsx → girişten gelince). */
-.shell.is-entering {
-  animation: fade 0.5s ease-out both;
-}
-
-@keyframes draw {
-  from {
-    stroke-dashoffset: 1;
-  }
-}
-
-@keyframes fill-in {
-  from {
-    fill-opacity: 0;
-  }
-}
-
-@keyframes fade {
-  from {
-    opacity: 0;
-  }
-}
-
-@keyframes fan-in {
-  from {
-    opacity: 0;
-    transform: scaleX(0.15);
-  }
-}
-
-@keyframes pulse {
-  0% {
-    stroke-dashoffset: 1.05;
-    opacity: 1;
-  }
-  16% {
-    stroke-dashoffset: 0;
-    opacity: 1;
-  }
-  17%,
-  100% {
-    opacity: 0;
-  }
-}
-
-@keyframes rise {
-  from {
-    opacity: 0;
-    translate: 0 12px;
-  }
-}
-
-@keyframes flood {
-  60% {
-    opacity: 0.95;
-  }
-  to {
-    opacity: 0.95;
-    clip-path: circle(150% at var(--flood-x, 50%) var(--flood-y, 20%));
-  }
-}
-
-@keyframes away {
+@keyframes veil-out {
   to {
     opacity: 0;
-    translate: 0 -12px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .login *,
-  .login *::before,
-  .login *::after,
-  .shell.is-entering {
-    animation: none !important;
-    transition: none !important;
+  .veil.is-leaving {
+    display: none;
+  }
+}
+
+@media (max-height: 820px) {
+  .login {
+    --prism-gap: var(--space-6);
+  }
+}
+
+@media (max-width: 767px) {
+  .login {
+    --prism-gap: var(--space-4);
+  }
+
+  .login-frame {
+    padding-inline: var(--space-4);
   }
 }
 

@@ -52,3 +52,12 @@ sitenin kaynağından import ediyor. Kullanıcı testler sürerken paneli kendis
 kullandı (paleti Turbo'ya, sonra Aurora'ya aldı) — panelin seçili paleti izlemesi o
 sırada bozuldu: Aurora'da kırmızı ton yok, hata yazısı camgöbeği çıktı; panel hep Tayf'a
 sabitlendi. Kullanıcı iki şey istedi: giriş ekranında prizma teması ve büyüyen içerik testleri.
+
+## Oturum 6 · 01.10.2026 — panel girişi sitenin prizmasıyla
+Giriş ekranının el çizimi prizması gitti; yerine sitenin `PrismStage` + `Starfield`'ı
+(@site) ve `intro.ts`'in zamanlamaları geldi. ADMIN, kullanıcının "genel bir uyum"
+isteğiyle Giriş slaytındaki isim gibi dairenin üst yayında (`Ring`, boyu sitedeki ismin
+uzunluğundan); form alt alta, prizma biraz yukarıda. Yanlış parola tayfta "401 nm"; giriş
+anında sahne tayfın içine yakınlaşıp ekranı sarıyor, aynı renkte örtü panelin üstünde
+söner. Giriş ekranı sitenin seçili paletinde (herkese açık `/api/content`), panel Tayf'ta.
+Tarayıcı MCP'leri bağlanmadı: doğrulama, PowerShell'den başlatılan başsız Chrome + CDP betiğiyle.

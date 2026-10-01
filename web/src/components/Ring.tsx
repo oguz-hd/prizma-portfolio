@@ -1,5 +1,7 @@
 import { useLayoutEffect, useState, type DependencyList, type RefObject } from 'react'
 
+import './ring.css'
+
 /**
  * Prizmayı çevreleyen görünmez daire — Giriş ve İletişim aynı yerleşimde
  * (Oturum 2: giriş; Oturum 4, kullanıcı: "iletişim de intro gibi dairesel olsun").
@@ -47,7 +49,7 @@ function measureAdv(): number {
   advMeasured = ctx.measureText('M').width / 100 || ADV_GUESS
   return advMeasured
 }
-/** Başlığın harf aralığı (em) — theme.css → .ring-title ile aynı. */
+/** Başlığın harf aralığı (em) — ring.css → .ring-title ile aynı. */
 const TITLE_TRACKING = 0.06
 /**
  * Başlık harfleri yatayda bu kat geniş (Oturum 3: "harflerin genişliği artsın").
@@ -139,7 +141,7 @@ export function arc(geo: RingGeo, r: number, sweep: 0 | 1): string {
 }
 
 /**
- * Üst yaydaki büyük başlık — geniş ve kalın (theme.css → .ring-title).
+ * Üst yaydaki büyük başlık — geniş ve kalın (ring.css → .ring-title).
  *
  * ⚠️ `textAnchor="middle"` KULLANILMIYOR: WebKit (iPhone Safari) ortalamayı
  * `textLength` germesinden ÖNCEKİ genişlikle yapıyor, fazlalık yalnızca sağa
