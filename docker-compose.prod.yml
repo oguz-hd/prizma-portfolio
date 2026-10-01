@@ -43,6 +43,15 @@ services:
       target: prod
     restart: unless-stopped
 
+  # Günlük yedek: veritabanı (14 gün) + görseller (7 gün) → /data/backups (tools/yedek/yedekle.sh).
+  backup:
+    image: alpine:3.20
+    command: ['/bin/sh', '/yedekle.sh']
+    volumes:
+      - data:/data
+      - ./tools/yedek/yedekle.sh:/yedekle.sh:ro
+    restart: unless-stopped
+
 volumes:
   caddy_data:
   caddy_config:

@@ -299,3 +299,29 @@ API açılışta eksik şema adımlarını uygular (`api/app/migrations.py`); he
 `site.db`'nin yerine kopyala. Faz 9 göçünün yedeği: volume'da `site.db.bak-v0` ve masaüstünde
 `prizma-site.db.yedek-2026-10-01`.
 
+
+---
+
+## Yedek
+
+Yayın yığınında `backup` servisi (docker-compose.prod.yml → `tools/yedek/yedekle.sh`) her gün
+`/data/backups/`'a veritabanının tutarlı kopyasını (`sqlite3 .backup`, 14 gün) ve görsellerin
+arşivini (7 gün) yazar. Elle bir kez almak:
+```powershell
+docker compose -f docker-compose.yml -f docker-compose.prod.yml run --rm -e YEDEK_BIR_KEZ=1 backup
+```
+Geri yüklemek: API'yi durdur → `site-YYYY-MM-DD.db`'yi `/data/site.db`'nin yerine kopyala →
+görseller için arşivi `/data`'ya aç → API'yi başlat.
+⚠️ Yedekler aynı volume'da: yanlış düzenlemeye ve bozulmaya karşı korur, sunucunun kaybına karşı
+DEĞİL. Sunucu dışına kopya, barındırma seçildikten sonra kurulacak.
+⚠️ Caddy `/data/*`'yı HTTP'den sunmuyor (Caddyfile) — eskiden `/data/site.db` indirilebiliyordu
+(Oturum 6'da kapatıldı). Caddyfile'ı değiştirirken bu bloğu koru.
+
+## Güvenlik (yayında)
+
+- Giriş: aynı IP'den 15 dakikada 5 hatalı deneme → 429 (`api/app/throttle.py`).
+- Başlıklar (Caddyfile): CSP (betik yalnızca kendi kökten), nosniff, X-Frame-Options DENY,
+  Referrer-Policy, Permissions-Policy, HSTS. Site ve panelde CSP ihlali yok (ölçüldü).
+- Yükleme: Caddy 16 MB'ın üstünü API'ye iletmiyor; API 15 MB + 40 MP sınırı, EXIF/GPS siliniyor.
+- İlk yayından önce: `.env`'de `JWT_SECRET` (uzun rastgele) ve güçlü `ADMIN_PASSWORD`; dev
+  veritabanı taşınacaksa paneldeki "Hesap"tan parolayı değiştir — API varsayılan parolayla açılmaz.

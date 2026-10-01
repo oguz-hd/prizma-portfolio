@@ -164,8 +164,10 @@ temadan (`applyTheme` → `appliedTokens`), içerikten değil — panel sahneyi 
    zaman çizelgesi, projeler, duyuru, galeri), projeler ve medya sayfaları, fotoğraf yükleme
    (EXIF/GPS silinir, WebP), bileşeni TÜR seçiyor, göç düzeni + pytest. Görünüş A1·B2·L1·C2·D2
    (DESIGN § 14). Kararlar ARCHITECTURE § 6. Test yığını/senaryo C → CALISTIRMA.
-6. ⏭ **Sırada: yayına hazırlık** (kullanıcı: "daha sonra birinci seçeneği yapalım") — giriş
-   denemesi sınırı, SQLite yedeği, kalıcı API testleri, barındırma/alan adı.
+6. ⏭ **Yayına hazırlık** (Oturum 6, sürüyor) — ✅ `/data/site.db` herkese açık indiriliyordu →
+   Caddy `/data/*` 404 · ✅ güvenlik başlıkları + CSP (ihlal yok, ölçüldü) · ✅ giriş sınırı
+   (`throttle.py`, 5/15 dk/IP) · ✅ günlük yedek servisi (`tools/yedek/yedekle.sh`) · ✅ pytest 18.
+   ⏭ Barındırma + alan adı (kullanıcı kararı bekleniyor) → sunucu dışı yedek, ilk yayın.
 Plan: `C:\Users\drn49\.claude\plans\hadi-back-and-e-hidden-puddle.md`.
 Kullanıcı notu (Claude Docs, API'yi denerken bilinmesi gerekenler):
 https://claude.ai/code/artifact/8a071f83-aa54-4eb2-a4a7-592661b51c62

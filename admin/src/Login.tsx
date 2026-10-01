@@ -156,9 +156,12 @@ function LoginScreen({ accents, nameChars, onSignedIn }: ScreenProps) {
       setError(
         unauthorized
           ? 'Wrong email or password.'
-          : err instanceof ApiError && err.status === 0
-            ? 'Can’t reach the server. Is the API running?'
-            : `Sign-in failed${err instanceof ApiError ? ` (HTTP ${err.status})` : ''}.`,
+          : err instanceof ApiError && err.status === 429
+            ? // Sunucu aynı IP'den çok hatalı denemeyi 15 dk durduruyor (api/app/throttle.py).
+              'Too many failed attempts. Try again in a few minutes.'
+            : err instanceof ApiError && err.status === 0
+              ? 'Can’t reach the server. Is the API running?'
+              : `Sign-in failed${err instanceof ApiError ? ` (HTTP ${err.status})` : ''}.`,
       )
       inFlight.current = false
       setBusy(false)

@@ -26,8 +26,22 @@ def test_admin_requires_token(client: TestClient) -> None:
 
 
 def test_wrong_password(client: TestClient) -> None:
-    r = client.post("/api/auth/login", json={"email": "admin@localhost", "password": "yanlis"})
+    ip = {"X-Forwarded-For": "203.0.113.1"}
+    r = client.post("/api/auth/login", headers=ip, json={"email": "admin@localhost", "password": "yanlis"})
     assert r.status_code == 401
+
+
+def test_login_is_throttled_per_ip(client: TestClient) -> None:
+    """5 hatalı denemeden sonra doğru parola bile 429 — tahmin yavaşlasın; başka IP etkilenmez."""
+    bad = {"email": "admin@localhost", "password": "yanlis"}
+    good = {"email": "admin@localhost", "password": "degistir"}
+    ip = {"X-Forwarded-For": "203.0.113.9"}
+    for _ in range(5):
+        assert client.post("/api/auth/login", headers=ip, json=bad).status_code == 401
+    r = client.post("/api/auth/login", headers=ip, json=good)
+    assert r.status_code == 429 and int(r.headers["Retry-After"]) > 0
+    other = {"X-Forwarded-For": "203.0.113.10"}
+    assert client.post("/api/auth/login", headers=other, json=good).status_code == 200
 
 
 # ── Hazır içerik ve göç ──────────────────────────────────────────────────────

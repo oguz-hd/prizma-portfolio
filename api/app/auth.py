@@ -3,11 +3,12 @@ from datetime import UTC, datetime, timedelta
 from typing import Annotated
 
 import jwt
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pwdlib import PasswordHash
 from sqlmodel import select
 
+from app import throttle
 from app.config import get_settings
 from app.db import SessionDep
 from app.models import AdminUser
@@ -93,7 +94,10 @@ router = APIRouter(prefix="/api/auth", tags=["auth"])
 
 
 @router.post("/login")
-def login(data: LoginIn, session: SessionDep) -> TokenOut:
+def login(data: LoginIn, session: SessionDep, request: Request) -> TokenOut:
+    # Parola tahminine karşı: aynı IP'den çok hatalı deneme → 429 (throttle.py).
+    ip = throttle.client_ip(request)
+    throttle.check(ip)
     user = session.exec(select(AdminUser).where(AdminUser.email == data.email)).first()
 
     # ⚠️ Kullanıcı yoksa da parola GERÇEKTEN doğrulanıyor (sahte hash'e karşı) ve
@@ -102,11 +106,13 @@ def login(data: LoginIn, session: SessionDep) -> TokenOut:
     # e-posta anında, kayıtlı e-posta ~50-100 ms sonra reddediliyordu.
     valid = verify_password(data.password, user.password_hash if user else _DUMMY_HASH)
     if user is None or not valid:
+        throttle.failed(ip)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="E-posta ya da parola hatalı",
         )
 
+    throttle.succeeded(ip)
     return TokenOut(access_token=create_access_token(user))
 
 

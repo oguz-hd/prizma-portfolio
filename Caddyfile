@@ -14,7 +14,19 @@
 	# API — yönetim paneli (Faz 7) ve sağlık kontrolü. Ziyaretçi sitesi API'ye
 	# hiç gitmez; içeriği aşağıdaki dosyadan okur.
 	handle /api/* {
+		# Görsel yükleme API'de 15 MB; sınırın üstü buraya kadar bile gelmesin.
+		request_body {
+			max_size 16MB
+		}
 		reverse_proxy api:8000
+	}
+
+	# ⚠️ Veri volume'u /srv/data'da — meta şablonu (/data/meta.html) kökten okuyor,
+	# taşınamıyor. Ama HTTP'den ASLA: aşağıdaki SPA bloğu /srv'yi sunduğu için
+	# /data/site.db (admin parola hash'i dahil) ve göç yedekleri indirilebiliyordu
+	# (Oturum 6, yayına hazırlıkta bulundu). Dışarı yalnızca content.json ve uploads.
+	handle /data/* {
+		respond 404
 	}
 
 	# ★ İçerik paylaşılan volume'dan okunuyor, imajın içinden değil.
@@ -28,9 +40,11 @@
 		file_server
 	}
 
-	# Panelden yüklenen görseller (Faz 7)
+	# Panelden yüklenen görseller (Faz 9). Adlar rastgele ve değişmez (api/app/media.py):
+	# görsel değişince yeni ad alıyor → sonsuza kadar önbelleklenebilir.
 	handle /uploads/* {
 		root * /srv/data
+		header Cache-Control "public, max-age=31536000, immutable"
 		file_server
 	}
 
@@ -51,9 +65,6 @@
 	}
 	handle /admin/* {
 		header Cache-Control "no-cache"
-		# Panel başka bir sitenin çerçevesine alınamasın: görünmez bir çerçevede
-		# "Sil"e tıklatma (clickjacking) yolu kapansın.
-		header X-Frame-Options "DENY"
 		try_files {path} /admin/index.html
 		file_server
 	}
@@ -72,5 +83,19 @@
 	@html path /index.html /
 	header @html Cache-Control "no-cache"
 
-	# Faz 9'da güvenlik başlıkları (CSP vb.) buraya eklenecek.
+	# ── Güvenlik başlıkları (yayına hazırlık, Oturum 6) — site ve panel ──
+	# CSP: betik yalnızca kendi kökümüzden (ikisi de dış dosya); stil 'unsafe-inline'
+	# index.html'deki ilk boya <style>'ı ve React'in style özniteliği için. Görsel
+	# data: favicon için (theme/favicon.ts). frame-ancestors + X-Frame-Options: başka
+	# site çerçeveye alamaz — panelde görünmez çerçevede "Sil"e tıklatma yolu kapalı.
+	# HSTS yalnızca HTTPS'te geçerli (tarayıcı http'de yok sayar); :80 yerel denemeye zararsız.
+	header {
+		Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+		Strict-Transport-Security "max-age=31536000"
+		-Server
+	}
 }

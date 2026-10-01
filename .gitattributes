@@ -1,0 +1,2 @@
+# Kabuk betikleri Linux konteynerinde çalışıyor: CRLF olursa `set -eu` hatası.
+*.sh text eol=lf
