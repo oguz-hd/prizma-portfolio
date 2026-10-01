@@ -167,7 +167,9 @@ temadan (`applyTheme` → `appliedTokens`), içerikten değil — panel sahneyi 
 6. ⏭ **Yayına hazırlık** (Oturum 6, sürüyor) — ✅ `/data/site.db` herkese açık indiriliyordu →
    Caddy `/data/*` 404 · ✅ güvenlik başlıkları + CSP (ihlal yok, ölçüldü) · ✅ giriş sınırı
    (`throttle.py`, 5/15 dk/IP) · ✅ günlük yedek servisi (`tools/yedek/yedekle.sh`) · ✅ pytest 18.
-   ⏭ Barındırma + alan adı (kullanıcı kararı bekleniyor) → sunucu dışı yedek, ilk yayın.
+   ⏸ Barındırma + alan adı: kullanıcı "şimdilik yayınlama" dedi (01.10.2026), alan adı yok.
+   Önerilen: Hetzner VPS (compose olduğu gibi) + Cloudflare Registrar. Sonra: sunucu dışı yedek.
+7. ⏭ **Beyaz tema** (kullanıcı: yayın yerine sıradaki iş) → sonra Faz 8 tema paneli.
 Plan: `C:\Users\drn49\.claude\plans\hadi-back-and-e-hidden-puddle.md`.
 Kullanıcı notu (Claude Docs, API'yi denerken bilinmesi gerekenler):
 https://claude.ai/code/artifact/8a071f83-aa54-4eb2-a4a7-592661b51c62
