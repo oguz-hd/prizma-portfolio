@@ -123,6 +123,10 @@ function LoginScreen({ accents, nameChars, onSignedIn }: ScreenProps) {
     const ox = fan.left + fan.width * 0.6 - box.left
     const oy = fan.top + fan.height * 0.5 - box.top
     const zoom = Math.min(40, Math.max(8, (2.4 * window.innerHeight) / fan.height))
+    // Ayrı katman: sahne bir kez çizilip doku olarak büyüsün. Yoksa tarayıcı her karede
+    // 8-40× ölçekte yeniden çiziyordu (hale blur(22px) dahil) — ölçüldü: 113-267 ms'lik
+    // takılmalar (Oturum 6, kullanıcı: "giriş animasyonu kasıyor").
+    stage.style.willChange = 'transform'
     gsap
       .timeline({ onComplete: () => onSignedIn(token, accents) })
       .to([brandRef.current, formRef.current], { opacity: 0, y: -12, duration: 0.35, ease: 'power2.in' }, 0)
