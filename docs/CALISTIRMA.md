@@ -275,3 +275,27 @@ Senaryo yalnızca boş (yeni tohumlanmış) veritabanına bir kez uygulanır; te
 `docker rm -f prizma-buyuk-a-api prizma-buyuk-a-web; docker volume rm prizma-buyuk-a`.
 ⚠️ Betik dosyalarını PowerShell'in `Get-Content`/`Set-Content`'iyle düzenleme —
 `-Encoding` verilmezse Türkçe karakterler bozulur (Oturum 6'da oldu).
+
+C senaryosu (Faz 9 türleri): `node tools/icerik/buyut.mjs C http://localhost:8013` — yeni
+türlerden birer bölüm ve 6 örnek görsel. Test yığınında panel açmak (senin içeriğine dokunmadan):
+```powershell
+docker network create prizma-c
+docker run -d --name prizma-c-api --network prizma-c -p 8013:8000 -v prizma-buyuk-c:/data `
+  -v "C:\Users\drn49\Desktop\prizma-portfolio\api\app:/app/app" -e DATA_DIR=/data -e DEBUG=1 prizma-portfolio-api:dev
+docker run -d --name prizma-c-web --network prizma-c -p 5183:80 -v prizma-buyuk-c:/srv/data:ro `
+  -v "C:\Users\drn49\Desktop\prizma-portfolio\Caddyfile:/etc/caddy/Caddyfile:ro" prizma-portfolio-web:prod
+docker run -d --name prizma-c-admin --network prizma-c -p 5186:5175 -e VITE_USE_POLLING=1 `
+  -e API_ORIGIN=http://prizma-c-api:8000 -e WEB_ORIGIN=http://prizma-c-web:80 -e VITE_SITE_URL=http://localhost:5183/ `
+  -v "C:\Users\drn49\Desktop\prizma-portfolio\admin:/app" -v /app/node_modules `
+  -v "C:\Users\drn49\Desktop\prizma-portfolio\web\src:/web/src:ro" prizma-portfolio-admin:dev
+```
+
+---
+
+## Şema göçleri ve yedekler
+
+API açılışta eksik şema adımlarını uygular (`api/app/migrations.py`); her uygulamadan önce
+`/data/site.db.bak-v<eski sürüm>` kopyası alınır. Geri dönmek: API'yi durdur, `.bak`'ı
+`site.db`'nin yerine kopyala. Faz 9 göçünün yedeği: volume'da `site.db.bak-v0` ve masaüstünde
+`prizma-site.db.yedek-2026-10-01`.
+

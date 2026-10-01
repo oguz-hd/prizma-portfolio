@@ -49,40 +49,42 @@ export function MediaPage() {
       title="Medya"
       lead="Galeriler ve proje kapakları için görseller. JPEG, PNG ya da WebP, en fazla 15 MB. Konum (GPS) ve diğer EXIF bilgileri yüklemede silinir."
     >
-      <div
-        className={over ? 'dropzone is-over' : 'dropzone'}
-        onDragOver={(e) => {
-          e.preventDefault()
-          setOver(true)
-        }}
-        onDragLeave={() => setOver(false)}
-        onDrop={drop}
-      >
-        <p>Görselleri buraya sürükle ya da</p>
-        <label className="btn btn-primary">
-          {status.kind === 'busy' ? 'Yükleniyor…' : 'Dosya seç'}
-          <input
-            ref={input}
-            className="sr-only"
-            type="file"
-            accept={ACCEPT}
-            multiple
-            disabled={status.kind === 'busy'}
-            onChange={(e) => upload(e.target.files)}
-          />
-        </label>
-        <StatusLine status={status} dirty={false} done="Yüklendi — alt metinlerini yaz." />
-      </div>
-
-      {library.length === 0 ? (
-        <p className="hint">Henüz görsel yok.</p>
-      ) : (
-        <div className="media-grid">
-          {[...library].reverse().map((m) => (
-            <MediaCard key={m.id} media={m} />
-          ))}
+      <div className="stack">
+        <div
+          className={over ? 'dropzone is-over' : 'dropzone'}
+          onDragOver={(e) => {
+            e.preventDefault()
+            setOver(true)
+          }}
+          onDragLeave={() => setOver(false)}
+          onDrop={drop}
+        >
+          <p>Görselleri buraya sürükle ya da</p>
+          <label className="btn btn-primary">
+            {status.kind === 'busy' ? 'Yükleniyor…' : 'Dosya seç'}
+            <input
+              ref={input}
+              className="sr-only"
+              type="file"
+              accept={ACCEPT}
+              multiple
+              disabled={status.kind === 'busy'}
+              onChange={(e) => upload(e.target.files)}
+            />
+          </label>
+          <StatusLine status={status} dirty={false} done="Yüklendi — alt metinlerini yaz." />
         </div>
-      )}
+
+        {library.length === 0 ? (
+          <p className="hint">Henüz görsel yok.</p>
+        ) : (
+          <div className="media-grid">
+            {[...library].reverse().map((m) => (
+              <MediaCard key={m.id} media={m} />
+            ))}
+          </div>
+        )}
+      </div>
     </Page>
   )
 }

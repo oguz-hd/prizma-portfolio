@@ -160,12 +160,11 @@ temadan (`applyTheme` → `appliedTokens`), içerikten değil — panel sahneyi 
    Kalan aday: `brand-flow` (navbar, background-position + drop-shadow) ve 60 yıldızın
    `twinkle`'ı hâlâ ekranın yenileme hızında — kullanıcıya önerildi, yanıt yok.
    Ucuz telefon profili ölçülemedi (pencere arkada kaldı). `Projects.tsx` silindi (kullanıcı).
-5. ⏭ **Faz 9 · Bölüm türleri ve medya** (kullanıcı kararı, Oturum 6) — panelden bölüm ekleme
-   (serbest metin, zaman çizelgesi, projeler, duyuru, fotoğraf/galeri), projeler panelde
-   (sitede yalnızca Projeler bölümü eklenirse), fotoğraf yükleme (EXIF/GPS silinir, WebP),
-   eklenen bölüm silinir / hazırlar gizlenir, göç düzeni (`PRAGMA user_version`).
-   Plan: `C:\Users\drn49\.claude\plans\faz-9-bolum-turleri-ve-medya.md` — 9a/9b/9c/9d, her birinde dur.
-6. **Sonra: yayına hazırlık** (kullanıcı: "daha sonra birinci seçeneği yapalım") — giriş
+5. ✅ (Oturum 6) **Faz 9 · Bölüm türleri ve medya** — panelden bölüm ekleme (serbest metin,
+   zaman çizelgesi, projeler, duyuru, galeri), projeler ve medya sayfaları, fotoğraf yükleme
+   (EXIF/GPS silinir, WebP), bileşeni TÜR seçiyor, göç düzeni + pytest. Görünüş A1·B2·L1·C2·D2
+   (DESIGN § 14). Kararlar ARCHITECTURE § 6. Test yığını/senaryo C → CALISTIRMA.
+6. ⏭ **Sırada: yayına hazırlık** (kullanıcı: "daha sonra birinci seçeneği yapalım") — giriş
    denemesi sınırı, SQLite yedeği, kalıcı API testleri, barındırma/alan adı.
 Plan: `C:\Users\drn49\.claude\plans\hadi-back-and-e-hidden-puddle.md`.
 Kullanıcı notu (Claude Docs, API'yi denerken bilinmesi gerekenler):

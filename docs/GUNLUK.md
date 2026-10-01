@@ -65,3 +65,8 @@ Oturum 6 sonu: ilk performans ölçümü (`tools/perf/olcum.mjs`, dört cihaz pr
 sorunsuz; asıl yük GPU'daydı ve ekranın yenileme hızıyla büyüyordu — prizma 74 fps'e
 sınırlandı, zayıf GPU'da cam panelin bulanıklığı kendiliğinden kalkıyor (`html[data-lite]`).
 Kod incelemesinin tek bulgusu düzeltildi: panelde çıkıştan sonra `scene.surge` 1'de kalıyordu.
+Faz 9 (Oturum 6): panelden bölüm ekleme — serbest metin, zaman çizelgesi, projeler, duyuru,
+galeri; fotoğraf yükleme (EXIF/GPS silinir, WebP). Bileşeni artık tür seçiyor. Şema göç
+düzeni ve ilk kalıcı API testleri geldi; dev veritabanı kopyada denenip sıfırlanmadan yükseldi.
+Görünüş seçenek sayfasıyla (A1 · B2 · L1 · C2 · D2); panel uçtan uca test yığınında denendi.
+

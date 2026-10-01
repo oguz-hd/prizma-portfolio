@@ -230,3 +230,17 @@ iletisim` ve geri aynı sırayla. İletişim 6 telefon boyutu × 2 dilde taşmı
 |---|---|
 | Prizmanın etrafındaki daire (isim ve bağlantıların dizildiği) %20 küçülsün → görünce "%10 geri büyüsün" | `components/Ring.tsx` → `DESKTOP_SCALE = 0.9`: masaüstünde yarıçap eskisinin %90'ı, Giriş ve İletişim birlikte. Başlık boyu yarıçaptan türüyor: %80'de isim her dizüstü boyunda 44 → 33 px'e iniyordu; **%90'da 1440×900'de 44, 1366×768'de 33** (ölçüldü; tam boyda ikisi de 44'tü). Telefonda uygulanmadı: orada daire ekranın eninden sınırlı, küçülünce isim 33 → 22 px'e iniyordu (390×844, hesap) |
 | Girişteki bağlantılar biraz büyüsün, çok görünmüyorlar | Masaüstünde 11 → **16.5 px** (11 × 1.5; Oturum 4'te 22 fazla bulunmuştu, ortası). Kural 11'in istisnası: 2x ekranda keskin, 1x'te hafif yumuşak. Telefonda 11 kaldı (Oturum 4: "mobilde çok büyük") |
+
+## 14. Faz 9 — panelden eklenen bölümlerin görünüşü (Oturum 6)
+
+Seçenek sayfasından (https://claude.ai/artifact/QyDBsuQRTQ2Pi7u8EoCR5f) kullanıcı seçimi
+**A1 · B2 · L1 · C2 · D2**:
+- **Duyuru (A1):** ayrı slayt — başlığın üstünde ışıyan nokta + "DUYURU" + tarih aralığı
+  (Intl, dile göre), altta tek düğme (`--lead` zemin). `AnnouncementSection.tsx`.
+- **Galeri (B2):** ilk fotoğraf 2×2 hücre, sonra üçlü sıralar; telefonda 2 sütun, ilk
+  fotoğraf 16:9 tam genişlik. Her fotoğraf sayfa birimi. `GallerySection.tsx`.
+- **Büyütme (L1):** `<dialog>` + showModal, oklar/Esc, açıkken deck kilitli. `Lightbox.tsx`.
+- **Proje kartı (C2):** üstte 16:9 kapak; kapaksız kart aynı oranda boş çerçeve + sıra no.
+- **Menü (D2):** her genişlikte yatay kayar, taşan kenar söner (ölçülerek), etkin bölüm
+  görünür alana kayar. 1440 ve 1024'te sekiz bölüm (EN/TR) taşmadan sığıyor (ölçüldü).
+

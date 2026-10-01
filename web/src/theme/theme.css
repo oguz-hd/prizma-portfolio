@@ -187,7 +187,9 @@ a {
 .about-bio,
 .not-found-body,
 .skill-note,
-.timeline-note {
+.timeline-note,
+.project-summary,
+.project-para {
   font-family: var(--font-body);
   font-size: var(--text-prose);
   line-height: var(--leading-prose);
@@ -351,11 +353,36 @@ html[data-intro='pending'] :is([data-reveal], [data-reveal-panel], [data-reveal-
 
 /* --- Navigasyon ve dil ---------------------------------------------------- */
 
-/* Oturum 2: bölümler SOLDA, işaretin hemen yanında; dil seçici sağa yaslı. */
+/* Oturum 2: bölümler SOLDA, işaretin hemen yanında; dil seçici sağa yaslı.
+   Faz 9 (D2): sığmazsa yatay kayar, taşan kenar söner (Nav.tsx → data-fade).
+   Alt boşluk: kaydırma kabı dikeyde de kırpıyor, alt çizgi (::after) kesilmesin. */
 .nav {
   display: flex;
   gap: var(--space-6);
   margin-right: auto;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 2px;
+}
+
+.nav::-webkit-scrollbar {
+  display: none;
+}
+
+.nav[data-fade='end'] {
+  -webkit-mask-image: linear-gradient(90deg, var(--ink) calc(100% - 48px), transparent);
+  mask-image: linear-gradient(90deg, var(--ink) calc(100% - 48px), transparent);
+}
+
+.nav[data-fade='start'] {
+  -webkit-mask-image: linear-gradient(90deg, transparent, var(--ink) 48px);
+  mask-image: linear-gradient(90deg, transparent, var(--ink) 48px);
+}
+
+.nav[data-fade='start end'] {
+  -webkit-mask-image: linear-gradient(90deg, transparent, var(--ink) 48px, var(--ink) calc(100% - 48px), transparent);
+  mask-image: linear-gradient(90deg, transparent, var(--ink) 48px, var(--ink) calc(100% - 48px), transparent);
 }
 
 .nav-link {
@@ -414,14 +441,7 @@ html[data-intro='pending'] :is([data-reveal], [data-reveal-panel], [data-reveal-
 
   .nav {
     gap: var(--space-3);
-    min-width: 0;
     flex: 1;
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-
-  .nav::-webkit-scrollbar {
-    display: none;
   }
 
   .nav-link,
@@ -461,13 +481,6 @@ html[data-intro='pending'] :is([data-reveal], [data-reveal-panel], [data-reveal-
   }
 }
 
-@media (max-width: 359px) {
-  .nav {
-    -webkit-mask-image: linear-gradient(90deg, var(--ink) 85%, transparent);
-    mask-image: linear-gradient(90deg, var(--ink) 85%, transparent);
-    padding-right: var(--space-6);
-  }
-}
 
 /* ── Etkileşim imzası ──────────────────────────────────────────────────────
    Sabit "ray" (--line) yerinde durur, üstüne --lead renginde bir çizgi SOLDAN
@@ -1089,4 +1102,302 @@ html[data-lite] .panel {
   border-width: 0 0 1px;
   padding: 0 0 var(--space-1);
   cursor: pointer;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Faz 9 — panelden eklenen bölüm türleri (seçimler: A1 · B2 · L1 · C2 · D2,
+   https://claude.ai/artifact/QyDBsuQRTQ2Pi7u8EoCR5f)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* --- Duyuru (A1): başlığın üstünde ışıyan nokta + tarih, altta tek düğme --- */
+
+.announcement-mark {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.announcement-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--lead);
+  box-shadow: 0 0 10px var(--lead);
+}
+
+.announcement-range {
+  color: var(--ink-dim);
+}
+
+.announcement-cta {
+  display: inline-block;
+  padding: var(--space-3) var(--space-6);
+  font-size: var(--label-size);
+  letter-spacing: var(--label-tracking);
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--ground);
+  background: var(--lead);
+  border-radius: var(--radius);
+  transition: box-shadow var(--duration-base) var(--ease-out);
+}
+
+.announcement-cta:hover,
+.announcement-cta:focus-visible {
+  box-shadow: 0 0 0 1px var(--lead), 0 0 24px -6px var(--lead);
+  outline: none;
+}
+
+/* --- Galeri (B2): ilk fotoğraf iki sütun × iki sıra, sonra üçlü sıralar --- */
+
+.gallery {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.gallery-cell:first-child {
+  grid-column: span 2;
+  grid-row: span 2;
+}
+
+.gallery-figure {
+  position: relative;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.gallery-open {
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: zoom-in;
+}
+
+.gallery-open:focus-visible {
+  outline: 1px solid var(--lead);
+  outline-offset: 2px;
+}
+
+.gallery-open img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  transition: transform var(--duration-base) var(--ease-out);
+}
+
+/* Büyük kare: yüksekliği yanındaki iki küçük sıra belirler — görsel boyu ızgarayı
+   büyütmesin diye mutlak konumlu. */
+.gallery-cell:first-child .gallery-open img {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  aspect-ratio: auto;
+}
+
+.gallery-open:hover img {
+  transform: scale(1.03);
+}
+
+.gallery-caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: var(--space-6) var(--space-3) var(--space-2);
+  font-size: var(--label-size);
+  letter-spacing: var(--label-tracking);
+  text-transform: uppercase;
+  color: var(--ink);
+  background: linear-gradient(transparent, color-mix(in srgb, var(--ground) 82%, transparent));
+  pointer-events: none;
+}
+
+@media (max-width: 767px) {
+  .gallery {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-2);
+  }
+
+  .gallery-cell:first-child {
+    grid-row: auto;
+  }
+
+  .gallery-cell:first-child .gallery-open img {
+    position: static;
+    aspect-ratio: 16 / 9;
+  }
+}
+
+/* --- Büyütme (L1, components/Lightbox.tsx) --------------------------------- */
+
+.lightbox {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: var(--space-6);
+  border: 0;
+  color: var(--ink);
+  background: transparent;
+}
+
+.lightbox[open] {
+  display: grid;
+  place-items: center;
+}
+
+.lightbox::backdrop {
+  background: color-mix(in srgb, var(--ground) 94%, transparent);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+
+.lightbox-figure {
+  display: grid;
+  gap: var(--space-3);
+  max-width: min(1600px, 100%);
+  margin: 0;
+}
+
+.lightbox-figure img {
+  display: block;
+  max-width: 100%;
+  max-height: calc(100vh - 160px);
+  width: auto;
+  height: auto;
+  border-radius: var(--radius);
+}
+
+.lightbox-caption {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-4);
+  font-family: var(--font-body);
+  font-size: var(--text-prose-sm);
+  color: var(--ink-dim);
+}
+
+.lightbox-tools {
+  position: fixed;
+  top: var(--space-4);
+  right: var(--space-4);
+  display: flex;
+  gap: var(--space-2);
+}
+
+.lightbox-btn {
+  width: 44px;
+  height: 44px;
+  font-family: var(--font-mono);
+  font-size: 22px;
+  color: var(--ink-dim);
+  background: color-mix(in srgb, var(--surface) 80%, transparent);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: color var(--duration-base) var(--ease-out), border-color var(--duration-base) var(--ease-out);
+}
+
+.lightbox-btn:hover,
+.lightbox-btn:focus-visible {
+  color: var(--ink);
+  border-color: var(--lead);
+  outline: none;
+}
+
+/* --- Projeler (C2): kapaklı kartlar --------------------------------------- */
+
+.project-list {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-8);
+}
+
+.project {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  height: 100%;
+}
+
+.project-cover {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  margin-bottom: var(--space-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+/* Kapaksız kart da yerini korur: aynı oranda çerçeve, ortada sıra numarası. */
+.project-cover-empty {
+  display: grid;
+  place-items: center;
+  background:
+    linear-gradient(90deg, var(--spectrum-stops)) bottom / 100% 1px no-repeat,
+    color-mix(in srgb, var(--surface) 60%, transparent);
+}
+
+.project-title {
+  font-size: var(--text-title);
+}
+
+.project-summary {
+  color: var(--ink);
+  font-size: var(--text-prose-sm);
+}
+
+.project-para {
+  color: var(--ink-dim);
+  font-size: var(--text-prose-sm);
+}
+
+.tech-list,
+.project-links {
+  list-style: none;
+  padding: 0;
+  margin-top: var(--space-2);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.tech-badge {
+  font-size: var(--label-size);
+  letter-spacing: var(--label-tracking);
+  color: var(--ink-dim);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: var(--space-1) var(--space-2);
+}
+
+@media (max-width: 1023px) {
+  .project-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 767px) {
+  .project-list {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }

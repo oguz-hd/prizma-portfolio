@@ -144,9 +144,10 @@ education       kurum, rol, dönem, not        ─┘
 projects        başlık, slug, özet, açıklama, tech[], repo_url, live_url,
                 görsel, sıra, yayında mı
 links           etiket, url, ikon, sıra          (github, linkedin, e-posta)
-sections        "hakkımda" vb. serbest içerik blokları
-posts           blog yazıları                     (Faz 7 — sonra)
-media           yüklenen görseller
+sections        slaytlar: kind (bileşen), visible, duyuru bağlantısı + yayın aralığı (Faz 9)
+section_media   galeri bölümünün görselleri ve sırası (Faz 9)
+posts           blog yazıları                     (sonra)
+media           yüklenen görseller: boyut, üretilen genişlikler (Faz 9)
 admin_user      tek kullanıcı, hash'li parola
 translations    ★ (entity, entity_id, field, locale, value) — iki dillilik
 ```
@@ -198,10 +199,34 @@ PUT   /api/admin/{skills|milestones|links|sections}/order   yeni sıra (kayıtla
 PUT   /api/admin/{skills|milestones|links|sections}/{id}    güncelle
 DEL   /api/admin/{skills|milestones|links}/{id}             sil (çevirileriyle)
 
+── Faz 9 ──
+GET   /api/admin/content                   herkese açık içerik + gizli bölümler, yayında
+                                           olmayan projeler, `visible`, medya kitaplığı
+POST  /api/admin/sections                  yeni bölüm (kind: text|timeline|projects|announcement|gallery);
+                                           İletişim'in ÖNÜNE girer (kapanış karesi sonda)
+DEL   /api/admin/sections/{id}             yalnızca eklenen türler (hazırlarda 409); maddeleri/galerisiyle
+POST|PUT|DEL /api/admin/sections/{id}/items[/{item}], PUT …/items/order   zaman çizelgesi maddeleri
+PUT   /api/admin/sections/{id}/media       galerinin görselleri + altyazıları (liste baştan yazılır)
+POST|PUT|DEL /api/admin/projects[/{id}], PUT /projects/order              projeler (+ kapak)
+POST  /api/admin/media (multipart) · PUT /media/{id} (alt) · DEL         kullanılan görsel silinmez (409)
+
 ── Sonra ──
-POST  /api/admin/media          → görsel yükleme (içerikte görsel alanı olunca)
 POST  /api/admin/theme/validate → kontrast kontrolü (Faz 8)
 ```
+
+**Faz 9 kararları (01.10.2026):**
+- **Bileşeni TÜR seçiyor** (`sections.kind`), slug değil — panelden eklenen bölüm kod
+  değişmeden slayt olur (§ 8'deki açık konu kapandı). Hazırlar (about/experience/contact)
+  silinmez, `visible=false` ile gizlenir.
+- **Projeler** panelde yönetilir; sitede yalnızca "projects" türünde bölüm varsa görünür.
+- **Duyurunun yayın aralığı sitede süzülüyor** (`useContent` → `inWindow`): content.json
+  her gün yeniden yazılmıyor, tarih geçince duyuru kendiliğinden düşmeli.
+- **Görsel:** `api/app/media.py` — JPEG/PNG/WebP (biçim içerikten), 15 MB, 40 MP sınırı;
+  **EXIF/GPS silinir**, orijinal saklanmaz; 640/1280/1920 WebP (`/data/uploads/{id}-{w}.webp`,
+  Caddy sunuyor; geliştirmede API `/uploads`'ı bağlıyor). Alt metin ve altyazı çeviri tablosunda.
+- **Şema göçleri:** `api/app/migrations.py` (`PRAGMA user_version`); açılışta eksik adımlar,
+  önce `site.db.bak-v<n>`. Veritabanı artık sıfırlanmadan yükseliyor.
+- **Testler:** `api/tests` (pytest, geçici veri klasöründe) — kapılardan biri.
 
 **Faz 7a kararları:**
 - **Okuma ayrı değil:** panel `GET /api/content`'i kullanıyor (aynı veri, aynı şekil).
@@ -212,8 +237,7 @@ POST  /api/admin/theme/validate → kontrast kontrolü (Faz 8)
   (opsiyonel alan boşsa hiç yazılmaz). Bağlantılar yalnızca `https`/`http`/`mailto`.
 - **Deneyim ve eğitim tek kaynak** (`milestones`, gövdede `kind`) — tablo da tek.
   Tür sonradan değişmez (sil + oluştur).
-- **Bölümler** yalnızca düzenlenir ve sıralanır; oluşturma/silme yok (bölüm ↔ bileşen
-  eşlemesi kodda, § 8). **Projeler** panelde yok — slayt kalktı (kural 12).
+- ~~Bölümler yalnızca düzenlenir; projeler panelde yok~~ → Faz 9'da değişti (aşağıda).
 - **Parola değişince bütün oturumlar düşer:** token, parola hash'inden türeyen bir
   iz taşıyor (`auth.py` → `_password_mark`); şemaya sütun eklemeden. Varsayılan
   parola (`degistir`) ve 10 karakterden kısası kabul edilmiyor.

@@ -6,6 +6,9 @@ import { Hero } from './sections/Hero'
 import { About } from './sections/About'
 import { Experience } from './sections/Experience'
 import { Contact } from './sections/Contact'
+import { AnnouncementSection } from './sections/AnnouncementSection'
+import { GallerySection } from './sections/GallerySection'
+import { ProjectsSection } from './sections/ProjectsSection'
 import { TextSection } from './sections/TextSection'
 import { TimelineSection } from './sections/TimelineSection'
 import type { SectionProps } from './sections/Section'
@@ -33,10 +36,10 @@ const SECTION_COMPONENTS: Record<SectionKind, ComponentType<SectionProps>> = {
   contact: Contact,
   text: TextSection,
   timeline: TimelineSection,
-  // Görünüşleri seçenek sayfasından (Faz 9b) — o zamana kadar başlık + metin.
-  projects: TextSection,
-  announcement: TextSection,
-  gallery: TextSection,
+  // Görünüşler seçenek sayfasından: A1 · B2 · L1 · C2 (Faz 9b).
+  projects: ProjectsSection,
+  announcement: AnnouncementSection,
+  gallery: GallerySection,
 }
 
 /**

@@ -20,6 +20,16 @@ const STRINGS = {
   experience: { tr: 'Deneyim', en: 'Experience' },
   education: { tr: 'Eğitim', en: 'Education' },
   emailMe: { tr: 'Bana yaz', en: 'Email me' },
+
+  // Faz 9 — panelden eklenen bölüm türleri
+  announcement: { tr: 'Duyuru', en: 'Announcement' },
+  tech: { tr: 'Kullanılan teknolojiler', en: 'Tech used' },
+  source: { tr: 'Kaynak kodu', en: 'Source code' },
+  liveDemo: { tr: 'Canlı demo', en: 'Live demo' },
+  enlarge: { tr: 'Büyüt', en: 'Enlarge' },
+  close: { tr: 'Kapat', en: 'Close' },
+  previous: { tr: 'Önceki', en: 'Previous' },
+  next: { tr: 'Sonraki', en: 'Next' },
   elsewhere: { tr: 'Başka yerlerde', en: 'Elsewhere' },
   backToTop: { tr: 'Başa dön', en: 'Back to top' },
 

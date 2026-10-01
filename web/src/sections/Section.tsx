@@ -35,8 +35,9 @@ export function Section({
   heading,
   body,
   children,
+  before,
   after,
-}: Omit<SectionProps, 'section'> & { children?: ReactNode; after?: ReactNode }) {
+}: Omit<SectionProps, 'section'> & { children?: ReactNode; before?: ReactNode; after?: ReactNode }) {
   const titleId = `${id}-title`
 
   return (
@@ -44,6 +45,8 @@ export function Section({
       <div className="slide-scroll" data-slide-scroll>
         <div className="slide-inner container">
           <div className="panel" data-reveal-panel>
+            {/* Başlığın üstündeki işaret (duyurunun tarihi). */}
+            {before}
             <header className="section-head" data-reveal data-i18n-fade>
               {/* data-page-count: bölünen slaytta sayaç ("1/2") buraya (paginate.ts). */}
               <p className="label section-index" data-page-count>
