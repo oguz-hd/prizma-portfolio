@@ -1,6 +1,7 @@
 import { Fragment, useRef } from 'react'
 
-import { INNER_GAP, RingTitle, arc, usePlaceBelow, useRing } from '../components/Ring'
+import { INNER_GAP, MAX_SPAN, RingTitle, arc, arcSpan, usePlaceBelow, useRing } from '../components/Ring'
+import type { Link } from '../content/types'
 import { useContent } from '../content/useContent'
 import { useStrings } from '../i18n/strings'
 
@@ -34,6 +35,21 @@ import { useStrings } from '../i18n/strings'
  */
 const linkSize = (W: number) => (W < 768 ? 11 : 16.5)
 
+/** Harf aralıkları (em) — theme.css → .ring-links text, --label-tracking. */
+const LINK_TRACKING = 0.04
+const EYEBROW_TRACKING = 0.12
+/** Ayraç " · " üç harf. */
+const linkChars = (ls: Link[]) => ls.reduce((n, l) => n + l.label.length, 0) + 3 * (ls.length - 1)
+
+/** Bağlantıları harf sayısına göre iki yarıya böl (sıra korunur). */
+function halves(ls: Link[]): Link[][] {
+  const half = linkChars(ls) / 2
+  let n = 0
+  const i = ls.findIndex((l) => (n += l.label.length + 3) > half)
+  const cut = Math.max(1, Math.min(ls.length - 1, i))
+  return [ls.slice(0, cut), ls.slice(cut)]
+}
+
 export function Hero() {
   const { profile, links } = useContent()
   const t = useStrings()
@@ -43,14 +59,39 @@ export function Hero() {
 
 
   const geo = useRing(boxRef, profile.name.length)
-  const link = linkSize(geo.W)
+
+  /*
+    Bağlantılar yayda MAX_SPAN'ı aşmasın (Ring.tsx): önce küçük boy (11), o da
+    sığmazsa ikinci yay — bir satır aşağıda, aynı merkezden.
+  */
+  const rowR = (size: number, row: number) => geo.r + size * 0.75 + row * size * 1.8
+  const fits = (ls: Link[], size: number) =>
+    arcSpan(geo, linkChars(ls), size, LINK_TRACKING, rowR(size, 0)) <= MAX_SPAN
+  const link = fits(links, linkSize(geo.W)) ? linkSize(geo.W) : 11
+  const rows = links.length > 1 && !fits(links, link) ? halves(links) : [links]
+
+  /*
+    Unvan · konum iç yayda: sığmazsa yalnızca unvan, o da sığmazsa kısaltılır.
+    Tam metin görünmez <p>'de (ekran okuyucu).
+  */
+  const eyebrowSize = geo.W < 768 ? (11 * 2) / 3 : 11
+  const maxChars = Math.floor(
+    (MAX_SPAN * (geo.r - INNER_GAP)) / ((geo.adv + EYEBROW_TRACKING) * eyebrowSize),
+  )
+  const full = `${profile.title} · ${profile.location}`
+  const eyebrow =
+    full.length <= maxChars
+      ? full
+      : profile.title.length <= maxChars
+        ? profile.title
+        : `${profile.title.slice(0, maxChars - 1).trimEnd()}…`
 
   /*
     İpucu bağlantı yayının hemen ALTINDA (Oturum 3). Ekranın dibine sabitken
     1024×768, 1280×720, 1366×768'de yaya biniyordu (ölçüldü). Sığmazsa önce
     hareketli çizgisi kalkar, o da sığmazsa gizlenir → Ring.tsx usePlaceBelow.
   */
-  usePlaceBelow(linksRef, hintRef, geo, 'is-compact', [links])
+  usePlaceBelow(linksRef, hintRef, geo, 'is-compact', [links, link, rows.length])
 
   const ids = { top: 'hero-ring-top', inner: 'hero-ring-inner', bottom: 'hero-ring-bottom' }
 
@@ -83,13 +124,15 @@ export function Hero() {
                 <path id={ids.top} d={arc(geo, geo.r, 1)} />
                 <path id={ids.inner} d={arc(geo, geo.r - INNER_GAP, 1)} />
                 {/* Alt yay soldan dipten sağa: harfler dairenin üstünde duruyor, dik. */}
-                <path id={ids.bottom} d={arc(geo, geo.r + link * 0.75, 0)} />
+                {rows.map((_, row) => (
+                  <path key={row} id={`${ids.bottom}-${row}`} d={arc(geo, rowR(link, row), 0)} />
+                ))}
               </defs>
 
               <g className="ring-eyebrow" aria-hidden="true" data-reveal data-i18n-fade>
                 <text>
                   <textPath href={`#${ids.inner}`} startOffset="50%" textAnchor="middle">
-                    {`${profile.title} · ${profile.location}`}
+                    {eyebrow}
                   </textPath>
                 </text>
               </g>
@@ -102,23 +145,25 @@ export function Hero() {
 
               {/* curious.page kuralı 4: iletişim bariz olmalı, aranmamalı. */}
               <g className="ring-links" data-reveal data-i18n-fade>
-                <text ref={linksRef} style={{ fontSize: link }}>
-                  <textPath href={`#${ids.bottom}`} startOffset="50%" textAnchor="middle">
-                    {links.map((l, i) => (
-                      <Fragment key={l.id}>
-                        {i > 0 && <tspan className="ring-sep"> · </tspan>}
-                        <a
-                          href={l.href}
-                          {...(l.href.startsWith('http')
-                            ? { target: '_blank', rel: 'noreferrer noopener' }
-                            : {})}
-                        >
-                          <tspan>{l.label}</tspan>
-                        </a>
-                      </Fragment>
-                    ))}
-                  </textPath>
-                </text>
+                {rows.map((row, r) => (
+                  <text key={r} ref={r === rows.length - 1 ? linksRef : undefined} style={{ fontSize: link }}>
+                    <textPath href={`#${ids.bottom}-${r}`} startOffset="50%" textAnchor="middle">
+                      {row.map((l, i) => (
+                        <Fragment key={l.id}>
+                          {i > 0 && <tspan className="ring-sep"> · </tspan>}
+                          <a
+                            href={l.href}
+                            {...(l.href.startsWith('http')
+                              ? { target: '_blank', rel: 'noreferrer noopener' }
+                              : {})}
+                          >
+                            <tspan>{l.label}</tspan>
+                          </a>
+                        </Fragment>
+                      ))}
+                    </textPath>
+                  </text>
+                ))}
               </g>
             </svg>
 

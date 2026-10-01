@@ -131,6 +131,18 @@ export function useRing(box: RefObject<HTMLElement | null>, sizeChars: number): 
 }
 
 /**
+ * Yay yazısının kaplayabileceği en geniş açı (rad, ~130°). Oturum 6, büyüyen içerik
+ * testi: 8 bağlantı alt yayda ~200° dolanıp tayfın üstüne çıkıyordu, uzun unvan·konum
+ * iç yayın ucundan taşıp kesiliyordu. Bu açıda uçlar yatayın epey içinde kalıyor.
+ */
+export const MAX_SPAN = 2.3
+
+/** Düz (gerilmemiş) yazının `r` yarıçaplı yayda kapladığı açı (rad). `track`: harf aralığı (em). */
+export function arcSpan(geo: RingGeo, chars: number, size: number, track: number, r: number): number {
+  return (chars * (geo.adv + track) * size) / r
+}
+
+/**
  * Yarım daire yolu, soldan sağa. `sweep` 1 → tepeden (saat yönü), 0 → dipten.
  * İkisi de soldan sağa aktığı için harfler her iki yayda da dik okunuyor.
  */

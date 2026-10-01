@@ -141,17 +141,12 @@ temadan (`applyTheme` → `appliedTokens`), içerikten değil — panel sahneyi 
    `components/ring.css`'e taşındı. Panel, sitenin `react`/`gsap` importlarını kendi
    node_modules'una çözüyor (vite `dedupe`, tsconfig `paths`). Tarayıcı MCP'leri yoksa:
    başsız Chrome'u **PowerShell'den** başlat (Bash'ten port açmıyor) + CDP betiği.
-2. **Büyüyen içerik testi bulguları** (prod build, ayrı veritabanı; kullanıcıya rapor
-   verilmedi): ✅ sığmayan slayt alt sayfalara bölünüyor — 10 yetenek grubu: Hakkımda
-   1440×900'de 2, 1366×768'de 3, telefonda 2 sayfa; bölüm gövdesi, uzun e-posta (11 px'e
-   iniyor), İletişim'de 7 bağlantı, uzun menü başlıkları (1440'ta) çalışıyor. ✗ Bölünen
-   slaytta iki sütun tek sütuna düşüyor (sağ yarı boş, gereğinden çok sayfa) · girişte 8
-   bağlantı alt yayda ~200° dolanıyor, "YouTube" tayfın üstüne biniyor → yay açısı sınırı
-   (aşınca 11 px ya da ikinci yay) · uzun unvan·konum iç yayda yataydan aşağı iniyor →
-   açı/uzunluk sınırı · 25 harflik isimde isim VE İletişim başlığı 22 px'e düşüyor
-   (İletişim başlığı ismin uzunluğundan hesaplanıyor). Senaryo betiği yeniden yazılmalı
-   (geçici klasördeydi): A = +6 grup, +3 deneyim, +1 eğitim, +2 bağlantı, 3. bio paragrafı;
-   B = +4 grup, 25 harf isim, uzun unvan/konum/başlıklar, uzun e-posta, 8 bağlantı.
+2. ✅ (Oturum 6) **Büyüyen içerik** — senaryolar kalıcı: `tools/icerik/buyut.mjs` (A/B, ayrı
+   test yığını, CALISTIRMA "Büyüyen içerik testi"). Düzeltildi: bölünen slayt geniş ekranda
+   iki sütunu koruyor (sütunu biten sayfada öbürü tam genişlikte, maddeleri iki sütunda);
+   giriş yaylarına açı sınırı `MAX_SPAN` (~130°, Ring.tsx) — bağlantılar önce 11 px, sonra
+   iki yay; unvan·konum sığmazsa yalnız unvan, o da sığmazsa "…". 25 harflik isim sorun
+   değil (görüldü). Panel girişindeki yakınlaşma takılıyordu → `will-change` (60 fps).
 3. **Beyaz tema** (kullanıcı: back-end'den sonra planlansın; site + panel, farklı estetik,
    prizma temasını koruyan) → önerilen sıra: Faz 7 bitince, Faz 8'den (tema paneli) ÖNCE.
 4. ✅ (Oturum 6) **Performans** — ölçüm betiği `tools/perf/olcum.mjs` (CALISTIRMA "Performans
