@@ -4,7 +4,6 @@ import { useContent } from './content/useContent'
 import { Hero } from './sections/Hero'
 import { About } from './sections/About'
 import { Experience } from './sections/Experience'
-import { Projects } from './sections/Projects'
 import { Contact } from './sections/Contact'
 import { NotFound, NOT_FOUND_LINES } from './sections/NotFound'
 import { SiteHeader } from './components/SiteHeader'
@@ -21,14 +20,10 @@ import { isLab, isNotFound } from './route'
  *
  * Başlıklar ve sıra useContent().sections'tan geliyor — nav ve ray ile AYNI
  * kaynak. Bir bölümün adı değişince üçü birlikte değişir, kaymaz.
- *
- * `projeler` içerikte şu an yok (Oturum 2'de kalktı); eşleme duruyor ki bölüm
- * içeriğe geri eklenince kod değişmeden slayt olarak gelsin.
  */
 const SECTION_COMPONENTS = {
   hakkimda: About,
   deneyim: Experience,
-  projeler: Projects,
   iletisim: Contact,
 } as const
 

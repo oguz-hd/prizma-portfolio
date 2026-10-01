@@ -19,9 +19,6 @@ import { useLocale } from './useLocale'
 const STRINGS = {
   experience: { tr: 'Deneyim', en: 'Experience' },
   education: { tr: 'Eğitim', en: 'Education' },
-  tech: { tr: 'Kullanılan teknolojiler', en: 'Tech used' },
-  source: { tr: 'Kaynak kodu', en: 'Source code' },
-  liveDemo: { tr: 'Canlı demo', en: 'Live demo' },
   emailMe: { tr: 'Bana yaz', en: 'Email me' },
   elsewhere: { tr: 'Başka yerlerde', en: 'Elsewhere' },
   backToTop: { tr: 'Başa dön', en: 'Back to top' },
