@@ -107,7 +107,7 @@ function LoginScreen({ accents, nameChars, onSignedIn }: ScreenProps) {
       events.forEach((ev) => window.removeEventListener(ev, skip, true))
       t.kill()
       // StrictMode'da efekt iki kez kuruluyor: yarıda kalan sahne karanlık kalmasın.
-      Object.assign(scene, { frame: 1, beam: 1, fan: 1, labels: 1, dirty: true })
+      Object.assign(scene, { frame: 1, beam: 1, fan: 1, labels: 1, surge: 0, dirty: true })
     }
   }, [accents])
 

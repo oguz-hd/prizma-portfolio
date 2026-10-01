@@ -830,6 +830,22 @@ html[data-intro='pending'] :is([data-reveal], [data-reveal-panel], [data-reveal-
   backdrop-filter: blur(6px);
 }
 
+/* Hafif kip (zayıf GPU, lite.ts) ve "saydamlığı azalt": bulanıklık yok; zemin
+   biraz daha dolu ki metin prizmanın üstünde okunsun, prizma yine seçilsin. */
+html[data-lite] .panel {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  background: color-mix(in srgb, var(--surface) 66%, transparent);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .panel {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: color-mix(in srgb, var(--surface) 66%, transparent);
+  }
+}
+
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .panel {
     background: var(--surface);

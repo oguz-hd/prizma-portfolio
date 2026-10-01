@@ -14,6 +14,7 @@ import { SlideRail } from './deck/SlideRail'
 import { PrismStage } from './prism/PrismStage'
 import { playIntro } from './prism/intro'
 import { isLab, isNotFound } from './route'
+import { watchFrameRate } from './lite'
 
 /**
  * Bölüm slug'ı → bileşen.
@@ -50,6 +51,8 @@ export function App() {
   useEffect(() => {
     if (!isLab) playIntro()
   }, [])
+
+  useEffect(() => (isLab ? undefined : watchFrameRate()), [])
 
   if (isLab) return <TokenLab />
 

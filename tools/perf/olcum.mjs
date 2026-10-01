@@ -156,6 +156,8 @@ async function profilOlc(p) {
     '--enable-precise-memory-info',
     '--js-flags=--expose-gc',
     ...(p.gpu ? [] : ['--disable-gpu', '--disable-gpu-compositing']),
+    // Yüksek yenileme hızlı ekran taklidi: OLCUM_SINIRSIZ=1 → vsync yok, rAF sınırsız.
+    ...(process.env.OLCUM_SINIRSIZ ? ['--disable-gpu-vsync', '--disable-frame-rate-limit'] : []),
     'about:blank',
   ]
   const chrome = spawn(CHROME, bayraklar, { stdio: 'ignore' })
@@ -278,6 +280,7 @@ async function profilOlc(p) {
     await tus('PageDown', 'PageDown', 34)
     await bekle(2000)
     sonuc.senaryo.icerikBosta = await pencere(8)
+    sonuc.hafifKip = await degerlendir(`'lite' in document.documentElement.dataset`)
 
     // 4b) Teşhis: aynı slayt, pahalı süzgeçlerden biri kapalı — farkı kim yaratıyor?
     const kapat = (css) =>

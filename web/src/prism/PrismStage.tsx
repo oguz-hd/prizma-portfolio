@@ -23,6 +23,17 @@ import {
 import { DIM, SURGE, accentCount, scene } from './scene'
 import './prism.css'
 
+/*
+  Kare sınırı (ölçüldü, CALISTIRMA "Performans ölçümü"): prizma hiç durmadığı için
+  GSAP varsayılanıyla ekranın yenileme hızında çiziliyordu — 240 Hz'de dahili GPU
+  %70-90 doluydu, 60 Hz'de %24-36. Salınım 60'ın üstünde fark edilmiyor.
+  60 değil 74: GSAP bir sonraki kareyi "öncekinden en az 1000/fps ms sonra" diye
+  bekliyor; 60 verilirse 60 Hz ekranda mikrosaniyelik sapma kare atlatır. 74 →
+  60 Hz: 60 · 120/240 Hz: 60 · 144 Hz: 72 · 165 Hz: ~55.
+  Ticker ortak: geçişler ve panel de bu hızda.
+*/
+gsap.ticker.fps(74)
+
 /**
  * ★ Sitenin merkezi: kalıcı prizma sahnesi.
  *

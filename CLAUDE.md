@@ -154,12 +154,17 @@ temadan (`applyTheme` → `appliedTokens`), içerikten değil — panel sahneyi 
    B = +4 grup, 25 harf isim, uzun unvan/konum/başlıklar, uzun e-posta, 8 bağlantı.
 3. **Beyaz tema** (kullanıcı: back-end'den sonra planlansın; site + panel, farklı estetik,
    prizma temasını koruyan) → önerilen sıra: Faz 7 bitince, Faz 8'den (tema paneli) ÖNCE.
+4. ✅ (Oturum 6) **Performans** — ölçüm betiği `tools/perf/olcum.mjs` (CALISTIRMA "Performans
+   ölçümü"). Bulgular: JS belleği 3-4 MB, sızıntı yok, arka plan sekmesi %0 CPU; GPU yükü
+   yenileme hızıyla orantılıydı (240 Hz'de dahili GPU %70-90). Yapılan: `gsap.ticker.fps(74)`
+   (PrismStage.tsx başı, neden 74 orada) · hafif kip `lite.ts` → `html[data-lite]` panelin
+   bulanıklığını kaldırır (GPU'suz cihazda içerik slaytı 41 → 60 fps) + "saydamlığı azalt".
+   Kalan aday: `brand-flow` (navbar, background-position + drop-shadow) ve 60 yıldızın
+   `twinkle`'ı hâlâ ekranın yenileme hızında — kullanıcıya önerildi, yanıt yok.
+   Ucuz telefon profili ölçülemedi (pencere arkada kaldı). `Projects.tsx` silindi (kullanıcı).
 Plan: `C:\Users\drn49\.claude\plans\hadi-back-and-e-hidden-puddle.md`.
 Kullanıcı notu (Claude Docs, API'yi denerken bilinmesi gerekenler):
 https://claude.ai/code/artifact/8a071f83-aa54-4eb2-a4a7-592661b51c62
-
-❓ **Açık karar:** `sections/Projects.tsx` kullanılmıyor (Projeler slaytı Oturum 2'de
-kalktı; proje kayıtları içerikte duruyor). Silinsin mi? Kullanıcıya soruldu, yanıt yok.
 
 **GitHub:** özel depo `github.com/oguz-hd/prizma-portfolio`; `master` →
 `origin/master`. `git push` doğrudan çalışıyor (kimlik Git Credential Manager'da).

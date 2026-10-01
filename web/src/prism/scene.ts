@@ -63,7 +63,8 @@ export function accentCount(): number {
 
 /** Açılış öncesi: her şey karanlık. main.tsx mount'tan ÖNCE çağırıyor — ilk karede tam prizma parlamasın. */
 export function darkenScene(): void {
-  Object.assign(scene, { frame: 0, beam: 0, fan: 0, labels: 0, focus: 0, dirty: true })
+  // surge da: panelde girişin dalgası 1'de bırakıyor, çıkışta açılış yeniden kuruluyor.
+  Object.assign(scene, { frame: 0, beam: 0, fan: 0, labels: 0, focus: 0, surge: 0, dirty: true })
 }
 
 /**

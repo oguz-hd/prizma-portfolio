@@ -251,3 +251,6 @@ Sonuçlar `tools/perf/sonuclar/` (git'e girmiyor). Ölçerken Chrome penceresini
 örtme/küçültme — sekme gizlenirse rAF durur, betik o profili "görünür değil" diye atlar.
 ⚠️ Chrome bu makinede dahili **Radeon 610M**'yi seçiyor (RTX değil) ve ekranın yenileme
 hızında (60 ya da 240 Hz) çiziyor — GPU yükü yenileme hızıyla orantılı; karşılaştırırken bak.
+`OLCUM_SINIRSIZ=1` vsync'i kapatır (yüksek yenileme taklidi) ama betiğin kendi rAF döngüsü
+saniyede ~1500 kare ürettirir → CPU/GPU rakamları anlamsızlaşır; yalnızca "prizma saniyede
+kaç kez çiziliyor" gibi sayımlar için (Oturum 6: 1134 rAF'ta 74 çizim).

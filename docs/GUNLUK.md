@@ -61,3 +61,7 @@ uzunluğundan); form alt alta, prizma biraz yukarıda. Yanlış parola tayfta "4
 anında sahne tayfın içine yakınlaşıp ekranı sarıyor, aynı renkte örtü panelin üstünde
 söner. Giriş ekranı sitenin seçili paletinde (herkese açık `/api/content`), panel Tayf'ta.
 Tarayıcı MCP'leri bağlanmadı: doğrulama, PowerShell'den başlatılan başsız Chrome + CDP betiğiyle.
+Oturum 6 sonu: ilk performans ölçümü (`tools/perf/olcum.mjs`, dört cihaz profili). Bellek
+sorunsuz; asıl yük GPU'daydı ve ekranın yenileme hızıyla büyüyordu — prizma 74 fps'e
+sınırlandı, zayıf GPU'da cam panelin bulanıklığı kendiliğinden kalkıyor (`html[data-lite]`).
+Kod incelemesinin tek bulgusu düzeltildi: panelde çıkıştan sonra `scene.surge` 1'de kalıyordu.
