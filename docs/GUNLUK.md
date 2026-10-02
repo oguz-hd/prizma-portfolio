@@ -73,4 +73,8 @@ Güvenlik taraması (Oturum 6 sonu): kimlik denetiminden önce gövde okunuyordu
 yükleme bağlantıyı askıda bırakıyordu — sınır API'ye (gövde okunmadan) taşındı. Dev portları
 yerele, API yayında root değil, belgeler kapalı. Yayın yığınının kopyasında uçtan uca, tarayıcı ve
 Lighthouse testleri; bulunan gerileme: panel girişi korumalı adrese gidiyordu (düzeldi).
-
+Oturum 7 (02.10.2026): site yayında — https://oguzhd.com. Önce yayın öncesi kontrol listesi kodla
+karşılaştırıldı (güvenlik çoğu tamam; httpOnly çerez, IP kilidi, sitemap/canonical/llms.txt yok, 404
+200 dönüyor). Hetzner'de ucuz tip stokta olmadığından DigitalOcean (1 GB + swap; derleme 94 sn).
+Kullanıcı öğrenmek için sunucu komutlarını kendisi yazdı; Claude anlatıp ssh ile doğruladı.
+İçerik temiz başladı (dev içeriği taşınmadı); canlıda uçtan uca 26/26.
