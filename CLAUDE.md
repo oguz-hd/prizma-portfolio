@@ -82,7 +82,7 @@ bunlar değişince panelin kapıları da çalıştırılır.
 13. **Prizma fareye bağlı DEĞİL** — hareketi kendi hâlinde (salınım + ışık darbeleri);
     mobilde de aynı görünmeli (kullanıcı kararı, Oturum 2).
 
-## Durum · 01.10.2026
+## Durum · 02.10.2026
 
 ✅ **v1** (Oturum 1) — iskele · taşınan katmanlar · prizma sahnesi · açılış ·
 slayt gösterisi · cam panel · ray · 404 nm · favicon · API kopyası.
@@ -167,8 +167,15 @@ temadan (`applyTheme` → `appliedTokens`), içerikten değil — panel sahneyi 
 6. ⏭ **Yayına hazırlık** (Oturum 6, sürüyor) — ✅ `/data/site.db` herkese açık indiriliyordu →
    Caddy `/data/*` 404 · ✅ güvenlik başlıkları + CSP (ihlal yok, ölçüldü) · ✅ giriş sınırı
    (`throttle.py`, 5/15 dk/IP) · ✅ günlük yedek servisi (`tools/yedek/yedekle.sh`) · ✅ pytest 18.
-   ⏸ Barındırma + alan adı: kullanıcı "şimdilik yayınlama" dedi (01.10.2026), alan adı yok.
-   Önerilen: Hetzner VPS (compose olduğu gibi) + Cloudflare Registrar. Sonra: sunucu dışı yedek.
+   ⏭ **Barındırma (02.10.2026, sürüyor — kullanıcı "adım adım" istiyor):** alan adı **oguzhd.com**
+   Cloudflare Registrar'dan ALINDI (kısa olsun: site GitHub/LinkedIn'den tıklanarak açılacak).
+   SSH anahtarı üretildi: `~/.ssh/prizma_hetzner` (parolasız, Claude'un bağlanması için).
+   Sırada: kullanıcı Hetzner hesabı + CX22 (Ubuntu 24.04, Nuremberg/Falkenstein, bu açık anahtarla)
+   → IP → sertleştirme → Docker → deploy key + clone → DNS (gri bulut; www → apex Cloudflare
+   kuralıyla) → boş içerikle ilk yayın + `tools/yayin` testleri → dev içeriğini taşı (hesap e-posta/
+   parolası tek seferlik ayarlanır) → CALISTIRMA. Plan: `~/.claude/plans/o-zman-clever-taco.md`.
+   Sonra: kontrol listesi (02.10.2026 — 404 durum kodu, sabit favicon, llms.txt, alt metin, token
+   süresi; alan adıyla sitemap, canonical, og:url) ve sunucu dışı yedek (Hetzner Backups önerildi).
 7. ✅ (Oturum 6) **Güvenlik taraması + yayın öncesi testler** (kullanıcı isteği) — rapor:
    https://claude.ai/code/artifact/b63b856b-06fa-4ae0-948f-e70fbed95811 · 1 kritik (/data/site.db,
    daha önce kapandı), 2 yüksek (kimlikten önce gövde okuma, sınırda asılı kalan yükleme), orta/düşükler;
