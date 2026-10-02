@@ -129,6 +129,68 @@ volume ortak olduğundan dev'de değişen parola prod'da da geçerli.
 
 ---
 
+## Yayın (sunucu) — https://oguzhd.com
+
+Kuruldu: 02.10.2026 (Oturum 7). Komutları kullanıcı kendisi yazdı; kurulum adımları aşağıda,
+yeniden kurmak gerekirse aynı sırayla.
+
+| Ne | Değer |
+|---|---|
+| Sunucu | DigitalOcean droplet `prizma`, Frankfurt (FRA1), 1 vCPU / 1 GB RAM / 25 GB, Ubuntu 24.04 |
+| Adres | `142.93.162.220` · `2a03:b0c0:3:f0:0:3:b8e:e000` |
+| Alan adı | `oguzhd.com`, Cloudflare Registrar; DNS Cloudflare'de |
+| Kod | `/opt/prizma-portfolio` (GitHub deploy key, salt okunur: `~/.ssh/github_deploy`) |
+| Gizli ayarlar | `/opt/prizma-portfolio/.env` (600) — `DOMAIN`, `ADMIN_EMAIL`, `JWT_SECRET`, `ADMIN_PASSWORD` |
+| Veri | Docker volume `prizma-portfolio_data` → `/var/lib/docker/volumes/prizma-portfolio_data/_data` |
+
+**Erişim** (bilgisayardan): `ssh prizma` — `~/.ssh/config`'te `HostName 142.93.162.220`,
+`User oguz`, `IdentityFile ~/.ssh/prizma_sunucu` (parolasız anahtar). Root ve parolayla giriş kapalı.
+
+**Güncelleme** (kod push edildikten sonra):
+```bash
+ssh prizma
+cd /opt/prizma-portfolio && git pull
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build   # ~1,5 dk
+```
+Veri volume'da — container yeniden kurulsa da kalır. ⚠️ Sunucuda **asla `down -v`** (volume'u siler).
+
+**Kayıtlar / durum:**
+```bash
+docker compose -f docker-compose.yml -f docker-compose.prod.yml ps
+docker compose -f docker-compose.yml -f docker-compose.prod.yml logs -f web   # Caddy, sertifika
+docker compose -f docker-compose.yml -f docker-compose.prod.yml logs -f api
+```
+
+**Canlı test** (bilgisayardan; parola sunucudan, ekrana yazılmadan — kayıt açıp siler, parolayı geri alır):
+```bash
+ADMIN_EMAIL=drn4902@gmail.com ADMIN_PASSWORD="$(ssh prizma "grep '^ADMIN_PASSWORD=' /opt/prizma-portfolio/.env | cut -d= -f2-")" node tools/yayin/uctan-uca.mjs https://oguzhd.com
+```
+
+**Kurulum adımları** (sırasıyla): `apt update && apt upgrade` + reboot → `adduser oguz`,
+`usermod -aG sudo,docker`, root'un `.ssh`'ı kopyalandı → `/etc/ssh/sshd_config.d/00-sertlestirme.conf`
+(`PermitRootLogin no`, `PasswordAuthentication no`, `KbdInteractiveAuthentication no`; `00-` çünkü
+sshd ilk okunan değeri kullanıyor, DO'nun `50-cloud-init.conf`'unu geçsin) → `ufw allow OpenSSH, 80,
+443` + `enable` → 2 GB `/swapfile` (+ fstab) → `timedatectl set-timezone Europe/Istanbul` → Docker
+resmî apt deposundan → deploy key + clone → `.env` (`openssl rand -hex 32`, parola
+`openssl rand -base64 18 | tr -d '/+='`) → DNS → `up -d --build`. Otomatik güvenlik güncellemeleri
+(`unattended-upgrades`) Ubuntu'da hazır açık.
+
+**DNS (Cloudflare):** `A @ → 142.93.162.220` ve `AAAA @ → 2a03:…` **DNS only (gri)** — turuncu
+bulutta Caddy istemci IP'sini göremez, giriş sınırı (`throttle.py`) herkesi tek IP sayar.
+`CNAME www → oguzhd.com` **Proxied** + Redirect Rule (`http.host eq "www.oguzhd.com"` →
+`concat("https://oguzhd.com", http.request.uri.path)`, 301, sorgu korunur) — www sunucuya hiç gelmez.
+
+**Yedek:** günlük, aynı volume'da (aşağıdaki "Yedek"). Sunucu dışı kopya YOK — kullanıcı kararı
+(02.10.2026, içerik az). Droplet silinirse içerik gider; içerik birikince DigitalOcean Backups
+(~%20) ya da yedeği bilgisayara çekmek.
+
+İçerik temiz başladı (seed). Bilgisayardaki dev volume'u taşımak gerekirse: dev API durmuşken
+`site.db` + `uploads/` arşivlenip sunucuda `api` durdurularak volume'a açılır; dev hesabı
+`degistir` parolalı olduğundan API açılmaz → hesap `docker compose … run --rm api python -c …`
+ile (`app.auth.hash_password`) `.env`'deki e-posta/parolaya çekilir.
+
+---
+
 ## Telefonda deneme (geçici yayın)
 
 Kalıcı yayın yok; telefonda denemek için site Cloudflare'in hızlı tüneliyle geçici bir

@@ -82,7 +82,7 @@ bunlar değişince panelin kapıları da çalıştırılır.
 13. **Prizma fareye bağlı DEĞİL** — hareketi kendi hâlinde (salınım + ışık darbeleri);
     mobilde de aynı görünmeli (kullanıcı kararı, Oturum 2).
 
-## Durum · 02.10.2026
+## Durum · 02.10.2026 (yayında)
 
 ✅ **v1** (Oturum 1) — iskele · taşınan katmanlar · prizma sahnesi · açılış ·
 slayt gösterisi · cam panel · ray · 404 nm · favicon · API kopyası.
@@ -164,23 +164,16 @@ temadan (`applyTheme` → `appliedTokens`), içerikten değil — panel sahneyi 
    zaman çizelgesi, projeler, duyuru, galeri), projeler ve medya sayfaları, fotoğraf yükleme
    (EXIF/GPS silinir, WebP), bileşeni TÜR seçiyor, göç düzeni + pytest. Görünüş A1·B2·L1·C2·D2
    (DESIGN § 14). Kararlar ARCHITECTURE § 6. Test yığını/senaryo C → CALISTIRMA.
-6. ⏭ **Yayına hazırlık** (Oturum 6, sürüyor) — ✅ `/data/site.db` herkese açık indiriliyordu →
-   Caddy `/data/*` 404 · ✅ güvenlik başlıkları + CSP (ihlal yok, ölçüldü) · ✅ giriş sınırı
-   (`throttle.py`, 5/15 dk/IP) · ✅ günlük yedek servisi (`tools/yedek/yedekle.sh`) · ✅ pytest 18.
-   ⏭ **Barındırma (02.10.2026, sürüyor — kullanıcı "adım adım" istiyor):** alan adı **oguzhd.com**
-   Cloudflare Registrar'dan ALINDI (kısa olsun: site GitHub/LinkedIn'den tıklanarak açılacak).
-   **Sunucu: DigitalOcean** (Hetzner'de ucuz tip stokta yoktu) — droplet `prizma`, Frankfurt,
-   1 vCPU / 1 GB + 2 GB swap, Ubuntu 24.04, `142.93.162.220` / `2a03:b0c0:3:f0:0:3:b8e:e000`.
-   Erişim: `ssh prizma` (bilgisayarda `~/.ssh/config` → kullanıcı `oguz`, anahtar `~/.ssh/prizma_sunucu`).
-   ✅ güncelleme · `oguz` (sudo, docker) · root ve parolayla giriş kapalı
-   (`/etc/ssh/sshd_config.d/00-sertlestirme.conf`) · ufw 22/80/443 · swap · Europe/Istanbul ·
-   Docker (resmî depo) · GitHub deploy key (salt okunur, sunucuda `~/.ssh/github_deploy`).
-   **Kullanıcı komutları kendisi yazıyor (öğrenmek için)** — Claude anlatır, salt okunur ssh ile doğrular.
-   Sırada: `/opt/prizma-portfolio`'ya clone → `.env` (sunucuda üretilir) → DNS (gri bulut; www → apex
-   Cloudflare kuralıyla) → boş içerikle ilk yayın + `tools/yayin` testleri → dev içeriğini taşı (hesap
-   e-posta/parolası tek seferlik ayarlanır) → CALISTIRMA. Plan: `~/.claude/plans/o-zman-clever-taco.md`.
-   Sonra: kontrol listesi (02.10.2026 — 404 durum kodu, sabit favicon, llms.txt, alt metin, token
-   süresi; alan adıyla sitemap, canonical, og:url) ve sunucu dışı yedek (DigitalOcean Backups ya da sunucu dışı kopya).
+6. ✅ **Yayında: https://oguzhd.com** (Oturum 7, 02.10.2026) — DigitalOcean droplet (Frankfurt,
+   1 GB + swap), Cloudflare'de alan adı (DNS gri bulut, www → apex Cloudflare kuralıyla), Let's
+   Encrypt Caddy'de. Canlıda `uctan-uca` 26/26. İçerik TEMİZ başladı (seed; dev içeriği taşınmadı —
+   kullanıcı "önemli değil"); içerik artık yalnızca canlı panelden. Sunucu dışı yedek yok
+   (kullanıcı: "o kadar yedeklik bir şey yok") — içerik birikince yeniden sor. Sunucu, erişim,
+   güncelleme → CALISTIRMA "Yayın (sunucu)". **Sunucu işlerini kullanıcı kendisi yazıyor**
+   (öğrenmek için) — Claude adım adım anlatır, `ssh prizma` ile salt okunur doğrular.
+   ⏭ Sırada: kontrol listesi (02.10.2026) — 404 durum kodu (bilinmeyen yol 200 dönüyor), sabit
+   favicon, llms.txt, alt metin zorunlu/uyarı, token süresi; alan adıyla sitemap, canonical, og:url
+   (+ og:image). Kullanıcı kararı bekleyenler: httpOnly çerez, panel IP kilidi, analytics + gizlilik, CTA.
 7. ✅ (Oturum 6) **Güvenlik taraması + yayın öncesi testler** (kullanıcı isteği) — rapor:
    https://claude.ai/code/artifact/b63b856b-06fa-4ae0-948f-e70fbed95811 · 1 kritik (/data/site.db,
    daha önce kapandı), 2 yüksek (kimlikten önce gövde okuma, sınırda asılı kalan yükleme), orta/düşükler;
