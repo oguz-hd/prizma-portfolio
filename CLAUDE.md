@@ -169,13 +169,18 @@ temadan (`applyTheme` → `appliedTokens`), içerikten değil — panel sahneyi 
    (`throttle.py`, 5/15 dk/IP) · ✅ günlük yedek servisi (`tools/yedek/yedekle.sh`) · ✅ pytest 18.
    ⏭ **Barındırma (02.10.2026, sürüyor — kullanıcı "adım adım" istiyor):** alan adı **oguzhd.com**
    Cloudflare Registrar'dan ALINDI (kısa olsun: site GitHub/LinkedIn'den tıklanarak açılacak).
-   SSH anahtarı üretildi: `~/.ssh/prizma_hetzner` (parolasız, Claude'un bağlanması için).
-   Sırada: kullanıcı Hetzner hesabı + CX22 (Ubuntu 24.04, Nuremberg/Falkenstein, bu açık anahtarla)
-   → IP → sertleştirme → Docker → deploy key + clone → DNS (gri bulut; www → apex Cloudflare
-   kuralıyla) → boş içerikle ilk yayın + `tools/yayin` testleri → dev içeriğini taşı (hesap e-posta/
-   parolası tek seferlik ayarlanır) → CALISTIRMA. Plan: `~/.claude/plans/o-zman-clever-taco.md`.
+   **Sunucu: DigitalOcean** (Hetzner'de ucuz tip stokta yoktu) — droplet `prizma`, Frankfurt,
+   1 vCPU / 1 GB + 2 GB swap, Ubuntu 24.04, `142.93.162.220` / `2a03:b0c0:3:f0:0:3:b8e:e000`.
+   Erişim: `ssh prizma` (bilgisayarda `~/.ssh/config` → kullanıcı `oguz`, anahtar `~/.ssh/prizma_sunucu`).
+   ✅ güncelleme · `oguz` (sudo, docker) · root ve parolayla giriş kapalı
+   (`/etc/ssh/sshd_config.d/00-sertlestirme.conf`) · ufw 22/80/443 · swap · Europe/Istanbul ·
+   Docker (resmî depo) · GitHub deploy key (salt okunur, sunucuda `~/.ssh/github_deploy`).
+   **Kullanıcı komutları kendisi yazıyor (öğrenmek için)** — Claude anlatır, salt okunur ssh ile doğrular.
+   Sırada: `/opt/prizma-portfolio`'ya clone → `.env` (sunucuda üretilir) → DNS (gri bulut; www → apex
+   Cloudflare kuralıyla) → boş içerikle ilk yayın + `tools/yayin` testleri → dev içeriğini taşı (hesap
+   e-posta/parolası tek seferlik ayarlanır) → CALISTIRMA. Plan: `~/.claude/plans/o-zman-clever-taco.md`.
    Sonra: kontrol listesi (02.10.2026 — 404 durum kodu, sabit favicon, llms.txt, alt metin, token
-   süresi; alan adıyla sitemap, canonical, og:url) ve sunucu dışı yedek (Hetzner Backups önerildi).
+   süresi; alan adıyla sitemap, canonical, og:url) ve sunucu dışı yedek (DigitalOcean Backups ya da sunucu dışı kopya).
 7. ✅ (Oturum 6) **Güvenlik taraması + yayın öncesi testler** (kullanıcı isteği) — rapor:
    https://claude.ai/code/artifact/b63b856b-06fa-4ae0-948f-e70fbed95811 · 1 kritik (/data/site.db,
    daha önce kapandı), 2 yüksek (kimlikten önce gövde okuma, sınırda asılı kalan yükleme), orta/düşükler;

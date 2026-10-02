@@ -12,6 +12,8 @@ data/
 *.db
 *.db-wal
 *.db-shm
+# elle alınmış veritabanı yedekleri (ör. prizma-site.db.yedek-2026-10-01)
+*.yedek-*
 
 # ortam değişkenleri (.env.example commit edilir, .env edilmez)
 .env
