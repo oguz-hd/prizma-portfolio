@@ -1,6 +1,15 @@
-import { Fragment, useRef } from 'react'
+import { useRef } from 'react'
 
-import { INNER_GAP, MAX_SPAN, RingTitle, arc, arcSpan, usePlaceBelow, useRing } from '../components/Ring'
+import {
+  INNER_GAP,
+  MAX_SPAN,
+  RingLinks,
+  RingTitle,
+  arc,
+  arcSpan,
+  usePlaceBelow,
+  useRing,
+} from '../components/Ring'
 import type { Link } from '../content/types'
 import { useContent } from '../content/useContent'
 import { useStrings } from '../i18n/strings'
@@ -54,7 +63,7 @@ export function Hero() {
   const { profile, links } = useContent()
   const t = useStrings()
   const boxRef = useRef<HTMLDivElement>(null)
-  const linksRef = useRef<SVGTextElement>(null)
+  const linksRef = useRef<SVGGElement>(null)
   const hintRef = useRef<HTMLParagraphElement>(null)
 
 
@@ -146,23 +155,16 @@ export function Hero() {
               {/* curious.page kuralı 4: iletişim bariz olmalı, aranmamalı. */}
               <g className="ring-links" data-reveal data-i18n-fade>
                 {rows.map((row, r) => (
-                  <text key={r} ref={r === rows.length - 1 ? linksRef : undefined} style={{ fontSize: link }}>
-                    <textPath href={`#${ids.bottom}-${r}`} startOffset="50%" textAnchor="middle">
-                      {row.map((l, i) => (
-                        <Fragment key={l.id}>
-                          {i > 0 && <tspan className="ring-sep"> · </tspan>}
-                          <a
-                            href={l.href}
-                            {...(l.href.startsWith('http')
-                              ? { target: '_blank', rel: 'noreferrer noopener' }
-                              : {})}
-                          >
-                            <tspan>{l.label}</tspan>
-                          </a>
-                        </Fragment>
-                      ))}
-                    </textPath>
-                  </text>
+                  <RingLinks
+                    key={r}
+                    ref={r === rows.length - 1 ? linksRef : undefined}
+                    geo={geo}
+                    path={`${ids.bottom}-${r}`}
+                    r={rowR(link, r)}
+                    size={link}
+                    track={LINK_TRACKING}
+                    links={row}
+                  />
                 ))}
               </g>
             </svg>

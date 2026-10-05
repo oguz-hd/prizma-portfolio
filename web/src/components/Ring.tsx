@@ -1,4 +1,11 @@
-import { useLayoutEffect, useState, type DependencyList, type RefObject } from 'react'
+import {
+  useLayoutEffect,
+  useState,
+  type DependencyList,
+  type ReactNode,
+  type Ref,
+  type RefObject,
+} from 'react'
 
 import './ring.css'
 
@@ -176,6 +183,75 @@ export function RingTitle({ geo, path, text }: { geo: RingGeo; path: string; tex
   )
 }
 
+export type RingLink = { id: string; href: string; label: string }
+
+/**
+ * Yaydaki bağlantılar (alt yaylar) — her bağlantı KENDİ `<a><text>`'i.
+ *
+ * ⚠️ Eskiden tek `<text>` → `<textPath>` → `<a>` → `<tspan>` idi. WebKit (Safari,
+ * iPhone) isabeti `<text>`'te bırakıp içteki `<a>`'ya hiç indirmiyor: Safari'de
+ * bağlantıların hiçbiri tıklanmıyordu (canlıda 0/6, `tools/safari/tikla.mjs`,
+ * 05.10.2026). `<text>`'e pointer-events vermek yetmedi — isabet `<text>`'te kaldı.
+ * `<a>` dışta olunca her tarayıcı aynı.
+ *
+ * Yer elle: Departure Mono eş aralıklı, her harf `(adv + track) × size` px. Satır
+ * yarım dairenin (boyu πr) ortasına; ayraç " · " üç harflik yer, nokta ortada.
+ * `track`, CSS'teki harf aralığıyla aynı olmalı (theme.css → .ring-links text).
+ */
+export function RingLinks({
+  geo,
+  path,
+  r,
+  size,
+  track,
+  links,
+  ref,
+}: {
+  geo: RingGeo
+  /** Yayın <path> kimliği (# olmadan). */
+  path: string
+  /** O yayın yarıçapı. */
+  r: number
+  size: number
+  track: number
+  links: RingLink[]
+  /** Satırın kabı — usePlaceBelow ölçüyor. */
+  ref?: Ref<SVGGElement>
+}) {
+  const charW = (geo.adv + track) * size
+  const chars = links.reduce((n, l) => n + l.label.length, 0) + 3 * (links.length - 1)
+  // Son harfin ardındaki aralık görünmüyor — ortalamada sayılmasın.
+  let at = (Math.PI * r - chars * charW + track * size) / 2
+  const parts: ReactNode[] = []
+  links.forEach((l, i) => {
+    if (i > 0) {
+      parts.push(
+        <text key={`${l.id}-sep`} className="ring-sep" aria-hidden="true" style={{ fontSize: size }}>
+          <textPath href={`#${path}`} startOffset={at + charW}>
+            ·
+          </textPath>
+        </text>,
+      )
+      at += 3 * charW
+    }
+    parts.push(
+      <a
+        key={l.id}
+        href={l.href}
+        {...(l.href.startsWith('http') ? { target: '_blank', rel: 'noreferrer noopener' } : {})}
+      >
+        <text style={{ fontSize: size }}>
+          <textPath href={`#${path}`} startOffset={at}>
+            {l.label}
+          </textPath>
+        </text>
+      </a>,
+    )
+    at += l.label.length * charW
+  })
+  return <g ref={ref}>{parts}</g>
+}
+
 /** Dairenin altındaki öğenin yaydan ve ekranın dibinden uzaklığı (px). */
 const BELOW_GAP = 16
 
@@ -186,7 +262,7 @@ const BELOW_GAP = 16
  * getBBox: açılışın kaydırması (üst <g>'deki transform) ölçüme girmiyor.
  */
 export function usePlaceBelow(
-  text: RefObject<SVGTextElement | null>,
+  text: RefObject<SVGGraphicsElement | null>,
   el: RefObject<HTMLElement | null>,
   geo: RingGeo,
   compact: string | null,

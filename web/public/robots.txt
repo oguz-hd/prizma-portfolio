@@ -1,4 +1,0 @@
-# Bütün site taranabilir. Yönetim paneli X-Robots-Tag: noindex ile dizine girmiyor (Caddyfile);
-# burada Disallow edilmiyor: engellenen sayfa taranamaz, noindex'i de görülemez.
-User-agent: *
-Allow: /

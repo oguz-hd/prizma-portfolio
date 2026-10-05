@@ -1,6 +1,6 @@
-import { Fragment, useRef } from 'react'
+import { useRef } from 'react'
 
-import { INNER_GAP, RingTitle, arc, usePlaceBelow, useRing } from '../components/Ring'
+import { INNER_GAP, RingLinks, RingTitle, arc, usePlaceBelow, useRing } from '../components/Ring'
 import { SiteFooter } from '../components/SiteFooter'
 import { useContent } from '../content/useContent'
 import { useStrings } from '../i18n/strings'
@@ -27,8 +27,8 @@ import type { SectionProps } from './Section'
 
 /** Alt yaydaki e-posta: 22 px, yayın ~85°'sinden fazlasını kaplayacaksa 11 px. */
 const MAIL = { big: 22, small: 11 }
-/** E-postanın harf aralığı (em) — theme.css → .ring-links text ile aynı. */
-const MAIL_TRACKING = 0.04
+/** Bağlantıların harf aralığı (em) — theme.css → .ring-links text ile aynı. */
+const LINK_TRACKING = 0.04
 /** Alt iç yaydaki GitHub · LinkedIn. */
 const SOCIAL = 11
 
@@ -36,7 +36,7 @@ export function Contact({ id, heading }: SectionProps) {
   const { profile, links } = useContent()
   const t = useStrings()
   const boxRef = useRef<HTMLDivElement>(null)
-  const mailRef = useRef<SVGTextElement>(null)
+  const mailRef = useRef<SVGGElement>(null)
   const footerRef = useRef<HTMLElement>(null)
   const titleId = `${id}-title`
 
@@ -48,8 +48,9 @@ export function Contact({ id, heading }: SectionProps) {
   // Büyük boyda adres, ÇİZİLDİĞİ yayın (r + boy × 0.75) ~85°'sinden fazlasını
   // kaplıyorsa küçük boy — uçtaki harfler dikleşmesin.
   const span = (size: number) =>
-    (address.length * (geo.adv + MAIL_TRACKING) * size) / (geo.r + size * 0.75)
+    (address.length * (geo.adv + LINK_TRACKING) * size) / (geo.r + size * 0.75)
   const mail = span(MAIL.big) < 1.5 ? MAIL.big : MAIL.small
+  const mailR = geo.r + mail * 0.75
   usePlaceBelow(mailRef, footerRef, geo, null, [mail, address])
 
   const ids = {
@@ -74,7 +75,7 @@ export function Contact({ id, heading }: SectionProps) {
               <path id={ids.top} d={arc(geo, geo.r, 1)} />
               <path id={ids.inner} d={arc(geo, geo.r - INNER_GAP, 1)} />
               {/* Alt yaylar soldan dipten sağa: harfler dairenin üstünde duruyor, dik. */}
-              <path id={ids.bottom} d={arc(geo, geo.r + mail * 0.75, 0)} />
+              <path id={ids.bottom} d={arc(geo, mailR, 0)} />
               <path id={ids.innerBottom} d={arc(geo, geo.r - INNER_GAP, 0)} />
             </defs>
 
@@ -92,34 +93,27 @@ export function Contact({ id, heading }: SectionProps) {
 
             {email && (
               <g className="ring-links" data-reveal data-i18n-fade>
-                <text ref={mailRef} style={{ fontSize: mail }}>
-                  <textPath href={`#${ids.bottom}`} startOffset="50%" textAnchor="middle">
-                    <a href={email.href}>
-                      <tspan>{address}</tspan>
-                    </a>
-                  </textPath>
-                </text>
+                <RingLinks
+                  ref={mailRef}
+                  geo={geo}
+                  path={ids.bottom}
+                  r={mailR}
+                  size={mail}
+                  track={LINK_TRACKING}
+                  links={[{ id: email.id, href: email.href, label: address }]}
+                />
               </g>
             )}
 
             <g className="ring-links" data-reveal data-i18n-fade>
-              <text style={{ fontSize: SOCIAL }}>
-                <textPath href={`#${ids.innerBottom}`} startOffset="50%" textAnchor="middle">
-                  {others.map((l, i) => (
-                    <Fragment key={l.id}>
-                      {i > 0 && <tspan className="ring-sep"> · </tspan>}
-                      <a
-                        href={l.href}
-                        {...(l.href.startsWith('http')
-                          ? { target: '_blank', rel: 'noreferrer noopener' }
-                          : {})}
-                      >
-                        <tspan>{l.label}</tspan>
-                      </a>
-                    </Fragment>
-                  ))}
-                </textPath>
-              </text>
+              <RingLinks
+                geo={geo}
+                path={ids.innerBottom}
+                r={geo.r - INNER_GAP}
+                size={SOCIAL}
+                track={LINK_TRACKING}
+                links={others}
+              />
             </g>
           </svg>
 

@@ -681,12 +681,17 @@ html[data-intro='pending'] :is([data-reveal], [data-reveal-panel], [data-reveal-
 }
 
 .ring-links text {
-  fill: var(--ink-faint);
   letter-spacing: 0.04em;
 }
 
+/* Bağlantılar arasındaki nokta — ayrı <text>, tıklanmıyor (.ring'den none). */
+.ring-links .ring-sep {
+  fill: var(--ink-faint);
+}
+
 /* Görünmez kalın çerçeve = dokunma alanı: 11px yazı parmağa küçük. Saydam
-   çizgi de isabet testine giriyor (pointer-events: visible). */
+   çizgi de isabet testine giriyor (pointer-events: visible). Renk, çizgi ve
+   pointer-events içteki <text>'e miras (Ring.tsx → RingLinks: <a> dışta). */
 .ring-links a {
   pointer-events: visible;
   fill: var(--lead);
@@ -698,8 +703,12 @@ html[data-intro='pending'] :is([data-reveal], [data-reveal-panel], [data-reveal-
 .ring-links a:hover,
 .ring-links a:focus-visible {
   fill: var(--ink);
-  text-decoration: underline;
   outline: none;
+}
+
+.ring-links a:hover text,
+.ring-links a:focus-visible text {
+  text-decoration: underline;
 }
 
 .hero-hint {
