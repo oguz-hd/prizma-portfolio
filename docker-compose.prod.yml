@@ -31,6 +31,9 @@ services:
       # Uygulama verisi. Salt okunur: Caddy yalnızca OKUR (content.json, uploads).
       # Yazan taraf Faz 5'teki API olacak.
       - data:/srv/data:ro
+      # Proje sayfaları: her biri kendi deposundan sunucuda /opt/sites/<ad>'a çekiliyor
+      # (Caddyfile → `import /srv/sites/*/Caddyfile`). Salt okunur.
+      - /opt/sites:/srv/sites:ro
       # Caddy'nin kendi deposu (TLS sertifikaları). Uygulama verisinden AYRI tutuluyor:
       # caddy imajı /data'yı kendi deposu olarak kullanıyor, çakışmasın.
       - caddy_data:/data

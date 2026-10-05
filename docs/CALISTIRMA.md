@@ -191,6 +191,46 @@ ile (`app.auth.hash_password`) `.env`'deki e-posta/parolaya çekilir.
 
 ---
 
+## Proje sayfaları (/opt/sites) — proje.oguzhd.com
+
+Diğer projelerin sayfaları bu depoda DEĞİL; her biri kendi deposundan gelir. Sunucudaki tek
+Caddy (bu deponun `web` konteyneri) `/opt/sites/*/Caddyfile` dosyalarını içe alır
+(Caddyfile başı + docker-compose.prod.yml'deki `/opt/sites:/srv/sites:ro`).
+
+Her projenin deposunda bir **`site` dalı**: yalnızca derlenmiş çıktı — `Caddyfile` (kendi alt
+alanı, kendi başlıkları) + `public/` (sunulan klasör; `.git` ve Caddyfile dışarıda kalır).
+
+| Proje | Adres | Klasör | Depo |
+|---|---|---|---|
+| Tiny Roamers | https://tinyroamers.oguzhd.com | `/opt/sites/tinyroamers` | `oguz-hd/tinyroamers` (`site` dalı, `npm run site`) |
+
+**Yeni proje eklemek** (bir kez):
+1. Cloudflare DNS: `A <ad> → 142.93.162.220`, `AAAA <ad> → 2a03:b0c0:3:f0:0:3:b8e:e000`, **DNS only (gri)**.
+2. Sunucuda deploy key (depo özelse; GitHub'da bir anahtar yalnızca bir depoya bağlanır):
+   ```bash
+   ssh-keygen -t ed25519 -f ~/.ssh/<ad>_deploy -N "" -C "prizma → <ad> (salt okunur)"
+   cat ~/.ssh/<ad>_deploy.pub     # GitHub → depo → Settings → Deploy keys → Add (yazma izni YOK)
+   printf '
+Host github-<ad>
+  HostName github.com
+  User git
+  IdentityFile ~/.ssh/<ad>_deploy
+  IdentitiesOnly yes
+' >> ~/.ssh/config
+   ```
+3. `git clone --branch site --single-branch git@github-<ad>:oguz-hd/<depo>.git /opt/sites/<ad>`
+4. Caddy'yi yeniden yükle (sertifikayı kendisi alır):
+   ```bash
+   cd /opt/prizma-portfolio && docker compose -f docker-compose.yml -f docker-compose.prod.yml exec web caddy reload --config /etc/caddy/Caddyfile
+   ```
+
+**Güncellemek:** `cd /opt/sites/<ad> && git pull` — dosyalar bağlı klasörden sunuluyor, yeniden
+başlatma yok. Projenin `Caddyfile`'ı değiştiyse 4. adımdaki `reload`.
+⚠️ Bir projenin Caddyfile'ı bozuksa `reload` reddedilir (eski ayar çalışmaya devam eder), ama
+konteyner yeniden başlarsa Caddy açılmaz → site de kapanır. `reload` hata verirse önce onu düzelt.
+
+---
+
 ## Telefonda deneme (geçici yayın)
 
 Kalıcı yayın yok; telefonda denemek için site Cloudflare'in hızlı tüneliyle geçici bir

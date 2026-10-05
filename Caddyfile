@@ -38,8 +38,23 @@
 	}
 }
 
+# ── Proje sayfaları ──
+# Her proje kendi deposundan yayına çıkar; bu depo onlara dokunmaz. Sunucuda
+# /opt/sites/<ad> = o deponun `site` dalı (içinde Caddyfile + public/), konteynerde
+# /srv/sites (docker-compose.prod.yml). Yeni proje: klasörü klonla + Caddy'yi yeniden yükle.
+# Klasör yoksa ya da boşsa (yerel deneme) eşleşme yok, Caddy yalnızca uyarı yazar.
+# → docs/CALISTIRMA.md "Proje sayfaları"
+import /srv/sites/*/Caddyfile
+
 {$DOMAIN::80} {
 	root * /srv
+
+	# Tiny Roamers 06.10.2026'da kendi alt alanına taşındı; eski yol oraya yönlensin.
+	# (`uri strip_prefix` + `{uri}` olmuyor: redir ilk adresi yazıyor — denendi.)
+	@tinyroamers path_regexp tr ^/tinyroamers(/.*)?$
+	handle @tinyroamers {
+		redir https://tinyroamers.oguzhd.com{re.tr.1} permanent
+	}
 	encode zstd gzip
 
 	# API — yönetim paneli (Faz 7) ve sağlık kontrolü. Ziyaretçi sitesi API'ye
