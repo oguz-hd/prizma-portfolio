@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dino Buddy — Privacy Policy</title>
+    <meta name="description" content="Dino Buddy collects no data. Everything runs locally in your browser." />
+    <style>
+      :root { --bg: #fbfaf7; --ink: #1d1d1b; --soft: #5f5c55; --line: #e6e2d8; --accent: #535353; }
+      @media (prefers-color-scheme: dark) {
+        :root { --bg: #15161a; --ink: #ececec; --soft: #a0a0a8; --line: #2d3038; --accent: #acacac; }
+      }
+      * { box-sizing: border-box; }
+      body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.65 system-ui, -apple-system, 'Segoe UI', sans-serif; }
+      main { max-width: 680px; margin: 0 auto; padding: 56px 20px 80px; }
+      h1 { font-size: 34px; line-height: 1.15; margin: 0 0 6px; letter-spacing: -0.02em; }
+      h2 { font-size: 20px; margin: 40px 0 8px; }
+      .meta { color: var(--soft); font-size: 14px; margin: 0 0 32px; }
+      .lead { font-size: 19px; padding: 16px 20px; border-left: 3px solid var(--accent); background: color-mix(in srgb, var(--accent) 8%, transparent); }
+      ul { padding-left: 20px; }
+      li { margin: 6px 0; }
+      a { color: inherit; }
+      code { font: 14px ui-monospace, Consolas, monospace; }
+      hr { border: 0; border-top: 1px solid var(--line); margin: 48px 0; }
+      .logo { width: 44px; height: auto; fill: var(--accent); shape-rendering: crispEdges; margin-bottom: 16px; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Dino Buddy — Privacy Policy</h1>
+      <p class="meta">Last updated: October 5, 2026</p>
+
+      <p>Dino Buddy is a browser extension that shows an animated pixel dinosaur on the web pages you visit.</p>
+      <p class="lead"><strong>Dino Buddy does not collect, store, transmit, sell or share any personal data.</strong></p>
+
+      <h2>What happens in your browser</h2>
+      <ul>
+        <li><strong>No data leaves your browser.</strong> The extension makes no network requests and contains no analytics, tracking or advertising code.</li>
+        <li><strong>Page content.</strong> To let the dinosaur walk on a page, the extension reads the position and size of elements on that page (for example headings, images and buttons). This happens only inside your browser, only while the dinosaur is shown, and nothing is recorded or sent anywhere.</li>
+        <li><strong>Settings.</strong> Your choices (size, color, whether the dinosaur appears on every site, and sites where you turned it off) are stored with <code>chrome.storage.sync</code>. Chrome may sync them between your own signed-in browsers; the developer has no access to them.</li>
+      </ul>
+
+      <h2>Permissions</h2>
+      <ul>
+        <li><code>activeTab</code> and <code>scripting</code>: show the dinosaur on the current tab when you ask for it from the extension's popup.</li>
+        <li><code>storage</code>: remember your settings.</li>
+        <li>Access to all sites (optional, asked only if you turn on “On every site”): show the dinosaur automatically on pages you open. You can revoke it any time by turning the option off or from Chrome's extension settings.</li>
+      </ul>
+
+      <h2>Contact</h2>
+      <p><a href="mailto:contact@oguzhd.com">contact@oguzhd.com</a> · <a href="https://oguzhd.com">oguzhd.com</a></p>
+
+      <hr />
+
+      <h2 lang="tr">Gizlilik Politikası (Türkçe)</h2>
+      <p lang="tr">Dino Buddy, gezdiğin web sayfalarında hareketli bir piksel dinozor gösteren bir tarayıcı eklentisidir. <strong>Hiçbir kişisel veri toplamaz, saklamaz, göndermez, satmaz ya da paylaşmaz.</strong> Eklenti hiçbir ağ isteği yapmaz; analiz, izleme ya da reklam kodu içermez. Dinonun sayfada dolaşabilmesi için sayfadaki elemanların konumu ve boyutu yalnızca tarayıcının içinde, yalnızca dino görünürken okunur; hiçbir şey kaydedilmez ya da gönderilmez. Ayarların <code>chrome.storage.sync</code> ile yalnızca senin Chrome'unda (ve oturum açtığın diğer Chrome'larında) tutulur.</p>
+    </main>
+  </body>
+</html>
