@@ -277,3 +277,42 @@ def test_xmp_location_is_not_published(client: TestClient, auth: dict, data_dir:
         raw = (Path(data_dir) / "uploads" / f"{media['id']}-{w}.webp").read_bytes()
         assert b"GPSLatitude" not in raw and b"xmpmeta" not in raw
     client.delete(f"/api/admin/media/{media['id']}", headers=auth)
+
+
+# ── Keşif dosyaları (discovery.py) ──────────────────────────────────────────
+
+
+def test_discovery_files_without_domain(client: TestClient, data_dir: str) -> None:
+    # Testte DOMAIN yok: robots ve llms yazılır, mutlak adres isteyenler yazılmaz.
+    root = Path(data_dir)
+    robots = (root / "robots.txt").read_text(encoding="utf-8")
+    assert "Allow: /" in robots and "Sitemap" not in robots
+    assert not (root / "sitemap.xml").exists()
+    llms = (root / "llms.txt").read_text(encoding="utf-8")
+    assert llms.startswith(f"# {published(data_dir)['profile']['name']}")
+    assert "canonical" not in (root / "meta.html").read_text(encoding="utf-8")
+
+
+def test_site_url_from_domain() -> None:
+    from app.config import Settings
+
+    assert Settings(domain="oguzhd.com").site_url == "https://oguzhd.com"
+    assert Settings(domain="https://oguzhd.com/").site_url == "https://oguzhd.com"
+    assert Settings(domain=":80").site_url is None
+    assert Settings(domain="").site_url is None
+
+
+def test_discovery_with_domain(client: TestClient) -> None:
+    from sqlmodel import Session
+
+    from app.content import build_content, render_meta
+    from app.db import engine
+    from app.discovery import render_llms, render_robots, render_sitemap
+
+    with Session(engine) as s:
+        content = build_content(s)
+    url = "https://oguzhd.com"
+    assert f"Sitemap: {url}/sitemap.xml" in render_robots(url)
+    assert f"<loc>{url}/</loc>" in render_sitemap(url)
+    assert f'<link rel="canonical" href="{url}/" />' in render_meta(content, url)
+    assert f"Website: {url}/" in render_llms(content, url)

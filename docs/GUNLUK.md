@@ -78,3 +78,8 @@ karşılaştırıldı (güvenlik çoğu tamam; httpOnly çerez, IP kilidi, sitem
 200 dönüyor). Hetzner'de ucuz tip stokta olmadığından DigitalOcean (1 GB + swap; derleme 94 sn).
 Kullanıcı öğrenmek için sunucu komutlarını kendisi yazdı; Claude anlatıp ssh ile doğruladı.
 İçerik temiz başladı (dev içeriği taşınmadı); canlıda uçtan uca 26/26.
+Oturum 8 (05.10.2026): genel kod incelemesi — kritik bulgu yok; plan A (Safari) → B (yayın kontrol
+listesi) → C (kararlar) → D (beyaz tema, Faz 8). Safari'de daire bağlantıları hiç tıklanmıyordu: WebKit
+isabeti <textPath> içindeki <a>'ya indirmiyor; 03.10'daki CSS denemesi yetmemişti (test ölçtü). Her
+bağlantı kendi <a><text>'i oldu (RingLinks), WebKit 12/12. B: gerçek 404, robots/sitemap/llms.txt,
+canonical, sabit favicon, token 4 saat, alt metin yedeği, yedek imajı, ruff + oxlint, React 19.3.

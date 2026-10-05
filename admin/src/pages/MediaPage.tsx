@@ -108,7 +108,15 @@ function MediaCard({ media }: { media: RawMedia }) {
       await reload()
     })
 
-  const missingAlt = !media.alt.tr.trim() && !dirty
+  // İki dil ayrı bakılıyor: site İngilizce açılıyor, yalnız TR yazılınca ziyaretçilerin
+  // çoğu boş alt metin görüyordu (site artık diğer dile düşüyor — useContent.ts).
+  const missing = (['tr', 'en'] as const).filter((l) => !media.alt[l].trim())
+  const missingAlt =
+    dirty || !missing.length
+      ? null
+      : missing.length === 2
+        ? 'Alt metin boş — ekran okuyucu bu görseli anlatamaz.'
+        : `${missing[0].toUpperCase()} alt metni boş — o dilde diğer dildeki gösterilir.`
   return (
     <Form className="card media-card" dirty={dirty} status={status} onSave={save} done="Kaydedildi">
       <Thumb media={media} />
@@ -120,7 +128,7 @@ function MediaCard({ media }: { media: RawMedia }) {
         value={alt}
         onChange={setAlt}
         hint="Görmeyenler için ne gösterdiğini anlat (ör. Teleskopla çekilmiş Orion Bulutsusu)."
-        warning={missingAlt ? 'Alt metin boş — ekran okuyucu bu görseli anlatamaz.' : null}
+        warning={missingAlt}
       />
       <div className="card-tools">
         {confirming ? (

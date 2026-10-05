@@ -230,7 +230,9 @@ def _not_reserved(v: str) -> str:
 def _safe_href(v: str) -> str:
     # `javascript:` gibi şemalar bağlantıyı koda çevirir — yalnızca bilinenler.
     if not re.fullmatch(r"(https?://|mailto:)\S+", v):
-        raise ValueError("bağlantı https://, http:// ya da mailto: ile başlamalı, boşluk içermemeli")
+        raise ValueError(
+            "bağlantı https://, http:// ya da mailto: ile başlamalı, boşluk içermemeli"
+        )
     return v
 
 

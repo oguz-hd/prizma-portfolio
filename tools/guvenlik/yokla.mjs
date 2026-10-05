@@ -84,7 +84,7 @@ for (let i = 0; i < 7; i++) {
 kontrol('Giriş sınırı: sahte X-Forwarded-For ile atlatma', son === 429, `7. deneme HTTP ${son}`)
 
 // Token'ı doğrudan API'den al (giriş sınırı Caddy'nin IP'sine düştü; API'de ayrı IP).
-const tok = (await (await fetch(API + '/api/auth/login', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ email: 'admin@localhost', password: 'degistir' }) })).json()).accessToken
+const tok = (await (await fetch(API + '/api/auth/login', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ email: process.env.ADMIN_EMAIL ?? 'admin@localhost', password: process.env.ADMIN_PASSWORD ?? 'degistir' }) })).json()).accessToken
 const yaz = (v, yol, govde) => istek(SITE + '/api/admin' + yol, { method: v, headers: { 'content-type': 'application/json', authorization: `Bearer ${tok}`, 'x-forwarded-for': '198.51.100.250' }, body: govde && JSON.stringify(govde) })
 
 // ── 5. Tehlikeli bağlantılar (kayıtlı XSS) ──────────────────────────────────

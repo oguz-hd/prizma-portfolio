@@ -28,7 +28,10 @@ async def _reply(send: Send, status: int, detail: str) -> None:
     await send({
         "type": "http.response.start",
         "status": status,
-        "headers": [(b"content-type", b"application/json; charset=utf-8"), (b"content-length", str(len(body)).encode())],
+        "headers": [
+            (b"content-type", b"application/json; charset=utf-8"),
+            (b"content-length", str(len(body)).encode()),
+        ],
     })
     await send({"type": "http.response.body", "body": body})
 

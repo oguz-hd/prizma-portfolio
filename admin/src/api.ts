@@ -26,7 +26,7 @@ function readStored(): string | null {
 }
 
 /**
- * Oturum sekmeyle sınırlı (sessionStorage): sekme kapanınca biter. Token 12 saat
+ * Oturum sekmeyle sınırlı (sessionStorage): sekme kapanınca biter. Token 4 saat
  * geçerli; parola değişince sunucu eskilerini reddediyor (api/app/auth.py).
  */
 let token: string | null = readStored()

@@ -29,10 +29,11 @@
     />
 
     <!--
-      Gerçek ikonu main.tsx token'lardan üretiyor (theme/favicon.ts). Bu boş ikon,
-      JS çalışmadan önce tarayıcının /favicon.ico'ya gidip 404 almasını önlüyor.
+      Simge: build'de Tayf paletiyle yazılan dosya (vite.config.ts → staticFavicon) —
+      arama motoru ve JS çalıştırmayanlar bunu görür. main.tsx sonra seçili palete
+      göre değiştiriyor (theme/favicon.ts). Geliştirmede aynı SVG'yi Vite sunuyor.
     -->
-    <link rel="icon" href="data:," />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
     <!--
       Sitenin içeriği (Faz 6: veritabanı → /content.json). main.tsx mount'tan önce

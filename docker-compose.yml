@@ -23,6 +23,8 @@ services:
       JWT_SECRET: ${JWT_SECRET:-}
       ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@localhost}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-degistir}
+      # Mutlak adresler (canonical, sitemap, llms.txt) — boşsa üretilmez (config.py → site_url).
+      DOMAIN: ${DOMAIN:-}
 
 volumes:
   # ★ Kalıcı veri. İçeriği (Faz 5'ten itibaren):

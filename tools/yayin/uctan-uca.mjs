@@ -48,7 +48,16 @@ for (const yol of ['/data/site.db', '/data/backups/', '/docs', '/api/docs', '/ap
   const metin = r.status === 200 ? await r.text() : ''
   kontrol(`Kapalı: ${yol}`, r.status === 404 || (r.status === 200 && metin.includes('<!doctype html>') && !metin.includes('swagger')), `HTTP ${r.status}`)
 }
-kontrol('404 sayfası (SPA)', (await istek('/olmayan-sayfa')).status === 200)
+// Bilinmeyen yol GERÇEK 404 ama gövde yine site (404 ekranını o çiziyor) — soft-404 değil.
+const yok = await istek('/olmayan-sayfa')
+kontrol('404 sayfası (durum 404, gövde site)', yok.status === 404 && (await yok.text()).includes('<!doctype html>'), `HTTP ${yok.status}`)
+kontrol('404 de güvenlik başlıklı', !!yok.headers.get('content-security-policy'))
+const robots = await istek('/robots.txt')
+kontrol('robots.txt', robots.status === 200 && (await robots.text()).includes('User-agent'), `HTTP ${robots.status}`)
+const llms = await istek('/llms.txt')
+kontrol('llms.txt', llms.status === 200 && (await llms.text()).startsWith('# '), `HTTP ${llms.status}`)
+const ikon = await istek('/favicon.svg')
+kontrol('favicon.svg', ikon.status === 200 && /svg/.test(ikon.headers.get('content-type') ?? ''), `HTTP ${ikon.status}`)
 const h = ana.headers
 kontrol('Güvenlik başlıkları', ['content-security-policy', 'x-content-type-options', 'x-frame-options', 'strict-transport-security'].every((b) => h.get(b)) && !h.get('server'))
 kontrol('Sıkıştırma', /zstd|gzip/.test((await istek('/content.json', { headers: { 'accept-encoding': 'gzip, zstd' } })).headers.get('content-encoding') ?? ''))

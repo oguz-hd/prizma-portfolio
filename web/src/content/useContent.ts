@@ -53,7 +53,9 @@ function resolveMilestones(list: RawMilestone[], locale: Locale): Milestone[] {
 }
 
 function resolveMedia<M extends RawMedia>(m: M, locale: Locale): Media {
-  return { id: m.id, width: m.width, height: m.height, widths: m.widths, alt: m.alt[locale] }
+  // Alt metin o dilde yoksa diğerininki: boş alt, ekran okuyucuya görseli hiç anlatmıyor.
+  const alt = m.alt[locale] || m.alt.tr || m.alt.en
+  return { id: m.id, width: m.width, height: m.height, widths: m.widths, alt }
 }
 
 /** Bugün (ziyaretçinin yerel günü) ISO biçiminde — duyurunun aralığıyla karşılaştırılır. */

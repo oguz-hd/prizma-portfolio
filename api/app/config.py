@@ -30,7 +30,9 @@ class Settings(BaseSettings):
 
     jwt_secret: str = INSECURE_DEFAULT_SECRET
     jwt_algorithm: str = "HS256"
-    access_token_ttl_minutes: int = 60 * 12
+    #: Panel oturumu. 12 saatti; çalınan bir token o kadar geçerli kalmasın diye 4 saat
+    #: (yayın kontrol listesi, 05.10.2026). Panel sekmeyle sınırlı (sessionStorage).
+    access_token_ttl_minutes: int = 60 * 4
 
     # Tek admin kullanıcı (docs/ARCHITECTURE.md § 2 — rol sistemi yok).
     # İlk açılışta bu bilgilerle hesap kurulur.
@@ -38,6 +40,12 @@ class Settings(BaseSettings):
     admin_password: str = INSECURE_DEFAULT_PASSWORD
 
     debug: bool = False
+
+    #: Sitenin alan adı (compose `.env` → DOMAIN, Caddy ile aynı değişken). Mutlak adres
+    #: isteyen her şey ondan: canonical, og:url, sitemap.xml, robots.txt'teki Sitemap
+    #: satırı, llms.txt. Boşsa ya da ':80' gibi yalnızca bir portsa (yerel deneme) bunlar
+    #: hiç üretilmez — yanlış adrese işaret eden bir sitemap, olmayanından kötü.
+    domain: str = ""
 
     @field_validator("jwt_secret", mode="after")
     @classmethod
@@ -49,6 +57,13 @@ class Settings(BaseSettings):
         `main.py`'deki uyarı da devreye girsin.
         """
         return value.strip() or INSECURE_DEFAULT_SECRET
+
+    @property
+    def site_url(self) -> str | None:
+        host = self.domain.strip().removeprefix("https://").removeprefix("http://").strip("/")
+        if not host or host.startswith(":") or host == "localhost":
+            return None
+        return f"https://{host}"
 
     @property
     def database_url(self) -> str:

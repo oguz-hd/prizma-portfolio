@@ -79,7 +79,10 @@ kontrol('Site: CSP ihlali yok', (await js('window.__csp.length')) === 0, (await 
 temizle()
 await cdp('Page.navigate', { url: SITE + '/olmayan-sayfa' })
 await bekle(3000)
-kontrol('404 sayfası', /404/.test((await js('document.body.innerText')) ?? '') && olaylar.hata.length === 0)
+// Sayfanın kendisi artık gerçek 404 (Caddyfile → handle_errors, 05.10.2026): Chrome bunu
+// "network" kaynaklı hata olarak kaydediyor — beklenen. Diğer hatalar sayılır.
+const hata404 = olaylar.hata.filter((h) => !h.startsWith('network:'))
+kontrol('404 sayfası', /404/.test((await js('document.body.innerText')) ?? '') && hata404.length === 0, hata404.slice(0, 2).join(' | '))
 
 // ── Panel ────────────────────────────────────────────────────────────────────
 // Giriş ekranı sitenin SEÇİLİ paletini almalı. Site varsayılan palette (Tayf) ise

@@ -18,6 +18,26 @@
 	}
 }
 
+# ── Güvenlik başlıkları (yayına hazırlık, Oturum 6) — site ve panel ──
+# Parça (snippet): hem normal yanıtlara hem handle_errors'a (404 sayfası) eklenmeli —
+# hata yolu ayrı bir rota, sitenin `header`'ını almıyor (05.10.2026, ölçüldü).
+# CSP: betik yalnızca kendi kökümüzden (ikisi de dış dosya); stil 'unsafe-inline'
+# index.html'deki ilk boya <style>'ı ve React'in style özniteliği için. Görsel
+# data: favicon için (theme/favicon.ts). frame-ancestors + X-Frame-Options: başka
+# site çerçeveye alamaz — panelde görünmez çerçevede "Sil"e tıklatma yolu kapalı.
+# HSTS yalnızca HTTPS'te geçerli (tarayıcı http'de yok sayar); :80 yerel denemeye zararsız.
+(security_headers) {
+	header {
+		Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+		Strict-Transport-Security "max-age=31536000"
+		-Server
+	}
+}
+
 {$DOMAIN::80} {
 	root * /srv
 	encode zstd gzip
@@ -89,13 +109,33 @@
 		file_server
 	}
 
-	# SPA yönlendirmesi: bilinmeyen yollar index.html'e düşer.
-	# Faz 4'teki proje detay sayfaları (/proje/otopark-yonetim-sistemi) buna dayanacak.
+	# Keşif dosyaları (api/app/discovery.py): API her yayında yazıyor. sitemap.xml
+	# yalnızca alan adı varken var — yoksa aşağıdaki 404.
+	@discovery path /robots.txt /sitemap.xml /llms.txt
+	handle @discovery {
+		root * /srv/data
+		header Cache-Control "no-cache"
+		file_server
+	}
+
+	# Site tek sayfa: yalnızca kök (slaytlar #hash'te) ve imajdaki gerçek dosyalar
+	# (fontlar). Başka her yol GERÇEK 404 — eskiden index.html 200'le dönüyordu,
+	# arama motoru her uydurma adresi ayrı sayfa sanıyordu (soft-404). 404 sayfasını
+	# yine site çiziyor (web/src/route.ts → isNotFound), aşağıdaki handle_errors'la.
 	handle {
 		# ★ Meta etiketleri (<title>, og:*) yayın anında içerikten: index.html'deki
 		# şablon /data/meta.html'i okuyor (web/vite.config.ts → metaFromContent).
 		templates @html
-		try_files {path} /index.html
+		file_server
+	}
+
+	# 404 → aynı index.html, durum kodu 404 kalarak. Site yolu okuyup 404 ekranını
+	# (404 nm) gösteriyor. Panelin yolları yukarıda try_files'la, buraya düşmüyor.
+	handle_errors 404 {
+		import security_headers
+		rewrite * /index.html
+		templates
+		header Cache-Control "no-cache"
 		file_server
 	}
 
@@ -103,19 +143,5 @@
 	@html path /index.html /
 	header @html Cache-Control "no-cache"
 
-	# ── Güvenlik başlıkları (yayına hazırlık, Oturum 6) — site ve panel ──
-	# CSP: betik yalnızca kendi kökümüzden (ikisi de dış dosya); stil 'unsafe-inline'
-	# index.html'deki ilk boya <style>'ı ve React'in style özniteliği için. Görsel
-	# data: favicon için (theme/favicon.ts). frame-ancestors + X-Frame-Options: başka
-	# site çerçeveye alamaz — panelde görünmez çerçevede "Sil"e tıklatma yolu kapalı.
-	# HSTS yalnızca HTTPS'te geçerli (tarayıcı http'de yok sayar); :80 yerel denemeye zararsız.
-	header {
-		Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
-		X-Content-Type-Options "nosniff"
-		X-Frame-Options "DENY"
-		Referrer-Policy "strict-origin-when-cross-origin"
-		Permissions-Policy "camera=(), microphone=(), geolocation=()"
-		Strict-Transport-Security "max-age=31536000"
-		-Server
-	}
+	import security_headers
 }

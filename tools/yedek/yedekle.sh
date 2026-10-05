@@ -13,7 +13,6 @@
 # YEDEK_BIR_KEZ=1 → bir kez al ve çık (deneme).
 set -eu
 
-apk add --no-cache sqlite >/dev/null
 dir=/data/backups
 mkdir -p "$dir"
 

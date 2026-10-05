@@ -27,7 +27,7 @@ export function GallerySection(props: SectionProps) {
                 type="button"
                 className="gallery-open"
                 onClick={() => setOpen(i)}
-                aria-label={`${t('enlarge')}: ${m.alt}`}
+                aria-label={m.alt ? `${t('enlarge')}: ${m.alt}` : t('enlarge')}
               >
                 <img
                   srcSet={mediaSrcSet(m)}

@@ -1,6 +1,9 @@
 import { defineConfig, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 
+import { faviconSvg } from './src/theme/favicon'
+import { PRESETS } from './src/theme/presets'
+
 /**
  * API'nin adresi — geliştirme sunucusu içeriği ve meta etiketlerini buradan alıyor.
  * Docker'da compose veriyor (`http://api:8000`, docker-compose.dev.yml); yerelde
@@ -49,8 +52,29 @@ function metaFromContent(): Plugin {
   }
 }
 
+/**
+ * `/favicon.svg` — çalışma anındaki simgenin (theme/favicon.ts) sitenin varsayılan
+ * paletindeki (Tayf) dosya hâli. Tarayıcı sekmesinde main.tsx seçili palete göre
+ * değiştiriyor; dosya, JS çalıştırmayanlar (arama sonuçları, paylaşım önizlemeleri) için.
+ */
+function staticFavicon(): Plugin {
+  const svg = faviconSvg(PRESETS.tayf.tokens)
+  return {
+    name: 'static-favicon',
+    configureServer(server) {
+      server.middlewares.use('/favicon.svg', (_req, res) => {
+        res.setHeader('Content-Type', 'image/svg+xml')
+        res.end(svg)
+      })
+    },
+    generateBundle() {
+      this.emitFile({ type: 'asset', fileName: 'favicon.svg', source: svg })
+    },
+  }
+}
+
 export default defineConfig({
-  plugins: [react(), metaFromContent()],
+  plugins: [react(), metaFromContent(), staticFavicon()],
   server: {
     // Konteyner dışından erişilebilmesi için 0.0.0.0'a bağlan.
     host: true,

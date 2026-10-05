@@ -400,16 +400,29 @@ DEĞİL. Sunucu dışına kopya, barındırma seçildikten sonra kurulacak.
 
 Hepsi yayın yığınının birebir kopyasında (yayın imajları, Caddyfile, yedek servisi), ayrı proje
 adıyla ve yalnızca bu bilgisayarda (8090). `test.env`: `DOMAIN=`, `ADMIN_EMAIL=…`, 64 karakterlik
-`JWT_SECRET`, güçlü `ADMIN_PASSWORD`; `ports.yml`: `services.web.ports: !override ['127.0.0.1:8090:80']`.
+`JWT_SECRET`, güçlü `ADMIN_PASSWORD`; `ports.yml`: `services.web.ports: !override ['127.0.0.1:8090:80']`
+ve `services.api.ports: ['127.0.0.1:8013:8000']`.
 ```powershell
 docker compose -p prizma-yayin-test --env-file test.env -f docker-compose.yml -f docker-compose.prod.yml -f ports.yml up -d --build
 $env:ADMIN_EMAIL='…'; $env:ADMIN_PASSWORD='…'
-node tools/yayin/uctan-uca.mjs http://127.0.0.1:8090    # ziyaretçi + yönetici yolu, 26 kontrol
+node tools/yayin/uctan-uca.mjs http://127.0.0.1:8090    # ziyaretçi + yönetici yolu, 404/robots/llms/favicon, 30 kontrol
 node tools/yayin/tarayici.mjs  http://127.0.0.1:8090    # gerçek Chrome: site, 404, panel girişi, 13 kontrol
-docker exec prizma-portfolio-api-1 pytest                # API, 23 test
-node tools/guvenlik/yokla.mjs                            # saldırı denemeleri, test yığını C'ye (5183/8013), 37 kontrol
+docker exec prizma-portfolio-api-1 pytest                # API, 26 test
+# Güvenlik yoklaması uç noktaları /openapi.json'dan okuyor — yayın API'sinde kapalı. Aynı
+# veri ve anahtarla DEBUG'lı bir kopya açılır (giriş bilgileri ADMIN_EMAIL/ADMIN_PASSWORD'dan):
+docker run -d --rm --name prizma-yayin-test-apidebug --network prizma-yayin-test_default --env-file test.env `
+  -e DATA_DIR=/data -e DEBUG=1 -v prizma-yayin-test_data:/data -p 127.0.0.1:8014:8000 prizma-portfolio-api:prod
+node tools/guvenlik/yokla.mjs http://127.0.0.1:8090 http://127.0.0.1:8014   # 37 kontrol
+docker stop prizma-yayin-test-apidebug
+# Safari (WebKit) — dairedeki bağlantılar gerçekten tıklanıyor mu (masaüstü + iPhone):
+docker build -t prizma-portfolio-safari tools/safari
+docker run --rm --add-host=host.docker.internal:host-gateway -v "${PWD}/tools/safari:/t" -w /pw prizma-portfolio-safari `
+  sh -c "cp /t/tikla.mjs . && node tikla.mjs http://host.docker.internal:8090"
 docker compose -p prizma-yayin-test -f docker-compose.yml -f docker-compose.prod.yml -f ports.yml down -v
 ```
+Lint: `docker exec prizma-portfolio-api-1 ruff check` · `docker exec prizma-portfolio-web-1 npm run lint`
+· `docker exec prizma-portfolio-admin-1 npm run lint` (oxlint; `.oxlintrc.json` — React Compiler
+kuralları kapalı, `exhaustive-deps` uyarı: PrismStage/Ring'deki eksik bağımlılıklar bilerek).
 Lighthouse (Chrome DevTools MCP → `lighthouse_audit`, masaüstü + mobil): 01.10.2026'da erişilebilirlik,
 en iyi uygulamalar, SEO 100/100/100. `uctan-uca` ve `tarayici` ilk gerçek yayından hemen sonra canlı
 adreste de çalıştırılır (içerik girilmeden: kayıt açıp siler, parolayı değiştirip geri alır).

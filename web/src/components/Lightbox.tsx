@@ -47,7 +47,7 @@ export function Lightbox({
     <dialog
       ref={ref}
       className="lightbox"
-      aria-label={item.alt}
+      aria-label={item.alt || item.caption || t('enlarge')}
       onClose={onClose}
       onKeyDown={(e) => {
         if (e.key === 'ArrowRight') go(1)

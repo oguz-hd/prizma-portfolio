@@ -77,6 +77,9 @@ Admin paneli çökse bile site ayakta kalır.
 | Sunum | `Caddyfile` | `/content.json` veri volume'undan, `Cache-Control: no-cache` + ETag (değişmediyse 304) |
 | Okuma | `web/src/content/useContent.ts` → `loadContent()` | `main.tsx` mount'tan ÖNCE bekler; `useContent()` senkron kaldı, bileşenlere dokunulmadı. `index.html` dosyayı `<link rel="preload">` ile önden çeker — JS inerken içerik de iner |
 | Meta | `content.py` → `render_meta` | `<title>`, description, og:title/description içerikten. Tarayıcılar JS çalıştırmadığı için sunucu gömer: yayında Caddy şablonu (`index.html` → `readFile /data/meta.html`), geliştirmede Vite `/api/meta`'dan |
+| Keşif | `discovery.py` → `publish.py` | `/data/robots.txt`, `llms.txt` (İngilizce düz metin özet) her yayında; `sitemap.xml`, canonical ve `og:url` yalnızca alan adı varken (`DOMAIN` → `config.site_url`). Caddy kökten sunuyor |
+| 404 | `Caddyfile` → `handle_errors 404` | Bilinmeyen yol gerçek 404 (05.10.2026'ya kadar 200'dü — soft-404); gövde yine `index.html`, 404 ekranını site çiziyor (`route.ts`) |
+| Simge | `vite.config.ts` → `staticFavicon` | `/favicon.svg` build'de Tayf paletiyle; çalışma anında seçili palete göre değişiyor |
 | Geliştirme | `web/vite.config.ts` | `/content.json` → API'nin `/api/content`'i (aynı şekil, canlı) |
 
 **Yedek içerik yok** (kullanıcı kararı): `site.ts` silindi, tek kaynak veritabanı.

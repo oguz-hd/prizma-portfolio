@@ -41,7 +41,8 @@ docker exec prizma-portfolio-web-1 npm run typecheck   # tsc --noEmit
 docker exec prizma-portfolio-web-1 npm run build       # asıl derleme
 docker exec prizma-portfolio-admin-1 npm run typecheck
 docker exec prizma-portfolio-admin-1 npm run build
-docker exec prizma-portfolio-api-1 pytest           # API, 23 test (geçici veri klasöründe)
+docker exec prizma-portfolio-api-1 pytest           # API, 26 test (geçici veri klasöründe)
+docker exec prizma-portfolio-api-1 ruff check       # lint (api), web/admin: npm run lint (oxlint)
 ```
 API şeması değişince: `api/app/migrations.py`'ye adım ekle — açılışta uygulanır, önce
 `/data/site.db.bak-v<n>` yedeği alınır. `down -v` artık gerekmez.
@@ -82,7 +83,7 @@ bunlar değişince panelin kapıları da çalıştırılır.
 13. **Prizma fareye bağlı DEĞİL** — hareketi kendi hâlinde (salınım + ışık darbeleri);
     mobilde de aynı görünmeli (kullanıcı kararı, Oturum 2).
 
-## Durum · 02.10.2026 (yayında)
+## Durum · 05.10.2026 (yayında)
 
 ✅ **v1** (Oturum 1) — iskele · taşınan katmanlar · prizma sahnesi · açılış ·
 slayt gösterisi · cam panel · ray · 404 nm · favicon · API kopyası.
@@ -171,9 +172,17 @@ temadan (`applyTheme` → `appliedTokens`), içerikten değil — panel sahneyi 
    (kullanıcı: "o kadar yedeklik bir şey yok") — içerik birikince yeniden sor. Sunucu, erişim,
    güncelleme → CALISTIRMA "Yayın (sunucu)". **Sunucu işlerini kullanıcı kendisi yazıyor**
    (öğrenmek için) — Claude adım adım anlatır, `ssh prizma` ile salt okunur doğrular.
-   ⏭ Sırada: kontrol listesi (02.10.2026) — 404 durum kodu (bilinmeyen yol 200 dönüyor), sabit
-   favicon, llms.txt, alt metin zorunlu/uyarı, token süresi; alan adıyla sitemap, canonical, og:url
-   (+ og:image). Kullanıcı kararı bekleyenler: httpOnly çerez, panel IP kilidi, analytics + gizlilik, CTA.
+   ✅ (Oturum 8, 05.10.2026) kontrol listesi: gerçek 404 (`handle_errors`), robots/sitemap/llms.txt +
+   canonical/og:url (`api/app/discovery.py`, alan adı `DOMAIN`'den), `/favicon.svg`, alt metin iki dil
+   uyarısı + sitede diğer dile düşme, token 12 → 4 saat, giriş sayacı temizleniyor, yedek imajı (sqlite
+   gömülü), ruff + oxlint, React 19.3 / Vite 8.3. **Safari bağlantı hatası** düzeldi (Ring.tsx →
+   `RingLinks`; WebKit testi `tools/safari`). Kod incelemesi + plan bu oturumda (A → B → C → D).
+   ⏭ Sırada (kullanıcı: "geri kalanı sonraki oturumlarda"):
+   **C · kullanıcı kararı:** httpOnly çerez, panel IP kilidi, analytics + gizlilik notu, CTA, og:image,
+   HSTS includeSubDomains (alt alan adı planı yoksa), sunucu dışı yedek.
+   **D · Beyaz tema → Faz 8 tema paneli** (aşağıdaki ⏸ notları; önce canlı seçenek sayfası).
+   Küçük: `@types/node` 22 → 26 bilerek yapılmadı (konteyner Node 22); 4 saatlik token panelde
+   kaydedilmemiş düzenlemeyi düşürebilir — şikâyet gelirse sessiz yenileme.
 7. ✅ (Oturum 6) **Güvenlik taraması + yayın öncesi testler** (kullanıcı isteği) — rapor:
    https://claude.ai/code/artifact/b63b856b-06fa-4ae0-948f-e70fbed95811 · 1 kritik (/data/site.db,
    daha önce kapandı), 2 yüksek (kimlikten önce gövde okuma, sınırda asılı kalan yükleme), orta/düşükler;

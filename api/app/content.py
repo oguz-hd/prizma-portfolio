@@ -5,6 +5,7 @@ from fastapi import APIRouter
 from fastapi.responses import HTMLResponse
 from sqlmodel import Session, select
 
+from app.config import get_settings
 from app.db import SessionDep
 from app.models import (
     AdminUser,  # noqa: F401  (SQLModel tablo kaydı için import ediliyor)
@@ -165,7 +166,9 @@ def build_content(session: Session, *, admin: bool = False) -> SiteContentOut:
         if m:
             key = f"{row.section_id}:{row.media_id}"
             gallery.setdefault(row.section_id, []).append(
-                SectionMediaOut(**m.model_dump(), caption=tr.maybe_text("section_media", key, "caption"))
+                SectionMediaOut(
+                    **m.model_dump(), caption=tr.maybe_text("section_media", key, "caption")
+                )
             )
 
     def section_out(s: Section) -> SectionOut:
@@ -220,7 +223,7 @@ def build_content(session: Session, *, admin: bool = False) -> SiteContentOut:
     )
 
 
-def render_meta(content: SiteContentOut) -> str:
+def render_meta(content: SiteContentOut, site_url: str | None = None) -> str:
     """
     Paylaşım kartı ve arama sonucu etiketleri — içerikten.
 
@@ -239,15 +242,22 @@ def render_meta(content: SiteContentOut) -> str:
     # kart da o dilde. Dil değişince sekme başlığını App güncelliyor.
     title = escape(content.settings.meta_title.en)
     desc = escape(content.settings.meta_description.en)
-    # index.html'deki yerinin girintisiyle (4 boşluk) — kaynak görünümü düzgün kalsın.
-    return "\n    ".join(
-        [
-            f"<title>{title}</title>",
-            f'<meta name="description" content="{desc}" />',
-            f'<meta property="og:title" content="{title}" />',
-            f'<meta property="og:description" content="{desc}" />',
+    tags = [
+        f"<title>{title}</title>",
+        f'<meta name="description" content="{desc}" />',
+        f'<meta property="og:title" content="{title}" />',
+        f'<meta property="og:description" content="{desc}" />',
+    ]
+    # Alan adı varsa (config.py → site_url): tek kanonik adres — www, http ve
+    # ?utm=… kopyaları ayrı sayfa sayılmasın.
+    if site_url:
+        url = escape(f"{site_url}/")
+        tags += [
+            f'<link rel="canonical" href="{url}" />',
+            f'<meta property="og:url" content="{url}" />',
         ]
-    )
+    # index.html'deki yerinin girintisiyle (4 boşluk) — kaynak görünümü düzgün kalsın.
+    return "\n    ".join(tags)
 
 
 router = APIRouter(prefix="/api", tags=["content"])
@@ -270,4 +280,4 @@ def read_content(session: SessionDep) -> SiteContentOut:
 @router.get("/meta", response_class=HTMLResponse)
 def read_meta(session: SessionDep) -> str:
     """`/data/meta.html`'in canlı hâli — geliştirmede Vite index.html'e gömüyor."""
-    return render_meta(build_content(session))
+    return render_meta(build_content(session), get_settings().site_url)

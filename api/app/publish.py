@@ -6,6 +6,7 @@ from sqlmodel import Session
 
 from app.config import get_settings
 from app.content import build_content, render_meta
+from app.discovery import render_llms, render_robots, render_sitemap
 
 """
 ★ Yayın: veritabanı → `/data/content.json` + `/data/meta.html` (docs/ARCHITECTURE.md § 3).
@@ -23,6 +24,10 @@ settings = get_settings()
 
 CONTENT_FILE = "content.json"
 META_FILE = "meta.html"
+#: Keşif dosyaları (discovery.py) — Caddy kökten sunuyor: /robots.txt, /sitemap.xml, /llms.txt.
+ROBOTS_FILE = "robots.txt"
+SITEMAP_FILE = "sitemap.xml"
+LLMS_FILE = "llms.txt"
 
 # İki yayın aynı anda çalışırsa (panelden art arda iki kayıt) yazmalar sıraya
 # girsin: kurma + yazma kilidin içinde, yani en son biten en güncel hâli yazar.
@@ -49,4 +54,13 @@ def publish(session: Session) -> None:
             settings.data_dir / CONTENT_FILE,
             content.model_dump_json(by_alias=True, exclude_none=True),
         )
-        _write_atomic(settings.data_dir / META_FILE, render_meta(content))
+        site_url = settings.site_url
+        _write_atomic(settings.data_dir / META_FILE, render_meta(content, site_url))
+        _write_atomic(settings.data_dir / ROBOTS_FILE, render_robots(site_url))
+        _write_atomic(settings.data_dir / LLMS_FILE, render_llms(content, site_url))
+        sitemap = settings.data_dir / SITEMAP_FILE
+        if site_url:
+            _write_atomic(sitemap, render_sitemap(site_url))
+        else:
+            # Alan adı kalktıysa eski adrese işaret eden sitemap kalmasın → 404.
+            sitemap.unlink(missing_ok=True)

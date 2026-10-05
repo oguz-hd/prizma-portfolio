@@ -43,6 +43,11 @@ def check(ip: str) -> None:
     now = time.monotonic()
     with _lock:
         times = _recent(ip, now)
+        if not times:
+            # Penceresi dolmuş IP sözlükte kalmasın: adres değiştirerek deneyen biri
+            # her adresle bir girdi bırakıp belleği şişirebiliyordu (kod incelemesi, 05.10.2026).
+            _failures.pop(ip, None)
+            return
         if len(times) < MAX_FAILURES:
             return
         retry = int(WINDOW_SECONDS - (now - times[0])) + 1
@@ -53,9 +58,17 @@ def check(ip: str) -> None:
     )
 
 
+#: Bu kadar IP birikince süresi dolmuşlar toplu silinir (bir kez deneyip dönmeyenler).
+SWEEP_AT = 1000
+
+
 def failed(ip: str) -> None:
+    now = time.monotonic()
     with _lock:
-        _recent(ip, time.monotonic()).append(time.monotonic())
+        _recent(ip, now).append(now)
+        if len(_failures) > SWEEP_AT:
+            for key in [k for k, t in _failures.items() if now - t[-1] > WINDOW_SECONDS]:
+                del _failures[key]
 
 
 def succeeded(ip: str) -> None:

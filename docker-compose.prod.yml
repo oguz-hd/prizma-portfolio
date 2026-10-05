@@ -45,7 +45,9 @@ services:
 
   # Günlük yedek: veritabanı (14 gün) + görseller (7 gün) → /data/backups (tools/yedek/yedekle.sh).
   backup:
-    image: alpine:3.20
+    image: prizma-portfolio-backup:prod
+    build:
+      context: ./tools/yedek
     command: ['/bin/sh', '/yedekle.sh']
     volumes:
       - data:/data
