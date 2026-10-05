@@ -83,3 +83,9 @@ listesi) → C (kararlar) → D (beyaz tema, Faz 8). Safari'de daire bağlantıl
 isabeti <textPath> içindeki <a>'ya indirmiyor; 03.10'daki CSS denemesi yetmemişti (test ölçtü). Her
 bağlantı kendi <a><text>'i oldu (RingLinks), WebKit 12/12. B: gerçek 404, robots/sitemap/llms.txt,
 canonical, sabit favicon, token 4 saat, alt metin yedeği, yedek imajı, ruff + oxlint, React 19.3.
+
+Oturum 9 (06.10.2026, tinyroamers oturumundan): sunucu proje sayfalarına açıldı. Caddyfile
+`import /srv/sites/*/Caddyfile` alıyor, compose /opt/sites'ı salt okunur bağlıyor; her proje kendi
+deposunun `site` dalından /opt/sites/<ad>'a çekiliyor, alt alanı proje.oguzhd.com. İlki
+tinyroamers.oguzhd.com (eski /tinyroamers/* → 301). Push'ta otomatik güncelleme denendi ve kullanıcı
+isteğiyle bırakıldı. Ortak belge: ozi/SUNUCU.md.

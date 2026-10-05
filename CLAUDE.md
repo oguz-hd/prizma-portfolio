@@ -3,6 +3,9 @@
 > Bu dosya her oturumda otomatik okunur. **Diğer dosyalar okunmaz** — aşağıdaki
 > tablo hangi işte hangisine bakılacağını söyler. Kullanıcıya baştan soru sorma.
 
+Ortak ilkeler ve gizlilik kuralları: `../../CLAUDE.md` (otomatik okunur). **Sunucunun genel
+yapısı, proje sayfaları (`proje.oguzhd.com`) ve yeni proje ekleme: `../../SUNUCU.md`.**
+
 Oğuz Han Duran'ın kişisel sitesi. Sitenin merkezinde bir **prizma** var: beyaz ışık
 soldan gelir, prizmadan geçip sağda tayfına ayrılır. Site bu ışığın geçişiyle açılır;
 sayfa kaymaz, bölümler **slayt** olarak bakılan alana gelir.

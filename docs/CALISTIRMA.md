@@ -193,6 +193,8 @@ ile (`app.auth.hash_password`) `.env`'deki e-posta/parolaya çekilir.
 
 ## Proje sayfaları (/opt/sites) — proje.oguzhd.com
 
+> Ana belge: `ozi/SUNUCU.md` (büyük resim, yayındaki siteler, sorun giderme, kararlar). Burada özet.
+
 Diğer projelerin sayfaları bu depoda DEĞİL; her biri kendi deposundan gelir. Sunucudaki tek
 Caddy (bu deponun `web` konteyneri) `/opt/sites/*/Caddyfile` dosyalarını içe alır
 (Caddyfile başı + docker-compose.prod.yml'deki `/opt/sites:/srv/sites:ro`).
