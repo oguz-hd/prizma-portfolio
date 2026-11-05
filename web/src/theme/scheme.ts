@@ -9,9 +9,9 @@ import type { PresetId, ThemeTokens } from './types'
 /**
  * Ziyaretçinin açık/koyu seçimi (dil seçicisiyle aynı kalıp: i18n/useLocale.ts).
  *
- * Varsayılan HEP koyu: `prefers-color-scheme` bilerek okunmuyor (Oğuz, 05.11.2026) —
- * site koyu bir gökte tasarlandı, açık tema ziyaretçinin bilerek seçtiği ikinci hâl.
- * Koyu tarafta içeriğin seçtiği ön ayar (panelden), açık tarafta LIGHT_TOKENS.
+ * Varsayılan HEP koyu: `prefers-color-scheme` bilerek okunmuyor. Site koyu bir gökte tasarlandı,
+ * açık tema ziyaretçinin bilerek seçtiği ikinci hâl. Koyu tarafta içeriğin seçtiği ön ayar
+ * (panelden), açık tarafta LIGHT_TOKENS.
  */
 export type Scheme = 'dark' | 'light'
 

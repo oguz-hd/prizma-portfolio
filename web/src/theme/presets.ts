@@ -98,9 +98,8 @@ export const PRESET_LIST: Preset[] = Object.values(PRESETS)
 /**
  * Açık tema paleti (ziyaretçi seçimi, theme/scheme.ts). "Cam plaka": astronomi
  * plakasının gümüş-gri emülsiyonu (A2) + parlak tayf (E2). Panelden seçilen koyu
- * ön ayarlardan bağımsız tek palet; panel hep koyu kalır. Seçenek sayfası:
- * docs/tasarim/beyaz-tema. E2'de sarı/yeşil/camgöbeği 3:1 altı — bilinçli kabul
- * (Oğuz, 05.11.2026); `lead` koyu çünkü düğme/bağlantı metni olarak da kullanılıyor.
+ * ön ayarlardan bağımsız tek palet; panel hep koyu kalır. Seçenek sayfası: docs/tasarim/beyaz-tema.
+ * E2'de sarı/yeşil/camgöbeği 3:1 altı: bilinçli kabul. `lead` koyu, çünkü düğme/bağlantı metni olarak da kullanılıyor.
  */
 export const LIGHT_TOKENS: ThemeTokens = {
   ground: '#E4E7E1',
@@ -108,8 +107,8 @@ export const LIGHT_TOKENS: ThemeTokens = {
   line: '#C3C9BE',
   ink: '#171B16',
   inkDim: '#434A42',
-  // Footer, "Back to top", daire bağlantıları 11–22 px'lik ince piksel yazı: 5,5 / 4,7:1 sayıda geçiyor ama
-  // gri zeminde silik duruyordu → 6,9 / 6,4:1'e koyulaştırıldı (Sorun 1, 05.11.2026).
+  // Footer, "Back to top" ve daire bağlantıları 11–22 px'lik ince piksel yazı; 5,5 / 4,7:1 sayıda geçiyor ama
+  // gri zeminde silik durur → 6,9 / 6,4:1.
   inkFaint: '#474E46',
   lead: '#005870',
   accents: ['#8B5CF6', '#3B82F6', '#06B6D4', '#22C55E', '#EAB308', '#F97316', '#EF4444'],

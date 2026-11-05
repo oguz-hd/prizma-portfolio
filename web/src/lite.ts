@@ -21,6 +21,8 @@ export function watchFrameRate(): () => void {
 
   const tick = (_time: number, deltaTime: number) => {
     if (deltaTime > GAP_MS) return
+    // Tema süpürmesinin kendisi kareyi yavaşlatabilir (theme/sweep.ts); onu cihazın hızı sayma.
+    if ('sweeping' in document.documentElement.dataset) return
     deltas.push(deltaTime)
     if (deltas.length > SAMPLES) deltas.shift()
     if (deltas.length < SAMPLES) return

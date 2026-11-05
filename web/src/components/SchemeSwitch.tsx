@@ -1,25 +1,30 @@
+import { useState } from 'react'
+
 import { useStrings } from '../i18n/strings'
 import { useScheme } from '../theme/scheme'
 import { sweepTo } from '../theme/sweep'
 
 /**
- * Açık / koyu tema düğmesi (dil seçicisinin yanında).
- *
- * Bilgi yalnızca renkle taşınmaz (docs/DESIGN.md § F/6): simge hedef temayı gösterir
- * (koyudayken güneş, açıktayken ay), aria-label ne yapacağını söyler.
- *
- * Geçiş: ışık süpürmesi + sıvı cam ucu (theme/sweep.ts).
+ * Açık / koyu tema düğmesi (dil seçicisinin yanında). Bilgi yalnızca renkle taşınmaz (docs/DESIGN.md § F/6):
+ * simge hedef temayı gösterir (koyudayken güneş, açıktayken ay), aria-label ne yapacağını söyler,
+ * değişince ekran okuyucuya duyurulur.
  */
 export function SchemeSwitch() {
   const t = useStrings()
   const scheme = useScheme()
   const next = scheme === 'dark' ? 'light' : 'dark'
+  // İlk yüklemede değil, yalnızca kullanıcı değiştirince duyurulur.
+  const [changed, setChanged] = useState(false)
 
   return (
+    <>
     <button
       type="button"
       className="scheme-btn"
-      onClick={() => sweepTo(next)}
+      onClick={() => {
+        setChanged(true)
+        sweepTo(next)
+      }}
       aria-label={t(scheme === 'dark' ? 'schemeToLight' : 'schemeToDark')}
       title={t(scheme === 'dark' ? 'schemeToLight' : 'schemeToDark')}
     >
@@ -34,5 +39,9 @@ export function SchemeSwitch() {
         )}
       </svg>
     </button>
+    <span className="sr-only" role="status">
+      {changed ? t(scheme === 'dark' ? 'schemeNowDark' : 'schemeNowLight') : ''}
+    </span>
+    </>
   )
 }

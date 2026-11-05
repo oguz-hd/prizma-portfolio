@@ -5,18 +5,16 @@ import { reducedMotion } from '../motion'
 import './sweep.css'
 
 /**
- * Tema geçişi: ışık süpürmesi + sıvı cam ucu (Oğuz seçimi G3, 05.11.2026).
+ * Tema geçişi: soldan sağa bir tayf bandı geçer, bandın ön kenarında dalgalanan ince bir sıvı cam
+ * şerit altındaki sayfayı kırar. Renkler şerit ekranın ortasından geçerken akar. Hiçbir şey
+ * kopyalanmaz: sayfa baştan sona canlı, prizma sahnesi geçiş boyunca akmaya devam eder.
  *
- * Soldan sağa bir tayf bandı geçer; bandın ön kenarında, dalgalanan ince bir sıvı cam
- * şerit altındaki sayfayı kırar. Renkler şerit ekranın ortasından geçerken akar.
- * View Transitions'ın eski-görüntü donmasından kaçınmak için hiçbir şey kopyalanmıyor:
- * sayfa baştan sona canlı, prizma sahnesi geçiş boyunca akmaya devam ediyor.
+ * Kırılma haritası squircle kenar profili y=(1-(1-x)^4)^(1/4) ve Snell yasasından (n=1,5) üretilir.
+ * `backdrop-filter: url()` yalnızca Chromium'da çalışır (WebKit 245510 açık). Yedekler sırayla:
+ * kırılmasız bulanık cam (Safari/Firefox) → yalnız bant (hafif kip, azaltılmış saydamlık) →
+ * anında geçiş (hareketi azalt).
  *
- * Kırılma haritası kube.io'daki yöntemin kendi uygulaması: squircle kenar profili
- * y=(1-(1-x)^4)^(1/4) ve Snell yasası (n=1,5). Kod kopyalanmadı, formülden yazıldı.
- * `backdrop-filter: url()` yalnızca Chromium'da çalışır (WebKit 245510 açık). Yedekler:
- * kırılmasız bulanık cam (Safari/Firefox) → yalnız bant (hafif kip) → anında geçiş
- * (hareketi azalt).
+ * ⚠️ Kenar çizgisinin `#fff`'i kuralı 1'in bilinçli istisnası: ışığın kendisi beyaz, temaya bağlı değil.
  */
 
 const SVG_NS = 'http://www.w3.org/2000/svg'
@@ -28,6 +26,7 @@ const FILTER_ID = 'scheme-glass'
 
 let busy = false
 let filterReady = false
+let cleanupTimer = 0
 
 const clamp01 = (v: number) => Math.max(0, Math.min(1, v))
 const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2)
@@ -119,9 +118,11 @@ export function sweepTo(next: Scheme): void {
   busy = true
 
   const root = document.documentElement
-  root.dataset.sweeping = '' // light.css/sweep.css: etkiler (hale, gravür, yıldız) tek karede değil, yumuşak geçsin
+  // sweep.css: tema etkileri (hale, gravür, yıldız) tek karede değil, yumuşak geçsin.
+  window.clearTimeout(cleanupTimer)
+  root.dataset.sweeping = ''
   const lite = 'lite' in root.dataset
-  const glassOk = !lite
+  const glassOk = !lite && !matchMedia('(prefers-reduced-transparency: reduce)').matches
   const refract = glassOk && ensureFilter()
   const W = innerWidth
   const H = innerHeight
@@ -132,6 +133,7 @@ export function sweepTo(next: Scheme): void {
 
   const overlay = el('div', 'scheme-sweep', document.body)
   overlay.setAttribute('aria-hidden', 'true')
+  overlay.style.opacity = '0' // ilk kareye kadar (gizli sekmede uzun sürebilir) cam sol kenarda görünmesin
   const run = el('div', 'ss-run', overlay)
   run.style.height = `${Hh}px`
   run.style.top = `${-H * 0.12}px`
@@ -139,7 +141,6 @@ export function sweepTo(next: Scheme): void {
   const band = el('div', 'ss-band', run)
   band.style.width = `${bandW}px`
   band.style.right = `${GLASS_W * 0.2}px`
-  band.style.mixBlendMode = from === 'dark' ? 'screen' : 'multiply'
   band.style.background = `linear-gradient(90deg, ${B.accents.join(', ')})`
   if (lite) band.style.filter = 'none'
 
@@ -183,7 +184,24 @@ export function sweepTo(next: Scheme): void {
   let flipped = false
   let lastQ = -1
 
-  const frame = (now: number) => {
+  const finish = () => {
+    overlay.remove()
+    if (!flipped) setScheme(next, false)
+    repaint() // tam token'lar
+    busy = false
+    cleanupTimer = window.setTimeout(() => delete root.dataset.sweeping, 700) // etkilerin geçişi bitsin
+  }
+
+  const frame = (now: number): void => {
+    try {
+      step(now)
+    } catch (err) {
+      console.error(err)
+      finish() // takılı kalan overlay/`busy` düğmeyi sayfa yenilenene kadar ölü bırakmasın
+    }
+  }
+
+  const step = (now: number) => {
     const p = clamp01((now - t0) / DURATION)
     const lead = -GLASS_W + ease(p) * (W + GLASS_W * 2 + bandW * 0.25)
     run.style.transform = `translate3d(${lead.toFixed(1)}px,0,0) skewX(${SKEW}deg)`
@@ -224,13 +242,7 @@ export function sweepTo(next: Scheme): void {
     }
 
     if (p < 1) requestAnimationFrame(frame)
-    else {
-      overlay.remove()
-      if (!flipped) setScheme(next, false)
-      repaint() // tam token'lar
-      busy = false
-      setTimeout(() => delete root.dataset.sweeping, 700) // etkilerin geçişi bitsin
-    }
+    else finish()
   }
   requestAnimationFrame(frame)
 }

@@ -39,6 +39,8 @@ const STRINGS = {
   slideIntro: { tr: 'Giriş', en: 'Intro' },
   schemeToLight: { tr: 'Açık temaya geç', en: 'Switch to light theme' },
   schemeToDark: { tr: 'Koyu temaya geç', en: 'Switch to dark theme' },
+  schemeNowLight: { tr: 'Açık tema', en: 'Light theme' },
+  schemeNowDark: { tr: 'Koyu tema', en: 'Dark theme' },
 
   scrollHint: { tr: 'Kaydır', en: 'Scroll' },
 

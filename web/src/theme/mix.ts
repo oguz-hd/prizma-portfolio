@@ -2,7 +2,7 @@ import type { ThemeTokens } from './types'
 
 /**
  * İki token kümesi arasında ara değer (tema geçişi süpürmesi, sweep.ts).
- * Renkler sRGB'de doğrusal karışır; geçiş ~0,7 sn sürüyor, cam şeridin altında kalıyor.
+ * Renkler sRGB'de doğrusal karışır; karışım penceresi süpürmenin yalnızca ortasıdır (~0,2 sn), cam şeridin altında kalır.
  */
 const rgb = (h: string): number[] => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16))
 
@@ -13,8 +13,8 @@ function mixHex(a: string, b: string, t: number): string {
 }
 
 export function mixTokens(a: ThemeTokens, b: ThemeTokens, t: number): ThemeTokens {
-  // Ton sayıları farklı olabilir (Turbo 6, açık palet 7): başlangıcın sayısı korunur,
-  // hedeften orantılı örneklenir. Sayı farkı bitişte tam token'larla kapanır.
+  // Ton sayıları farklıysa başlangıcın sayısı korunur, hedeften orantılı örneklenir
+  // (açık palet zaten koyu ön ayarın sayısına indirilir, scheme.ts → resample; bu yalnızca yedek).
   const n = a.accents.length
   const accents = a.accents.map((c, i) => {
     const j = n === 1 ? 0 : Math.round((i / (n - 1)) * (b.accents.length - 1))
@@ -35,9 +35,8 @@ export function mixTokens(a: ThemeTokens, b: ThemeTokens, t: number): ThemeToken
 }
 
 /**
- * Paleti `n` tona orantılı örnekler (uçlar korunur). Açık palet 7 tonlu; koyu ön ayar
- * 6 tonluysa (Turbo) sahnenin duraklarıyla aynı sayıya indirilir: sahne ton sayısını
- * yalnızca kurulurken okuyor, geçişte sayı değişirse son karede renk zıplıyordu.
+ * Paleti `n` tona orantılı örnekler (uçlar korunur). Açık palet koyu ön ayarla aynı sayıda ton taşır:
+ * sahne ton sayısını yalnız kurulurken okur, geçişte sayı değişirse son karede renk zıplar.
  */
 export function resample(colors: string[], n: number): string[] {
   if (n === colors.length) return colors

@@ -24,6 +24,12 @@ export function appliedTokens(): ThemeTokens | null {
   return applied
 }
 
+/** Meta etiketini yalnız değer değişince yazar: süpürmede her karede çağrılıyor, boşuna DOM mutasyonu olmasın. */
+function setMeta(name: string, value: string): void {
+  const el = document.querySelector(`meta[name="${name}"]`)
+  if (el && el.getAttribute('content') !== value) el.setAttribute('content', value)
+}
+
 export function applyTheme(
   tokens: ThemeTokens,
   root: HTMLElement = document.documentElement,
@@ -63,7 +69,7 @@ export function applyTheme(
   root.dataset.scheme = scheme
   // Telefonun üst çubuğu da zemin renginde (index.html'deki ilk değer koyu).
   if (root === document.documentElement) {
-    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', tokens.ground)
-    document.querySelector('meta[name="color-scheme"]')?.setAttribute('content', scheme)
+    setMeta('theme-color', tokens.ground)
+    setMeta('color-scheme', scheme)
   }
 }

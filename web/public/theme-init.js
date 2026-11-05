@@ -1,14 +1,9 @@
 /*
- * Sayfa boyanmadan önce ziyaretçinin açık tema seçimini işaretler (Sorun 6, 05.11.2026).
- *
- * Neden ayrı dosya: Caddy CSP'si `script-src 'self'` — inline betik çalışmaz.
- * Neden burada: JS paketi inip tema uygulanana kadar `index.html` koyu zemini boyar;
- * açık temayı seçmiş ziyaretçi her yenilemede kısa bir siyah flaş görürdü.
- *
- * Yalnızca `html[data-boot="light"]` işaretini koyar; zemin rengi index.html'deki stilde
- * (renk kodlarının yaşadığı ikinci yer, presets.ts → LIGHT_TOKENS.ground ile aynı olmalı).
- * İşareti theme/scheme.ts → initScheme kaldırır; ondan sonra zemini --ground belirler.
- * Hata verirse (gizli sekme, kapalı site verisi) sessizce koyu kalır.
+ * Sayfa boyanmadan önce ziyaretçinin açık tema seçimini işaretler: JS paketi inip tema uygulanana kadar
+ * index.html koyu zemini boyar, açık seçen ziyaretçi her yenilemede siyah flaş görürdü.
+ * Ayrı dosya, çünkü CSP `script-src 'self'` inline betiği engeller. Yalnızca `html[data-boot="light"]`
+ * işaretini koyar (zemin index.html'deki stilde); işareti applyTheme kaldırır. Hata verirse koyu kalır.
+ * ⚠️ '#E4E7E1' = LIGHT_TOKENS.ground; index.html'deki değerle birlikte değişmeli.
  */
 ;(function () {
   try {

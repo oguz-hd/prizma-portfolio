@@ -1,4 +1,4 @@
-/* Tema geçişi süpürmesi (theme/sweep.ts). Renk kodu yok: beyaz parlama ışığın kendisi, kalanı token. */
+/* Tema geçişi süpürmesi (theme/sweep.ts). Cam yüzeyin beyazı ışığın kendisi (kural 1 istisnası), kalan renkler token. */
 .scheme-sweep {
   position: fixed;
   inset: 0;
@@ -41,20 +41,24 @@
   overflow: visible;
 }
 
-/* Geçiş sürerken, tema etkilerinin (açık temaya özgü çizgi, hale, yıldız, panel) tek karede
-   değil yumuşakça değişmesi. Yalnızca süpürme boyunca: sürekli açık olsa GSAP'ın satır içi
-   değerleriyle çakışır. Yarıda tetiklenir (q ≥ 0,5), süre süpürmenin kalanıyla örtüşür. */
-html[data-sweeping] :is(.prism-fan, .prism-glass, .prism-back, .prism-face, .prism-main, .prism-glow, .starfield, .star, .panel, .brand) {
+/*
+  Süpürme boyunca tema etkileri (açık temaya özgü çizgi, hale, yıldız, panel) tek karede değil yumuşakça değişir.
+  Yalnızca bu süre: sürekli açık olsa GSAP'ın satır içi değerleriyle çakışır; panelin `opacity`'si bu yüzden listede yok
+  (slayt geçişi süpürmeyle aynı ana denk gelirse gecikmesin).
+*/
+html[data-sweeping] :is(.prism-fan, .prism-glass, .prism-back, .prism-face, .prism-main, .prism-glow, .starfield, .star, .brand) {
   transition:
     fill-opacity 0.65s ease,
     stroke-opacity 0.65s ease,
     stroke-width 0.65s ease,
     stroke 0.65s ease,
     opacity 0.65s ease,
-    filter 0.65s ease,
+    filter 0.65s ease;
+}
+html[data-sweeping] .panel {
+  transition:
     background-color 0.65s ease,
-    backdrop-filter 0.65s ease,
-    box-shadow 0.65s ease;
+    backdrop-filter 0.65s ease;
 }
 html[data-sweeping] .prism-stage stop {
   transition: stop-color 0.65s ease;
