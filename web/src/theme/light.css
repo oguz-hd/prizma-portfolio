@@ -32,6 +32,12 @@
 [data-scheme='light'] .prism-inner {
   stroke-opacity: 0.8;
 }
+/* 404 soğurma çizgileri (Sorun 5): koyu zeminde zemin renginde çizgi ışığı "keser" (karanlık çizgi). Açık zeminde aynı
+   renk beyaz bir boşluk gibi duruyordu; metin "karanlık çizgi" diyor → açıkta mürekkep. */
+[data-scheme='light'] .prism-ray-gap,
+[data-scheme='light'] .prism-strip-gap {
+  stroke: var(--ink);
+}
 /* Slayt rayı (Sorun 3, 05.11.2026): 14×2 px çizgiler parlak tonda, %40 opaklıkla gri zeminde 1,2–1,6:1'di
    (neredeyse görünmez). Ton %45 mürekkeple koyulur, opaklık .85: 3,0–4,8:1; etkin olan tam opak. */
 [data-scheme='light'] :is(.rail-mark, .rail-page) {
