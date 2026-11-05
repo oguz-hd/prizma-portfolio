@@ -108,8 +108,10 @@ export const LIGHT_TOKENS: ThemeTokens = {
   line: '#C3C9BE',
   ink: '#171B16',
   inkDim: '#434A42',
-  inkFaint: '#555D54',
-  lead: '#006F86',
+  // Footer, "Back to top", daire bağlantıları 11–22 px'lik ince piksel yazı: 5,5 / 4,7:1 sayıda geçiyor ama
+  // gri zeminde silik duruyordu → 6,9 / 6,4:1'e koyulaştırıldı (Sorun 1, 05.11.2026).
+  inkFaint: '#474E46',
+  lead: '#005870',
   accents: ['#8B5CF6', '#3B82F6', '#06B6D4', '#22C55E', '#EAB308', '#F97316', '#EF4444'],
   scheme: 'light',
 }
