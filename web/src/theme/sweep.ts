@@ -252,8 +252,8 @@ export function sweepTo(next: Scheme): void {
       const back: number[][] = []
       for (let i = 0; i <= ROWS; i++) {
         const y = (i / ROWS) * Hh
-        front.push([GW + amp * (9 * Math.sin(y * 0.0155 + t * 2.4) + 4.5 * Math.sin(y * 0.043 - t * 3.6)) - 8, y])
-        back.push([8 + 7 * Math.sin(y * 0.012 - t * 1.8 + 1), y])
+        front.push([GW + amp * (4 * Math.sin(y * 0.0155 + t * 1.0) + 1.8 * Math.sin(y * 0.043 - t * 1.5)) - 8, y])
+        back.push([8 + 3.5 * Math.sin(y * 0.012 - t * 0.8 + 1), y])
       }
       const poly = front
         .concat(back.slice().reverse())
@@ -267,7 +267,7 @@ export function sweepTo(next: Scheme): void {
       paths[2].setAttribute('d', edgePath(shifted, -1.6))
       paths[3].setAttribute('d', edgePath(shifted))
       paths[4].setAttribute('d', edgePath(shifted))
-      paths[4].setAttribute('stroke-dashoffset', String(-t * 220)) // parlamalar dalgayla birlikte kayar
+      paths[4].setAttribute('stroke-dashoffset', String(-t * 90)) // parlamalar dalgayla birlikte, yavaşça kayar
     }
 
     // Renk akışı: yalnızca şerit ekranın ortasından geçerken (yaklaşık %28–72).
