@@ -109,8 +109,8 @@ Kullanıcı notu (Claude Docs, API'yi denerken): https://claude.ai/code/artifact
 
 1. **Tema geçişi:** sıvı cam görünümü iyileştirilecek (Oğuz: yeterince iyi değil); küçük kasma → performans
    kademeleri (tam / dengeli / hafif: `hardwareConcurrency`, `deviceMemory`, kare ölçümü; isteğe bağlı elle seçim).
-2. **Temaya özgü / uyum animasyonları, içerik düzenlemeleri, araştırmalar** (Oğuz, 05.11).
-3. Skill ve plugin konuşması + araştırma (hafıza: `skill-plugin-konusmasi-hatirlat`).
+2. Skill ve plugin konuşması + araştırma (hafıza: `skill-plugin-konusmasi-hatirlat`).
+3. **Temaya özgü / uyum animasyonları, içerik düzenlemeleri, araştırmalar** (Oğuz, 05.11).
 4. API bağımlılıkları kilitsiz: `uv lock` + `uv sync --frozen`, uv/alpine/caddy/node imajlarını sabitle (hafıza: `prizma-uv-lock-hatirlat`).
 5. **Faz 8 tema paneli** ve bekleyen C kararları: httpOnly çerez, panel IP kilidi, analytics + gizlilik notu, CTA, og:image,
    HSTS `includeSubDomains`, sunucu dışı yedek.
