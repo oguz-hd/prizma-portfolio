@@ -22,6 +22,16 @@
 [data-scheme='light'] .announcement-dot {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--lead) 18%, transparent);
 }
+/* Prizma çizgileri panelin arkasında da seçilsin (Sorun 4): yüz çizgisi tam opak, arka kenar ve iç çizgi güçlü. */
+[data-scheme='light'] .prism-stage svg .prism-face {
+  stroke-opacity: 1;
+}
+[data-scheme='light'] .prism-back {
+  stroke-opacity: 0.4;
+}
+[data-scheme='light'] .prism-inner {
+  stroke-opacity: 0.8;
+}
 /* Slayt rayı (Sorun 3, 05.11.2026): 14×2 px çizgiler parlak tonda, %40 opaklıkla gri zeminde 1,2–1,6:1'di
    (neredeyse görünmez). Ton %45 mürekkeple koyulur, opaklık .85: 3,0–4,8:1; etkin olan tam opak. */
 [data-scheme='light'] :is(.rail-mark, .rail-page) {
@@ -34,12 +44,12 @@
   opacity: 1;
 }
 /* Cam panel: açık zeminde %48 yüzeyde doygun tayf metnin altında fazla; %70 prizmayı siliyordu → %58.
-   Sorun 2 (05.11.2026): tayf yine de "FastAPI · Python" gibi metne sızıyordu → altındaki renk soluklaştırılıyor
-   (saturate .45), bulanıklık 6 → 8 px. 16 px metni temizliyordu ama prizmanın çizgisini de siliyordu. */
+   Sorun 2 (05.11.2026): tayf metne sızıyordu → altındaki renk soluklaştırılıyor (saturate). Sorun 4: bulanıklık ince
+   prizma çizgisini siliyordu (8 px'te ~%85 erir) → bulanıklık 2 px, işi renk soluklaştırma görüyor (.35). */
 [data-scheme='light'] .panel {
   background: color-mix(in srgb, var(--surface) 58%, transparent);
-  -webkit-backdrop-filter: blur(8px) saturate(0.45);
-  backdrop-filter: blur(8px) saturate(0.45);
+  -webkit-backdrop-filter: blur(2px) saturate(0.35);
+  backdrop-filter: blur(2px) saturate(0.35);
 }
 @media (prefers-reduced-transparency: reduce) {
   [data-scheme='light'] .panel {
