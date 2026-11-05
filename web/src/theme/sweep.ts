@@ -22,6 +22,8 @@ const GLASS_W = 150 // px, cam şeridin genişliği
 const SKEW = -12 // derece, bant ve cam aynı eğimde
 const DURATION = 1700 // ms
 const ROWS = 30 // dalga kenarının dikey örnek sayısı
+const WAVE_STEP_MS = 16 // dalga/clip-path güncelleme aralığı: 240 Hz ekranda da ~60 Hz (GPU yükü yenileme hızıyla orantılı)
+const MIX_STEPS = 30 // renk karışımı adım sayısı (her karede stil yeniden hesabı olmasın)
 const FILTER_ID = 'scheme-glass'
 
 let busy = false
@@ -150,7 +152,7 @@ export function sweepTo(next: Scheme): void {
     glass = el('div', 'ss-glass', run)
     glass.style.width = `${GLASS_W}px`
     glass.style.right = `${-GLASS_W * 0.25}px`
-    const bf = `${refract ? `url(#${FILTER_ID}) ` : ''}blur(${refract ? 1 : 5}px) saturate(1.7) brightness(1.1)`
+    const bf = `${refract ? `url(#${FILTER_ID}) ` : 'blur(5px) '}saturate(1.7) brightness(1.1)`
     glass.style.backdropFilter = bf
     glass.style.setProperty('-webkit-backdrop-filter', bf)
 
@@ -182,7 +184,8 @@ export function sweepTo(next: Scheme): void {
 
   const t0 = performance.now()
   let flipped = false
-  let lastQ = -1
+  let lastStep = -1
+  let lastWave = -Infinity
 
   const finish = () => {
     overlay.remove()
@@ -207,7 +210,8 @@ export function sweepTo(next: Scheme): void {
     run.style.transform = `translate3d(${lead.toFixed(1)}px,0,0) skewX(${SKEW}deg)`
     overlay.style.opacity = Math.min(1, Math.sin(Math.PI * Math.min(1, p * 1.03)) * 1.9).toFixed(3)
 
-    if (glass) {
+    if (glass && now - lastWave >= WAVE_STEP_MS) {
+      lastWave = now
       const t = now / 1000
       const amp = 1 + 0.35 * Math.sin(Math.PI * p) // ortada dalgalar büyür
       const front: number[][] = []
@@ -232,9 +236,10 @@ export function sweepTo(next: Scheme): void {
 
     // Renk akışı: yalnızca şerit ekranın ortasından geçerken (yaklaşık %28–72).
     const q = clamp01((lead / W - 0.28) / 0.44)
-    if (q !== lastQ) {
-      lastQ = q
-      if (q > 0 && q < 1) applyTheme(mixTokens(A, B, ease(q)))
+    const stepQ = Math.round(q * MIX_STEPS)
+    if (stepQ !== lastStep) {
+      lastStep = stepQ
+      if (q > 0 && q < 1) applyTheme(mixTokens(A, B, ease(stepQ / MIX_STEPS)))
       if (q >= 0.5 && !flipped) {
         flipped = true
         setScheme(next, false) // durum + düğme simgesi; boyama karışımla sürüyor
