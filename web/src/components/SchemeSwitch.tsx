@@ -1,8 +1,6 @@
-import { flushSync } from 'react-dom'
-
 import { useStrings } from '../i18n/strings'
-import { reducedMotion } from '../motion'
-import { setScheme, useScheme } from '../theme/scheme'
+import { useScheme } from '../theme/scheme'
+import { sweepTo } from '../theme/sweep'
 
 /**
  * Açık / koyu tema düğmesi (dil seçicisinin yanında).
@@ -10,42 +8,18 @@ import { setScheme, useScheme } from '../theme/scheme'
  * Bilgi yalnızca renkle taşınmaz (docs/DESIGN.md § F/6): simge hedef temayı gösterir
  * (koyudayken güneş, açıktayken ay), aria-label ne yapacağını söyler.
  *
- * Geçiş: View Transitions ile düğmeden büyüyen bir daire — yeni tema dairenin içinde
- * açılır. Desteklemeyen tarayıcıda ya da "hareketi azalt"ta renk anında değişir.
+ * Geçiş: ışık süpürmesi + sıvı cam ucu (theme/sweep.ts).
  */
-const DURATION_MS = 400
-
 export function SchemeSwitch() {
   const t = useStrings()
   const scheme = useScheme()
   const next = scheme === 'dark' ? 'light' : 'dark'
 
-  function toggle(e: React.MouseEvent<HTMLButtonElement>) {
-    const start = document.startViewTransition?.bind(document)
-    if (!start || reducedMotion()) {
-      setScheme(next)
-      return
-    }
-    // Klavyeyle tıklamada (0,0) gelir; o zaman dairenin merkezi düğmenin kendisi.
-    const rect = e.currentTarget.getBoundingClientRect()
-    const x = e.clientX || rect.left + rect.width / 2
-    const y = e.clientY || rect.top + rect.height / 2
-    const radius = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y))
-
-    const transition = start(() => flushSync(() => setScheme(next)))
-    void transition.ready.then(() => {
-      document.documentElement.animate(
-        { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${radius}px at ${x}px ${y}px)`] },
-        { duration: DURATION_MS, easing: 'cubic-bezier(0.4, 0, 0.2, 1)', pseudoElement: '::view-transition-new(root)' },
-      )
-    })
-  }
-
   return (
     <button
       type="button"
       className="scheme-btn"
-      onClick={toggle}
+      onClick={() => sweepTo(next)}
       aria-label={t(scheme === 'dark' ? 'schemeToLight' : 'schemeToDark')}
       title={t(scheme === 'dark' ? 'schemeToLight' : 'schemeToDark')}
     >

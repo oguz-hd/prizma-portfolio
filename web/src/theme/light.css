@@ -83,21 +83,6 @@
     0 0 / 88px 88px repeat;
 }
 
-/* ── Tema geçişi (components/SchemeSwitch.tsx) ──────────────────────────────
-   View Transitions: eski görünüm yerinde kalır, yenisi düğmeden büyüyen bir daireyle açılır.
-   Varsayılan çapraz solma kapalı; dairenin kendisi JS'te (clip-path, Web Animations). */
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation: none;
-  mix-blend-mode: normal;
-}
-::view-transition-old(root) {
-  z-index: 1;
-}
-::view-transition-new(root) {
-  z-index: 2;
-}
-
 /* Hafif kipte tam ekran etkiler kapalı: cam bulanıklığı zaten gitti, `brightness` + 30 px
    blur'lu hale de aynı cihazda ağır. */
 html[data-lite][data-scheme='light'] .prism-glow {

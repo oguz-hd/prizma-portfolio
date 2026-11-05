@@ -50,8 +50,20 @@ export function getScheme(): Scheme {
   return current
 }
 
-/** Rengi hemen değiştirir. Animasyon çağıranın işi (components/SchemeSwitch.tsx). */
-export function setScheme(next: Scheme): void {
+export function tokensOf(scheme: Scheme): ThemeTokens {
+  return tokensFor(scheme)
+}
+
+/** Süpürme bitince: ara karışımı bırakıp tam token'ları yaz (sweep.ts). */
+export function repaint(): void {
+  paint()
+}
+
+/**
+ * Seçimi değiştirir. `paintNow: false` yalnızca durumu (kayıt, düğme simgesi) çevirir;
+ * boyamayı süpürme kendisi yapar (sweep.ts), bitişte `repaint()`.
+ */
+export function setScheme(next: Scheme, paintNow = true): void {
   if (next === current) return
   current = next
   try {
@@ -59,7 +71,7 @@ export function setScheme(next: Scheme): void {
   } catch {
     // Kaydedilemezse bu oturumda seçim yine de geçerli.
   }
-  paint()
+  if (paintNow) paint()
   listeners.forEach((fn) => fn())
 }
 

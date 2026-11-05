@@ -92,3 +92,4 @@ isteğiyle bırakıldı. Ortak belge: ozi/SUNUCU.md.
 
 ## 05.11.2026 — Beyaz tema
 Seçenek sayfası (tasarimci) → Oğuz A2·B2·C4·D4·E2 seçti. Seçici ziyaretçide (dil gibi), varsayılan koyu, geçiş daire (View Transitions). Panel koyu kaldı. Ayrıntı: CLAUDE.md Sırada 8.
+Tema geçişi: View Transitions daire bırakıldı (eski görüntü donuk). Yerine sweep.ts: tayf bandı + dalgalı sıvı cam ucu, canlı, kare medyanı 4 ms. Araştırma: sivi-cam-arastirma.md (scratchpad), kube.io yöntemi kendi koduyla.
