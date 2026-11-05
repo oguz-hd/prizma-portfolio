@@ -43,7 +43,7 @@ function paint(): void {
 
 /** main.tsx: içerik yüklendikten sonra, mount'tan önce. */
 export function initScheme(preset: PresetId): Scheme {
-  darkPreset = preset
+  darkPreset = preset in PRESETS ? preset : 'tayf' // içerik bilinmeyen bir ön ayar getirirse boş sayfa yerine varsayılan
   current = readStored()
   paint()
   return current

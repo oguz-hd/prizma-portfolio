@@ -48,7 +48,10 @@ export function Lightbox({
       ref={ref}
       className="lightbox"
       aria-label={item.alt || item.caption || t('enlarge')}
-      onClose={onClose}
+      // StrictMode'da efekt söküm→kurulum arasında `close()` olayı geç gelir; hâlâ açıksa kapanma sayma.
+      onClose={(e) => {
+        if (!e.currentTarget.open) onClose()
+      }}
       onKeyDown={(e) => {
         if (e.key === 'ArrowRight') go(1)
         if (e.key === 'ArrowLeft') go(-1)

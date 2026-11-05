@@ -3,7 +3,6 @@ import { createRoot } from 'react-dom/client'
 
 import './theme/fonts.css'
 import './theme/theme.css'
-import './theme/light.css'
 import { applyTheme } from './theme/applyTheme'
 import { applyFavicon } from './theme/favicon'
 import { PRESETS } from './theme/presets'
@@ -12,9 +11,12 @@ import { getPreset, loadContent } from './content/useContent'
 import { initLocale } from './i18n/useLocale'
 import { prepareIntro } from './prism/intro'
 import { isLab } from './route'
+import { ErrorBoundary } from './components/ErrorBoundary'
 import { LoadError } from './components/LoadError'
 
 import { App } from './App'
+// App'ten SONRA: light.css, prism.css ve starfield.css'in genel kurallarını ezebilmeli (aynı özgüllük, son yazılan kazanır).
+import './theme/light.css'
 
 /**
  * Giriş noktası.
@@ -56,7 +58,9 @@ async function boot(root: HTMLElement): Promise<void> {
 
   createRoot(root).render(
     <StrictMode>
-      <App />
+      <ErrorBoundary>
+        <App />
+      </ErrorBoundary>
     </StrictMode>,
   )
 }

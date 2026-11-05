@@ -18,7 +18,7 @@
     if (theme) theme.setAttribute('content', '#E4E7E1')
     var scheme = document.querySelector('meta[name="color-scheme"]')
     if (scheme) scheme.setAttribute('content', 'light')
-  } catch (e) {
+  } catch {
     /* koyu kalır */
   }
 })()

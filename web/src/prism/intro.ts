@@ -44,6 +44,14 @@ export function prepareIntro(): void {
   lockDeck()
 }
 
+/** Render hatasında (ErrorBoundary): açılış hiç başlamadıysa hata ekranı gizli kalmasın (kural 7). */
+export function abortIntro(): void {
+  if (!pending) return
+  pending = false
+  delete document.documentElement.dataset.intro
+  unlockDeck(0)
+}
+
 function seen(): boolean {
   try {
     return sessionStorage.getItem(SEEN_KEY) === '1'

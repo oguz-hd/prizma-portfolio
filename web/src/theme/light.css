@@ -1,13 +1,14 @@
 /*
-  Açık tema etkileri (ziyaretçi seçimi, theme/scheme.ts). Renk kodu YOK — hepsi token (kural 1).
-  Seçilen yön: A2 B2 C4 D4 E2 (Oğuz, 05.11.2026); seçenek sayfası ve elenenler:
-  docs/tasarim/beyaz-tema/. A ve E presets.ts → LIGHT_TOKENS'ta; B/C/D burada.
-  prism.css / starfield.css'teki genel [data-scheme='light'] kuralları bunun TEMELİ;
-  buradakiler (sonra yüklenir) onları ayrıntıda ezer.
+  Açık tema etkileri (ziyaretçi seçimi, theme/scheme.ts). Renk kodu yok, hepsi token (kural 1).
+  Seçilen yön A2 B2 C4 D4 E2; elenenler docs/tasarim/beyaz-tema/. A ve E presets.ts → LIGHT_TOKENS'ta, B/C/D burada.
+
+  ⚠️ Bu dosya prism.css ve starfield.css'ten SONRA yüklenmeli (main.tsx, App'ten sonra): aynı özgüllükte
+  son yazılan kazanır, yoksa buradaki hale (C4) ve yıldız (D4) kuralları ezilir.
 */
 
-/* ── Ortak (her açık yönde) ─────────────────────────────────────────────── */
-/* INTRO yazısı: koyu gökte ışıma; kâğıtta ışıma leke gibi duruyor → ince mürekkep kenarı. */
+/* ── Ortak ──────────────────────────────────────────────────────────────── */
+
+/* INTRO yazısı: koyu gökte ışıma, kâğıtta leke gibi durur → ince mürekkep kenarı. */
 [data-scheme='light'] .brand {
   filter: drop-shadow(0 0 0.6px color-mix(in srgb, var(--ink) 55%, transparent));
 }
@@ -15,6 +16,7 @@
 [data-scheme='light'] .brand:focus-visible {
   filter: drop-shadow(0 0 0.8px var(--ink));
 }
+
 /* Ray işareti ve duyuru noktası: ışıma yerine tok renk. */
 [data-scheme='light'] .rail-link[aria-current] .rail-mark {
   box-shadow: none;
@@ -22,36 +24,26 @@
 [data-scheme='light'] .announcement-dot {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--lead) 18%, transparent);
 }
-/* Prizma çizgileri panelin arkasında da seçilsin (Sorun 4): yüz çizgisi tam opak, arka kenar ve iç çizgi güçlü. */
-[data-scheme='light'] .prism-stage svg .prism-face {
-  stroke-opacity: 1;
-}
-[data-scheme='light'] .prism-back {
-  stroke-opacity: 0.4;
-}
-[data-scheme='light'] .prism-inner {
-  stroke-opacity: 0.8;
-}
-/* 404 soğurma çizgileri (Sorun 5): koyu zeminde zemin renginde çizgi ışığı "keser" (karanlık çizgi). Açık zeminde aynı
-   renk beyaz bir boşluk gibi duruyordu; metin "karanlık çizgi" diyor → açıkta mürekkep. */
-[data-scheme='light'] .prism-ray-gap,
-[data-scheme='light'] .prism-strip-gap {
-  stroke: var(--ink);
-}
-/* Slayt rayı (Sorun 3, 05.11.2026): 14×2 px çizgiler parlak tonda, %40 opaklıkla gri zeminde 1,2–1,6:1'di
-   (neredeyse görünmez). Ton %45 mürekkeple koyulur, opaklık .85: 3,0–4,8:1; etkin olan tam opak. */
+
+/* Ray çizgileri: parlak ton gri zeminde 1,2–1,6:1'di. Ton %45 mürekkeple koyulur, opaklık .85 → 3,0–4,8:1. */
 [data-scheme='light'] :is(.rail-mark, .rail-page) {
   background: color-mix(in srgb, var(--tone) 55%, var(--ink));
   opacity: 0.85;
 }
-[data-scheme='light'] .rail-link[aria-current] .rail-mark,
-[data-scheme='light'] .rail-page.is-on,
-[data-scheme='light'] .rail-link:hover .rail-mark {
+[data-scheme='light'] .rail-page.is-on {
   opacity: 1;
 }
-/* Cam panel: açık zeminde %48 yüzeyde doygun tayf metnin altında fazla; %70 prizmayı siliyordu → %58.
-   Sorun 2 (05.11.2026): tayf metne sızıyordu → altındaki renk soluklaştırılıyor (saturate). Sorun 4: bulanıklık ince
-   prizma çizgisini siliyordu (8 px'te ~%85 erir) → bulanıklık 2 px, işi renk soluklaştırma görüyor (.35). */
+
+/* 404 soğurma çizgileri: koyu zeminde zemin renginde çizgi ışığı "keser"; açıkta aynı renk beyaz boşluk olur. */
+[data-scheme='light'] .prism-ray-gap,
+[data-scheme='light'] .prism-strip-gap {
+  stroke: var(--ink);
+}
+
+/*
+  Cam panel: altındaki tayf metne sızmasın diye renk soluklaştırılır (saturate .35). Bulanıklık 2 px'te
+  kalır; 8 px'te prizmanın ince çizgisi ~%85 erir ve panelin arkasında seçilemez.
+*/
 [data-scheme='light'] .panel {
   background: color-mix(in srgb, var(--surface) 58%, transparent);
   -webkit-backdrop-filter: blur(2px) saturate(0.35);
@@ -64,14 +56,9 @@
     background: color-mix(in srgb, var(--surface) 66%, transparent);
   }
 }
-/* Hafif kipte panelin bulanıklığı kapalı (theme.css); açık kural onu geri açmasın. */
-html[data-lite][data-scheme='light'] .panel {
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
-}
 
-/* B2 Gravür (Newton, Opticks levhaları): tayf soluk boya, kenarları mürekkep tel;
-   ışık ince bir mürekkep çizgisi; darbe mürekkep ucu gibi kayar. */
+/* ── B2 Gravür (Newton, Opticks levhaları) ──────────────────────────────── */
+/* Tayf soluk boya, kenarları mürekkep tel; ışık ince bir mürekkep çizgisi. */
 [data-scheme='light'] .prism-fan {
   fill-opacity: 0.4;
   stroke: var(--ink);
@@ -91,21 +78,30 @@ html[data-lite][data-scheme='light'] .panel {
 [data-scheme='light'] .prism-glass {
   fill-opacity: 0.05;
 }
+/* Çizgiler panelin arkasında da seçilsin. */
 [data-scheme='light'] .prism-back {
   stroke-opacity: 0.4;
+}
+[data-scheme='light'] .prism-inner {
+  stroke-opacity: 0.8;
 }
 [data-scheme='light'] .prism-stage svg .prism-face {
   stroke-opacity: 1;
 }
 
-/* C4 Işık masası: tonlar ağartılıp geniş yayılıyor — renkli zeminde (plaka, gök)
-   zeminden AÇIK okunur, arkadan aydınlatılmış cam gibi. Beyaz zeminde kaybolur. */
+/* ── C4 Işık masası ─────────────────────────────────────────────────────── */
+/* Tonlar ağartılıp geniş yayılır: renkli zeminde (plaka) arkadan aydınlatılmış cam gibi. */
 [data-scheme='light'] .prism-glow {
   filter: blur(30px) saturate(1.25) brightness(1.75);
   opacity: 0.9;
 }
+/* Hafif kipte tam ekran hale kapalı: brightness + 30 px blur zayıf GPU'da ağır. */
+html[data-lite][data-scheme='light'] .prism-glow {
+  display: none;
+}
 
-/* Plaka lekeleri: astronomi plakaları negatif — yıldız açık camda koyu nokta. */
+/* ── D4 Réseau ──────────────────────────────────────────────────────────── */
+/* Astronomi plakaları negatif: yıldız açık camda koyu nokta. */
 [data-scheme='light'] .star {
   background: var(--ink) !important;
   transform: scale(1.5);
@@ -113,7 +109,7 @@ html[data-lite][data-scheme='light'] .panel {
 [data-scheme='light'] .starfield {
   opacity: 0.5;
 }
-/* D4 Réseau: Carte du Ciel plakalarına pozlanan ölçü ağı, 88 px (11 × 8) artılar + plaka lekeleri. */
+/* Carte du Ciel plakalarına pozlanan ölçü ağı: 88 px (11 × 8) artılar. */
 [data-scheme='light'] .starfield::before {
   content: '';
   position: absolute;
@@ -124,10 +120,4 @@ html[data-lite][data-scheme='light'] .panel {
     0 0 / 88px 88px repeat;
   mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='88' height='88'%3E%3Cpath d='M43.5 38h1v12h-1zM38 43.5h12v1H38z'/%3E%3C/svg%3E")
     0 0 / 88px 88px repeat;
-}
-
-/* Hafif kipte tam ekran etkiler kapalı: cam bulanıklığı zaten gitti, `brightness` + 30 px
-   blur'lu hale de aynı cihazda ağır. */
-html[data-lite][data-scheme='light'] .prism-glow {
-  display: none;
 }

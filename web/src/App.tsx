@@ -1,4 +1,4 @@
-import { useEffect, type ComponentType } from 'react'
+import { lazy, Suspense, useEffect, type ComponentType } from 'react'
 
 import type { SectionKind } from './content/types'
 import { useContent } from './content/useContent'
@@ -15,7 +15,6 @@ import type { SectionProps } from './sections/Section'
 import { NotFound, NOT_FOUND_LINES } from './sections/NotFound'
 import { SiteHeader } from './components/SiteHeader'
 import { Starfield } from './components/Starfield'
-import { TokenLab } from './lab/TokenLab'
 import { Deck } from './deck/SlideDeck'
 import { SlideRail } from './deck/SlideRail'
 import { PrismStage } from './prism/PrismStage'
@@ -30,6 +29,11 @@ import { watchFrameRate } from './lite'
  * Başlıklar ve sıra useContent().sections'tan geliyor — nav ve ray ile AYNI
  * kaynak. Bir bölümün adı değişince üçü birlikte değişir, kaymaz.
  */
+// Yalnız geliştirmede: yayın paketine girmez (DEV sabiti derlemede `false` olur, import ağaçtan düşer).
+const TokenLab = import.meta.env.DEV
+  ? lazy(() => import('./lab/TokenLab').then((m) => ({ default: m.TokenLab })))
+  : null
+
 const SECTION_COMPONENTS: Record<SectionKind, ComponentType<SectionProps>> = {
   about: About,
   experience: Experience,
@@ -68,7 +72,12 @@ export function App() {
 
   useEffect(() => (isLab ? undefined : watchFrameRate()), [])
 
-  if (isLab) return <TokenLab />
+  if (isLab && TokenLab)
+    return (
+      <Suspense fallback={null}>
+        <TokenLab />
+      </Suspense>
+    )
 
   if (isNotFound) {
     return (
@@ -88,7 +97,8 @@ export function App() {
       <Deck>
         <Hero />
         {sections.map((s, i) => {
-          const Component = SECTION_COMPONENTS[s.kind]
+          // Önbellekteki eski paket, içeriğe sonradan eklenen bir türü tanımayabilir: düz metne düş.
+          const Component = SECTION_COMPONENTS[s.kind] ?? TextSection
           return (
             <Component
               key={s.id}

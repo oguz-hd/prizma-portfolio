@@ -111,8 +111,17 @@ function setState(slide: HTMLElement, state: 'active' | 'leaving' | null) {
   else slide.removeAttribute('aria-hidden')
 }
 
+/** Bozuk yüzde kodlu hash (`#a%`) `URIError` fırlatır; ziyaretçinin adresi siteyi çökertmesin. */
+function safeDecode(raw: string): string {
+  try {
+    return decodeURIComponent(raw)
+  } catch {
+    return ''
+  }
+}
+
 function indexFromHash(): number | null {
-  const id = decodeURIComponent(window.location.hash.slice(1))
+  const id = safeDecode(window.location.hash.slice(1))
   if (!id) return null
   const i = slides.findIndex((s) => s.id === id)
   return i >= 0 ? i : null
@@ -325,9 +334,9 @@ function onWheel(e: WheelEvent) {
   if (dy === 0 || Math.abs(e.deltaX) > Math.abs(e.deltaY)) return
   const dir = dy > 0 ? 1 : -1
 
-  // Slaytın içi bu yönde kayabiliyorsa önce o kayar.
+  // Slaytın içi bu yönde kayabiliyorsa önce o kayar (kilit açıkken: lightbox arkadaki slaytı kaydırmasın).
   const sc = scrollerOf(slides[index])
-  if (!busy && canScroll(sc, dir)) {
+  if (!busy && now >= lockedUntil && canScroll(sc, dir)) {
     innerAt = now
     // İmleç kaydırıcının dışındaysa (üst çubuk, ray) tarayıcı kaydırmaz — elle.
     if (!sc!.contains(e.target as Node)) {
@@ -452,7 +461,7 @@ function onClick(e: MouseEvent) {
     return
   const a = e.target instanceof Element ? e.target.closest('a[href^="#"]') : null
   if (!a) return
-  const id = decodeURIComponent(a.getAttribute('href')!.slice(1))
+  const id = safeDecode(a.getAttribute('href')!.slice(1))
   const i = slides.findIndex((s) => s.id === id)
   if (i < 0) return
   e.preventDefault()
