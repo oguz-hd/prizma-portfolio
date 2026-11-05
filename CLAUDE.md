@@ -194,8 +194,7 @@ temadan (`applyTheme` → `appliedTokens`), içerikten değil — panel sahneyi 
 8. ✅ **Beyaz tema (05.11.2026)** — yön A2·B2·C4·D4·E2 (Cam plaka). Ziyaretçi seçimi: üst çubukta güneş/ay düğmesi
    (`SchemeSwitch`, dil seçici gibi; `theme/scheme.ts`, localStorage `prizma.scheme`), **varsayılan koyu**
    (`prefers-color-scheme` okunmaz), geçiş = **ışık süpürmesi + dalgalı sıvı cam ucu** (`theme/sweep.ts`, Oğuz seçimi G3; demo: artifact Fkrx1B2hY9sYP6gEQHAbBT): tayf bandı arkada, ön kenarda squircle+Snell kırılma haritalı `backdrop-filter` cam (yalnız Chromium; Safari/Firefox bulanık cam, `data-lite` yalnız bant, hareket azaltılmışsa anında). View Transitions bırakıldı (eski görüntü donuk kalıyordu). Açık palet, koyu ön ayarın ton sayısına örneklenir (`mix.ts → resample`): sahne ton sayısını yalnız kurulurken okur, sayı değişirse geçişte renk zıplar. Etkiler `html[data-sweeping]` ile yumuşak geçer. Dikkat: sitenin `svg{max-width:100%}` kuralı 0 genişlikli üst öğede svg'yi ezer (`.ss-edge{max-width:none}`).
-   Açık palet `LIGHT_TOKENS` (presets.ts), etkiler `theme/light.css`. Panel hep koyu. Açık: E2'de INTRO/ray tonları 3:1 altı
-   (bilerek), 404 soğurma çizgisi açıkta beyaz boşluk (karar bekliyor), index.html zemin flaşı. Sonra Faz 8 tema paneli.
+   Açık palet `LIGHT_TOKENS` (presets.ts), etkiler `theme/light.css`. Panel hep koyu. Açık-tema cilası (05.11): footer/bağlantı kontrastı, panel altı tayf sızması, ray çizgileri, panel arkasında prizma, 404 çizgisi koyu, yenilemede flaş yok (`public/theme-init.js`, `html[data-boot]`), mobil 320–390 px temiz. Açık kalan: dev ön ayarı Turbo (canlı Tayf; dev panelinden Oğuz çevirecek). Sonra Faz 8 tema paneli.
 Plan: `C:\Users\drn49\.claude\plans\hadi-back-and-e-hidden-puddle.md`.
 Kullanıcı notu (Claude Docs, API'yi denerken bilinmesi gerekenler):
 https://claude.ai/code/artifact/8a071f83-aa54-4eb2-a4a7-592661b51c62
