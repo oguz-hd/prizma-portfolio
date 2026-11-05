@@ -193,7 +193,7 @@ temadan (`applyTheme` → `appliedTokens`), içerikten değil — panel sahneyi 
    `tools/yayin/tarayici.mjs` (13), pytest 23, Lighthouse 100/100/100 → CALISTIRMA "Yayın öncesi testler".
 8. ✅ **Beyaz tema (05.11.2026)** — yön A2·B2·C4·D4·E2 (Cam plaka). Ziyaretçi seçimi: üst çubukta güneş/ay düğmesi
    (`SchemeSwitch`, dil seçici gibi; `theme/scheme.ts`, localStorage `prizma.scheme`), **varsayılan koyu**
-   (`prefers-color-scheme` okunmaz), geçiş = düğmeden büyüyen daire (View Transitions; desteklemezse/hareket azaltılmışsa anında).
+   (`prefers-color-scheme` okunmaz), geçiş = düğmeden büyüyen daire, 400 ms (View Transitions; eski görüntü durağan olduğu için uzun sürerse prizma donmuş görünür; desteklemezse/hareket azaltılmışsa anında).
    Açık palet `LIGHT_TOKENS` (presets.ts), etkiler `theme/light.css`. Panel hep koyu. Açık: E2'de INTRO/ray tonları 3:1 altı
    (bilerek), 404 soğurma çizgisi açıkta beyaz boşluk (karar bekliyor), index.html zemin flaşı. Sonra Faz 8 tema paneli.
 Plan: `C:\Users\drn49\.claude\plans\hadi-back-and-e-hidden-puddle.md`.

@@ -13,7 +13,7 @@ import { setScheme, useScheme } from '../theme/scheme'
  * Geçiş: View Transitions ile düğmeden büyüyen bir daire — yeni tema dairenin içinde
  * açılır. Desteklemeyen tarayıcıda ya da "hareketi azalt"ta renk anında değişir.
  */
-const DURATION_MS = 750
+const DURATION_MS = 400
 
 export function SchemeSwitch() {
   const t = useStrings()
@@ -36,7 +36,7 @@ export function SchemeSwitch() {
     void transition.ready.then(() => {
       document.documentElement.animate(
         { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${radius}px at ${x}px ${y}px)`] },
-        { duration: DURATION_MS, easing: 'cubic-bezier(0.65, 0, 0.35, 1)', pseudoElement: '::view-transition-new(root)' },
+        { duration: DURATION_MS, easing: 'cubic-bezier(0.4, 0, 0.2, 1)', pseudoElement: '::view-transition-new(root)' },
       )
     })
   }
