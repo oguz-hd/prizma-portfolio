@@ -28,7 +28,11 @@ export function applyTheme(
   tokens: ThemeTokens,
   root: HTMLElement = document.documentElement,
 ): void {
-  if (root === document.documentElement) applied = tokens
+  if (root === document.documentElement) {
+    applied = tokens
+    // public/theme-init.js'in ilk boyama işareti: tema artık token'larla geldi, zemini --ground belirler.
+    delete root.dataset.boot
+  }
   const s = root.style
 
   s.setProperty('--ground', tokens.ground)

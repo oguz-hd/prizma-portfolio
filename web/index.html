@@ -13,7 +13,10 @@
     <meta name="theme-color" content="#070A12" />
     <style>
       html { background: #070A12; }
+      /* Açık temayı seçmiş ziyaretçi (public/theme-init.js): ilk boyama açık zeminde. LIGHT_TOKENS.ground ile aynı. */
+      html[data-boot='light'] { background: #E4E7E1; color-scheme: light; }
     </style>
+    <script src="/theme-init.js"></script>
 
     <!--
       Sitenin TEK fontu (Oturum 2, kullanıcı isteği): önden çek. `font-display:
