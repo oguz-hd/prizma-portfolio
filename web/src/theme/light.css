@@ -22,9 +22,25 @@
 [data-scheme='light'] .announcement-dot {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--lead) 18%, transparent);
 }
-/* Cam panel: açık zeminde %48 yüzeyde doygun tayf metnin altında fazla; %70 prizmayı siliyordu → %58. */
+/* Cam panel: açık zeminde %48 yüzeyde doygun tayf metnin altında fazla; %70 prizmayı siliyordu → %58.
+   Sorun 2 (05.11.2026): tayf yine de "FastAPI · Python" gibi metne sızıyordu → altındaki renk soluklaştırılıyor
+   (saturate .45), bulanıklık 6 → 8 px. 16 px metni temizliyordu ama prizmanın çizgisini de siliyordu. */
 [data-scheme='light'] .panel {
   background: color-mix(in srgb, var(--surface) 58%, transparent);
+  -webkit-backdrop-filter: blur(8px) saturate(0.45);
+  backdrop-filter: blur(8px) saturate(0.45);
+}
+@media (prefers-reduced-transparency: reduce) {
+  [data-scheme='light'] .panel {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: color-mix(in srgb, var(--surface) 66%, transparent);
+  }
+}
+/* Hafif kipte panelin bulanıklığı kapalı (theme.css); açık kural onu geri açmasın. */
+html[data-lite][data-scheme='light'] .panel {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
 }
 
 /* B2 Gravür (Newton, Opticks levhaları): tayf soluk boya, kenarları mürekkep tel;
