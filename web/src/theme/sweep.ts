@@ -20,7 +20,7 @@ import './sweep.css'
 
 const SVG_NS = 'http://www.w3.org/2000/svg'
 const SKEW = -12 // derece, bant ve cam aynı eğimde
-const DURATION = { full: 1700, balanced: 1300, lite: 1100 } // ms, kademeye göre
+const DURATION = { full: 2100, balanced: 1600, lite: 1300 } // ms, kademeye göre
 const ROWS = 30 // dalga kenarının dikey örnek sayısı
 const WAVE_STEP_MS = 16 // dalga/clip-path güncelleme aralığı: 240 Hz ekranda da ~60 Hz (GPU yükü yenileme hızıyla orantılı)
 const MIX_STEPS = 30 // renk karışımı adım sayısı (her karede stil yeniden hesabı olmasın)
