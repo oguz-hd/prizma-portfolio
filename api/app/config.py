@@ -4,8 +4,8 @@ from pathlib import Path
 from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-#: Yalnızca yerel geliştirme için. Üretimde bu değer görülürse uyarı basılıyor
-#: (`main.py`) — bu sırla çıkılırsa token'lar tahmin edilebilir olur.
+#: Yalnızca yerel geliştirme için. Üretimde bu değerle API açılmıyor (`main.py`):
+#: bu sırla çıkılırsa token'lar tahmin edilebilir olur.
 INSECURE_DEFAULT_SECRET = "gelistirme-icin-guvensiz-anahtar"
 
 #: Yalnızca yerel geliştirme için admin parolası. Üretimde veritabanındaki hesap
@@ -19,7 +19,7 @@ class Settings(BaseSettings):
 
     ⚠️ `jwt_secret` üretimde MUTLAKA verilmeli. Varsayılan yalnızca yerel
     geliştirme için; bu değerle üretime çıkılırsa token'lar tahmin edilebilir olur.
-    Bu yüzden `main.py` üretimde varsayılanı görürse uyarıyor.
+    Bu yüzden `main.py` üretimde varsayılanı görürse API'yi açmıyor.
     """
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
@@ -30,8 +30,7 @@ class Settings(BaseSettings):
 
     jwt_secret: str = INSECURE_DEFAULT_SECRET
     jwt_algorithm: str = "HS256"
-    #: Panel oturumu. 12 saatti; çalınan bir token o kadar geçerli kalmasın diye 4 saat
-    #: (yayın kontrol listesi, 05.10.2026). Panel sekmeyle sınırlı (sessionStorage).
+    #: Panel oturumu: çalınan token uzun geçerli kalmasın diye 4 saat (panel sekmeyle sınırlı).
     access_token_ttl_minutes: int = 60 * 4
 
     # Tek admin kullanıcı (docs/ARCHITECTURE.md § 2 — rol sistemi yok).
@@ -54,7 +53,7 @@ class Settings(BaseSettings):
         Compose `JWT_SECRET: ${JWT_SECRET:-}` yazınca değişken BOŞ STRING olarak
         geliyor ve varsayılanı eziyor. Boş bir sır, güvensiz varsayılandan da
         kötü — imzalama sessizce anlamsızlaşır. Boşsa varsayılana düşülüyor ki
-        `main.py`'deki uyarı da devreye girsin.
+        `main.py`'deki ret de devreye girsin.
         """
         return value.strip() or INSECURE_DEFAULT_SECRET
 

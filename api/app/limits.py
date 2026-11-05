@@ -1,20 +1,28 @@
-import json
-
-from starlette.types import ASGIApp, Message, Receive, Scope, Send
-
 """
-İstek gövdesi sınırı — gövde OKUNMADAN önce (güvenlik taraması, Oturum 6).
+İstek gövdesi sınırı — gövde OKUNMADAN önce.
 
 Neden ara katman: FastAPI yükleme gövdesini (multipart) uç noktanın bağımlılıklarından,
 yani KİMLİK DENETİMİNDEN önce okuyor; token'sız biri de sunucuya dosya yazdırabiliyordu.
 Caddy'nin `request_body max_size`'ı tek başına yetmiyordu: gövdeyi 16 MB'da kesiyor ama
 API beyan edilen uzunluğu beklemeye devam ediyor, bağlantı yanıtsız asılı kalıyordu.
 
-  1. Yönetim uçlarında Authorization başlığı yoksa → 401, gövdeye dokunmadan.
-     (Başlık VARSA token'ı yine uç nokta doğruluyor; bu yalnızca erken ret.)
+  1. Yönetim uçlarında geçerli bir Bearer token yoksa (başlık yok, imza ya da süre hatalı) → 401,
+     gövdeye dokunmadan. Yalnızca başlığın varlığına bakmak yetmiyordu: sahte `Bearer x` ile 15 MB
+     okutulup sonra reddediliyordu. Parola izi ve hesap kontrolü yine uç noktada.
   2. Content-Length sınırın üstündeyse → 413, gövdeye dokunmadan.
   3. Uzunluk beyan edilmemişse (chunked) okunan bayt sayılıyor; aşınca 413.
 """
+
+import json
+
+import jwt
+from starlette.types import ASGIApp, Message, Receive, Scope, Send
+
+from app.config import get_settings
+
+settings = get_settings()
+
+
 
 MAX_BODY = 16 * 1024 * 1024  # yükleme 15 MB (media.py) + çok parçalı formun payı
 PROTECTED = ("/api/admin/", "/api/auth/me", "/api/auth/password")
@@ -36,6 +44,17 @@ async def _reply(send: Send, status: int, detail: str) -> None:
     await send({"type": "http.response.body", "body": body})
 
 
+def _valid_bearer(value: bytes) -> bool:
+    scheme, _, token = value.decode("latin-1").partition(" ")
+    if scheme.lower() != "bearer" or not token:
+        return False
+    try:
+        jwt.decode(token, settings.jwt_secret, algorithms=[settings.jwt_algorithm])
+    except jwt.PyJWTError:
+        return False
+    return True
+
+
 class BodyLimit:
     def __init__(self, app: ASGIApp) -> None:
         self.app = app
@@ -47,7 +66,7 @@ class BodyLimit:
 
         headers = dict(scope["headers"])
         path: str = scope["path"]
-        if path.startswith(PROTECTED) and b"authorization" not in headers:
+        if path.startswith(PROTECTED) and not _valid_bearer(headers.get(b"authorization", b"")):
             await _reply(send, 401, "Oturum gerekli")
             return
 

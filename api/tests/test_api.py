@@ -316,3 +316,54 @@ def test_discovery_with_domain(client: TestClient) -> None:
     assert f"<loc>{url}/</loc>" in render_sitemap(url)
     assert f'<link rel="canonical" href="{url}/" />' in render_meta(content, url)
     assert f"Website: {url}/" in render_llms(content, url)
+
+
+def test_upload_with_fake_bearer_is_rejected_before_body(client: TestClient) -> None:
+    """Sahte `Authorization` başlığı gövdeyi okutmamalı: imza/süre ara katmanda doğrulanıyor."""
+    r = client.post(
+        "/api/admin/media",
+        headers={"Authorization": "Bearer sahte"},
+        files={"file": ("a.jpg", b"x" * 1024, "image/jpeg")},
+    )
+    assert r.status_code == 401
+
+
+def test_phone_jpeg_mpo_is_accepted(client: TestClient, auth: dict) -> None:
+    """Çok kareli telefon JPEG'leri Pillow'da MPO görünür; reddedilmemeli."""
+    out = io.BytesIO()
+    first = Image.new("RGB", (800, 600), (10, 120, 220))
+    second = Image.new("RGB", (800, 600), (220, 120, 10))
+    first.save(out, "MPO", save_all=True, append_images=[second])
+    r = _upload(client, auth, out.getvalue())
+    assert r.status_code in (200, 201), r.text
+
+
+def test_too_tall_image_is_422_and_leaves_no_files(
+    client: TestClient, auth: dict, data_dir: str
+) -> None:
+    """WebP kenar sınırı (16383 px) aşılırsa 500 değil 422; yarım dosya da kalmaz."""
+    from pathlib import Path
+
+    uploads = Path(data_dir) / "uploads"
+    before = {p.name for p in uploads.glob("*")} if uploads.exists() else set()
+    out = io.BytesIO()
+    Image.new("RGB", (1200, 17000), (255, 255, 255)).save(out, "PNG")
+    r = client.post(
+        "/api/admin/media", headers=auth, files={"file": ("uzun.png", out.getvalue(), "image/png")}
+    )
+    assert r.status_code == 422, r.text
+    after = {p.name for p in uploads.glob("*")} if uploads.exists() else set()
+    assert after == before
+
+
+def test_password_change_is_throttled_per_ip(client: TestClient, auth: dict) -> None:
+    """Çalınmış token mevcut parolayı sınırsız denemeye yaramasın."""
+    codes = []
+    for _ in range(8):
+        r = client.put(
+            "/api/auth/password",
+            headers={**auth, "X-Forwarded-For": "203.0.113.77"},  # kendi IP'si: diğer testlerin sayacını bozmasın
+            json={"currentPassword": "yanlis-parola", "newPassword": "yepyeni-uzun-parola-1"},
+        )
+        codes.append(r.status_code)
+    assert 429 in codes

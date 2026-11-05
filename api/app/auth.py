@@ -74,6 +74,7 @@ def get_current_admin(
             credentials.credentials,
             settings.jwt_secret,
             algorithms=[settings.jwt_algorithm],
+            options={"require": ["exp", "sub"]},
         )
     except jwt.PyJWTError:
         raise unauthorized from None
@@ -123,7 +124,7 @@ def read_me(admin: CurrentAdminDep) -> AdminOut:
 
 @router.put("/password")
 def change_password(
-    data: PasswordChangeIn, admin: CurrentAdminDep, session: SessionDep
+    data: PasswordChangeIn, admin: CurrentAdminDep, session: SessionDep, request: Request
 ) -> TokenOut:
     """
     Parolayı değiştirir ve YENİ bir token döndürür: eski token'lar — bu isteği
@@ -132,7 +133,11 @@ def change_password(
     ⚠️ `.env`'deki ADMIN_PASSWORD'u değiştirmek hesabı değiştirmez (tohumlama
     yalnızca boş veritabanında çalışır) — parola buradan değişir.
     """
+    # Çalınmış bir token mevcut parolayı sınırsız denemeye yaramasın: giriştekiyle aynı sınır.
+    ip = throttle.client_ip(request)
+    throttle.check(ip)
     if not verify_password(data.current_password, admin.password_hash):
+        throttle.failed(ip)
         # 401 değil: oturum geçerli, yanlış olan formdaki parola. 401 panelde
         # "oturum düştü" diye girişe atardı.
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Mevcut parola hatalı")

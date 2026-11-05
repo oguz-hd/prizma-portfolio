@@ -48,9 +48,8 @@ class Translations:
     Çeviri tablosunu TEK sorguda okuyup bellekte indeksler.
 
     ⚠️ Alternatif her alan için ayrı sorgu atmaktı — bu sayfada ~40 çevrilen alan
-    var, yani 40 sorgu. `GET /api/content` sitenin en sık çağrılan uç noktası
-    (docs/ARCHITECTURE.md § 3: "hız pazarlık konusu değil"), N+1 sorguya
-    tahammülü yok.
+    var, yani 40 sorgu. Aynı sorgu her yayında (publish.py) ve `GET /api/content`'te
+    çalışıyor; N+1'e tahammülü yok.
     """
 
     def __init__(self, session: Session) -> None:

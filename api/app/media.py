@@ -31,7 +31,12 @@ MAX_BYTES = 15 * 1024 * 1024
 #: güvenlik taraması) — sınır aşağıda başlıktan, piksel açılmadan uygulanıyor.
 MAX_PIXELS = 40_000_000
 Image.MAX_IMAGE_PIXELS = MAX_PIXELS
-ACCEPTED = {"JPEG", "PNG", "WEBP"}
+#: Açılış çözücüleri. Telefon JPEG'leri (portre, HDR) birden çok kare taşır: JPEG çözücüsü açar,
+#: sonra `image.format` "MPO" olur, o yüzden ACCEPTED'a ayrıca girer.
+FORMATS = ["JPEG", "PNG", "WEBP"]
+ACCEPTED = {*FORMATS, "MPO"}
+#: WebP kenar sınırı; uzun ekran görüntüleri bunu aşabilir.
+WEBP_MAX_SIDE = 16383
 #: Üretilen genişlikler — site `srcset` ile ekrana uygun olanı seçiyor.
 WIDTHS = (640, 1280, 1920)
 QUALITY = 82
@@ -56,12 +61,20 @@ def store(data: bytes) -> Media:
     if len(data) > MAX_BYTES:
         raise HTTPException(413, detail="Görsel en fazla 15 MB olabilir")
     try:
-        image = Image.open(io.BytesIO(data))  # yalnızca başlık okunuyor
+        # `formats`: yalnızca bu çözücüler çalışır (EPS/PSD/TIFF… açılmasın).
+        image = Image.open(io.BytesIO(data), formats=FORMATS)  # yalnızca başlık okunuyor
         kind = image.format
         if image.width * image.height > MAX_PIXELS:
             raise _bad("Görsel çok büyük: en fazla 40 megapiksel")
         image.load()
-    except (UnidentifiedImageError, Image.DecompressionBombError, OSError) as err:
+    except (
+        UnidentifiedImageError,
+        Image.DecompressionBombError,
+        OSError,
+        ValueError,
+        SyntaxError,
+        EOFError,
+    ) as err:
         raise _bad("Görsel okunamadı (JPEG, PNG ya da WebP olmalı)") from err
     if kind not in ACCEPTED:
         raise _bad("Yalnızca JPEG, PNG ve WebP kabul ediliyor")
@@ -74,12 +87,22 @@ def store(data: bytes) -> Media:
     widths = [w for w in WIDTHS if w < image.width] or [image.width]
     if image.width > widths[-1] and len(widths) < len(WIDTHS):
         widths.append(image.width)  # orijinal büyük ama en büyük basamaktan küçük
+    if max(round(image.height * w / image.width) for w in widths) > WEBP_MAX_SIDE:
+        raise _bad(f"Görsel çok uzun: yükseklik en fazla {WEBP_MAX_SIDE} piksel olabilir")
     folder = uploads_dir()
-    for w in widths:
-        h = round(image.height * w / image.width)
-        resized = image if w == image.width else image.resize((w, h), Image.Resampling.LANCZOS)
-        # exif verilmiyor → yazılmıyor.
-        resized.save(folder / file_name(media_id, w), "WEBP", quality=QUALITY, method=6)
+    written: list[Path] = []
+    try:
+        for w in widths:
+            h = round(image.height * w / image.width)
+            resized = image if w == image.width else image.resize((w, h), Image.Resampling.LANCZOS)
+            target = folder / file_name(media_id, w)
+            written.append(target)
+            # exif verilmiyor → yazılmıyor.
+            resized.save(target, "WEBP", quality=QUALITY, method=6)
+    except (ValueError, OSError) as err:
+        for path in written:  # satır yazılmadığı için yarım dosyalar sonsuza dek artık kalırdı
+            path.unlink(missing_ok=True)
+        raise _bad("Görsel dönüştürülemedi") from err
 
     return Media(
         id=media_id,

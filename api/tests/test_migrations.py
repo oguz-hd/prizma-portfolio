@@ -52,3 +52,14 @@ def test_fresh_database_only_records_version(tmp_path: Path) -> None:
     with engine.connect() as conn:
         assert conn.execute(text("PRAGMA user_version")).scalar_one() == LATEST
     assert not list(tmp_path.glob("*.bak-*"))
+
+
+def test_existing_backup_is_not_overwritten(tmp_path: Path) -> None:
+    """Yarım kalan göç yeniden denenirken ilk (temiz) yedek yarım göçmüş veritabanıyla ezilmez."""
+    db_file = tmp_path / "site.db"
+    _v0(db_file)
+    backup = tmp_path / "site.db.bak-v0"
+    backup.write_bytes(b"ilk temiz yedek")
+    engine = create_engine(f"sqlite:///{db_file}")
+    migrate(engine, db_file)
+    assert backup.read_bytes() == b"ilk temiz yedek"

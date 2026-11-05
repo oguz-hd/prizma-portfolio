@@ -31,6 +31,12 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         # Güvenlik kontrolünden ÖNCE: API güvensiz varsayılanlar yüzünden açılmasa
         # da site (Caddy) güncel içerikle ayakta kalsın — kapanan yalnızca panel.
         publish(session)
+        if settings.debug and "." in settings.domain:
+            # DOMAIN gerçek bir alan adıysa bu üretimdir: yanlışlıkla kalan DEBUG=1 güvensiz
+            # varsayılanları, /docs'u ve SQL günlüğünü (parola hash'i dahil) sessizce açmasın.
+            raise RuntimeError(
+                f"DEBUG=1 üretim alan adıyla birlikte açılamaz (DOMAIN={settings.domain})."
+            )
         if not settings.debug:
             refuse_insecure_defaults(session)
     yield

@@ -68,8 +68,12 @@ def migrate(engine: Engine, db_file: Path) -> None:
 
     if not fresh:
         backup = db_file.with_name(f"{db_file.name}.bak-v{version}")
-        shutil.copy2(db_file, backup)
-        logger.info("Göç öncesi yedek: %s", backup.name)
+        if backup.exists():
+            # Yarım kalan göç yeniden denenirken ilk (temiz) yedek ezilmesin.
+            logger.info("Göç öncesi yedek zaten var, ezilmiyor: %s", backup.name)
+        else:
+            shutil.copy2(db_file, backup)
+            logger.info("Göç öncesi yedek: %s", backup.name)
 
     with engine.begin() as conn:
         if not fresh:

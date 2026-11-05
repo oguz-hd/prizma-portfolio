@@ -12,8 +12,8 @@ from app.discovery import render_llms, render_robots, render_sitemap
 ★ Yayın: veritabanı → `/data/content.json` + `/data/meta.html` (docs/ARCHITECTURE.md § 3).
 
 Ziyaretçi tarafı veritabanını hiç görmez: Caddy bu iki dosyayı paylaşılan
-volume'dan okur. API her açılışta ve her içerik değişikliğinden sonra
-(Faz 7 — panel) ikisini yeniden yazar.
+volume'dan okur. API her açılışta ve panelden yapılan her içerik değişikliğinden sonra
+bunları (ayrıca robots.txt, llms.txt, sitemap.xml) yeniden yazar.
 
     content.json   site mount'tan önce bunu çeker (web/src/content/useContent.ts)
     meta.html      <title> + description + og:* — Caddy index.html'e gömer
