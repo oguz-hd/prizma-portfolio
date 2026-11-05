@@ -127,8 +127,17 @@ function LoginScreen({ accents, nameChars, onSignedIn }: ScreenProps) {
     // 8-40× ölçekte yeniden çiziyordu (hale blur(22px) dahil) — ölçüldü: 113-267 ms'lik
     // takılmalar (Oturum 6, kullanıcı: "giriş animasyonu kasıyor").
     stage.style.willChange = 'transform'
+    // Giriş animasyona bağlı kalmasın (site kuralı 6): sekme arka plana geçip rAF dururse emniyet kaydeder.
+    let signedIn = false
+    const finish = () => {
+      if (signedIn) return
+      signedIn = true
+      window.clearTimeout(guard)
+      onSignedIn(token, accents)
+    }
+    const guard = window.setTimeout(finish, (ENTER_S + 0.5) * 1000 + 600)
     gsap
-      .timeline({ onComplete: () => onSignedIn(token, accents) })
+      .timeline({ onComplete: finish })
       .to([brandRef.current, formRef.current], { opacity: 0, y: -12, duration: 0.35, ease: 'power2.in' }, 0)
       .to('.starfield', { opacity: 0, duration: 0.6 }, 0)
       .to(scene, { surge: 1, duration: 0.5, ease: 'power2.out' }, 0)

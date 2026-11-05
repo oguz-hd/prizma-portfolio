@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, useSyncExternalStore, type MouseEvent } from 'react'
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore, type MouseEvent } from 'react'
 
 import type { RawSiteContent } from '@site/content/types'
 
@@ -130,10 +130,38 @@ function Panel() {
     return () => window.removeEventListener('beforeunload', warn)
   }, [dirty.size])
 
+  // Tarayıcının geri tuşu ya da elle hash değişimi bağlantı tıklamasındaki uyarıyı atlıyordu: sayfa
+  // değişir, form sessizce sökülür. Kaydedilmemiş değişiklik varken hash eski sayfaya döndürülür,
+  // hedef için aynı onay açılır. Onaylanan çıkış (`leave`) korumayı bir kez atlar.
+  const dirtyRef = useRef(dirty)
+  const allowRef = useRef(false)
+  useEffect(() => {
+    dirtyRef.current = dirty
+  }, [dirty])
+  useEffect(() => {
+    let current = readPage()
+    const onHash = () => {
+      const target = readPage()
+      if (target === current) return
+      if (dirtyRef.current.size > 0 && !allowRef.current) {
+        window.location.hash = current
+        setLeaving(target)
+        return
+      }
+      allowRef.current = false
+      current = target
+    }
+    window.addEventListener('hashchange', onHash)
+    return () => window.removeEventListener('hashchange', onHash)
+  }, [])
+
   const leave = (target: PageId | 'logout') => {
     setLeaving(null)
     if (target === 'logout') setToken(null)
-    else window.location.hash = target
+    else {
+      allowRef.current = true
+      window.location.hash = target
+    }
   }
 
   const navigate = (e: MouseEvent, target: PageId) => {

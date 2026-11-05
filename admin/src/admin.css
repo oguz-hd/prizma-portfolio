@@ -142,6 +142,12 @@ a {
     background var(--fast) var(--ease);
 }
 
+/* Dosya seç düğmesinin girdisi görünmez (sr-only): odak göstergesi kutuya verilir. */
+.btn:has(input:focus-visible) {
+  outline: 2px solid var(--lead);
+  outline-offset: 2px;
+}
+
 .btn:hover:not(:disabled) {
   color: var(--ink);
   border-color: var(--ink-faint);

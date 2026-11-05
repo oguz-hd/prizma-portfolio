@@ -13,6 +13,7 @@ import { Page } from './Page'
  * buradan seçer; kullanılan görsel silinmez, sunucu nerede kullanıldığını söyler.
  */
 const ACCEPT = 'image/jpeg,image/png,image/webp'
+const MAX_BYTES = 15 * 1024 * 1024
 
 export function MediaPage() {
   const { content, reload } = usePanel()
@@ -27,6 +28,15 @@ export function MediaPage() {
       // Sırayla: sunucu her görseli çevirirken bekletiyor; aynı anda 10 dosya belleği şişirir.
       const errors: string[] = []
       for (const file of Array.from(files)) {
+        // Sürükle-bırak `accept`'i atlar: büyük ya da yanlış türde dosya boşuna yüklenmesin.
+        if (!ACCEPT.split(',').includes(file.type)) {
+          errors.push(`${file.name}: yalnızca JPEG, PNG ve WebP.`)
+          continue
+        }
+        if (file.size > MAX_BYTES) {
+          errors.push(`${file.name}: 15 MB'ı aşıyor.`)
+          continue
+        }
         try {
           await api.upload(file)
         } catch (err) {
@@ -41,6 +51,7 @@ export function MediaPage() {
   const drop = (e: DragEvent) => {
     e.preventDefault()
     setOver(false)
+    if (status.kind === 'busy') return // yükleme sürerken ikinci bırakma ikinci bir yükleme başlatmasın
     upload(e.dataTransfer.files)
   }
 
@@ -97,7 +108,10 @@ function MediaCard({ media }: { media: RawMedia }) {
 
   const save = () =>
     run(async () => {
-      await api.put(`/media/${media.id}`, { alt })
+      // Sunucu kırpılmış metni saklar; taslak da aynısı olsun, yoksa "kaydedilmemiş değişiklik" kalıcı görünür.
+      const clean = { tr: alt.tr.trim(), en: alt.en.trim() }
+      await api.put(`/media/${media.id}`, { alt: clean })
+      setAlt(clean)
       await reload()
     })
 
