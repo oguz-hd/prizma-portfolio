@@ -1,13 +1,3 @@
-import os
-import threading
-from pathlib import Path
-
-from sqlmodel import Session
-
-from app.config import get_settings
-from app.content import build_content, render_meta
-from app.discovery import render_llms, render_robots, render_sitemap
-
 """
 ★ Yayın: veritabanı → `/data/content.json` + `/data/meta.html` (docs/ARCHITECTURE.md § 3).
 
@@ -19,6 +9,16 @@ bunları (ayrıca robots.txt, llms.txt, sitemap.xml) yeniden yazar.
     meta.html      <title> + description + og:* — Caddy index.html'e gömer
                    (Caddyfile → templates), çünkü paylaşım kartları JS çalıştırmaz
 """
+
+import os
+import threading
+from pathlib import Path
+
+from sqlmodel import Session
+
+from app.config import get_settings
+from app.content import build_content, render_meta
+from app.discovery import render_llms, render_robots, render_sitemap
 
 settings = get_settings()
 

@@ -1,3 +1,15 @@
+"""
+★ Bu dosya bir SÖZLEŞME.
+
+Buradaki şekil, ön yüzdeki `web/src/content/types.ts` → `RawSiteContent` ile
+BİREBİR aynı olmak zorunda. Site mount'tan önce `content.json`'ı (bu şeklin
+dökümü, publish.py) çekip doğrudan kullanıyor — arada dönüştürme yok.
+
+Alan adları JavaScript tarafında camelCase (`metaTitle`), Python tarafında
+snake_case. `alias_generator` ikisini birbirine çeviriyor; `populate_by_name`
+sayesinde Python tarafında doğal adlarla yazılabiliyor.
+"""
+
 import re
 from datetime import date
 from typing import Annotated, Literal
@@ -13,18 +25,6 @@ from pydantic import (
 from pydantic.alias_generators import to_camel
 
 from app.config import INSECURE_DEFAULT_PASSWORD
-
-"""
-★ Bu dosya bir SÖZLEŞME.
-
-Buradaki şekil, ön yüzdeki `web/src/content/types.ts` → `RawSiteContent` ile
-BİREBİR aynı olmak zorunda. Site mount'tan önce `content.json`'ı (bu şeklin
-dökümü, publish.py) çekip doğrudan kullanıyor — arada dönüştürme yok.
-
-Alan adları JavaScript tarafında camelCase (`metaTitle`), Python tarafında
-snake_case. `alias_generator` ikisini birbirine çeviriyor; `populate_by_name`
-sayesinde Python tarafında doğal adlarla yazılabiliyor.
-"""
 
 
 class CamelModel(BaseModel):
@@ -107,7 +107,7 @@ class ProjectOut(CamelModel):
     cover: "MediaOut | None" = None
 
 
-#: Bölüm türleri (Faz 9) — hangi bileşen çizer. web/src/content/types.ts → SectionKind.
+#: Bölüm türleri — hangi bileşen çizer. web/src/content/types.ts → SectionKind.
 #: Hazırlar (about, experience, contact) silinmez, gizlenir; diğerleri panelden eklenir.
 SectionKind = Literal[
     "about", "experience", "contact", "text", "timeline", "projects", "announcement", "gallery"
@@ -168,7 +168,7 @@ class SiteContentOut(CamelModel):
     media: list[MediaOut] | None = None
 
 
-# ── Yönetim girdileri (Faz 7, admin.py) ──────────────────────────────────────
+# ── Yönetim girdileri (admin.py) ──────────────────────────────────────
 #
 # Girdi = çıktının şekli: panel aynı kaydın iki dilini yan yana düzenliyor
 # (docs/ARCHITECTURE.md § 5). Kimlik (`id`) ve sıra (`order`) yalnızca oluştururken
@@ -265,7 +265,7 @@ class ProfileIn(CamelModel):
     name: NonEmpty
     title: RequiredText
     location: RequiredText
-    # Sitede gösterilmiyor (Oturum 2) ama sözleşmede — olduğu gibi geri gönderilir.
+    # Sitede gösterilmiyor ama sözleşmede — olduğu gibi geri gönderilir.
     tagline: LocalizedText
     bio: RequiredParagraphs
 
@@ -313,7 +313,7 @@ class SectionIn(CamelModel):
     heading: RequiredText
     nav_label: OptionalText = None
     body: Paragraphs = LocalizedList()
-    # Verilmezse değişmez (eski panel bu alanı göndermiyordu).
+    # Verilmezse değişmez.
     visible: bool | None = None
     # Yalnızca duyuru (admin.py diğer türlerde reddediyor).
     link: SectionLinkIn | None = None

@@ -1,12 +1,5 @@
-import logging
-import shutil
-from collections.abc import Callable
-from pathlib import Path
-
-from sqlalchemy import Connection, Engine, text
-
 """
-Şema göçleri — var olan veritabanı silinmeden yükselir (Faz 9).
+Şema göçleri — var olan veritabanı silinmeden yükselir.
 
 `SQLModel.metadata.create_all` yalnızca EKSİK TABLOYU kurar; var olan tabloya
 sütun eklemez. Bu yüzden şema değişince ya veritabanı sıfırlanırdı (içerik gider)
@@ -23,6 +16,13 @@ Yeni adım eklemek: modeli değiştir → buraya `(n, fonksiyon)` ekle → adım
 olsun (`_add_column` var olan sütunu atlıyor), çünkü yarıda kalan bir adım yeniden
 çalışabilir.
 """
+
+import logging
+import shutil
+from collections.abc import Callable
+from pathlib import Path
+
+from sqlalchemy import Connection, Engine, text
 
 logger = logging.getLogger("uvicorn.error")
 

@@ -33,7 +33,7 @@ class Settings(BaseSettings):
     #: Panel oturumu: çalınan token uzun geçerli kalmasın diye 4 saat (panel sekmeyle sınırlı).
     access_token_ttl_minutes: int = 60 * 4
 
-    # Tek admin kullanıcı (docs/ARCHITECTURE.md § 2 — rol sistemi yok).
+    # Tek admin kullanıcı.
     # İlk açılışta bu bilgilerle hesap kurulur.
     admin_email: str = "admin@localhost"
     admin_password: str = INSECURE_DEFAULT_PASSWORD

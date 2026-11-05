@@ -237,7 +237,7 @@ def render_meta(content: SiteContentOut, site_url: str | None = None) -> str:
     og:image + boyutları eklenir ve kart `summary_large_image` olur. Alan adı belli
     olunca adres mutlak olmalı — bazı platformlar göreli görseli okumaz.
     """
-    # Site İngilizce açılır (web/src/i18n/types.ts → DEFAULT_LOCALE, Oturum 3);
+    # Site İngilizce açılır (web/src/i18n/types.ts → DEFAULT_LOCALE);
     # kart da o dilde. Dil değişince sekme başlığını App güncelliyor.
     title = escape(content.settings.meta_title.en)
     desc = escape(content.settings.meta_description.en)

@@ -1,11 +1,5 @@
-import threading
-import time
-from collections import deque
-
-from fastapi import HTTPException, Request, status
-
 """
-Giriş denemesi sınırı (yayına hazırlık, Oturum 6) — parola tahminini yavaşlatır.
+Giriş denemesi sınırı — parola tahminini yavaşlatır.
 
 Aynı IP'den `MAX_FAILURES` hatalı denemeden sonra pencere dolana kadar 429 +
 Retry-After. Başarılı giriş o IP'nin sayacını siler. Bellekte: tek süreç (fastapi run,
@@ -16,6 +10,12 @@ IP: yayında istek Caddy'den gelir, `request.client` Caddy'nin adresidir. Caddy 
 gelen X-Forwarded-For'a güvenmiyor (trusted_proxies tanımsız), başlığı kendisi yazıyor —
 ilk değer gerçek istemci. Geliştirmede başlık yoksa doğrudan bağlanan adres.
 """
+
+import threading
+import time
+from collections import deque
+
+from fastapi import HTTPException, Request, status
 
 MAX_FAILURES = 5
 WINDOW_SECONDS = 15 * 60
@@ -45,7 +45,7 @@ def check(ip: str) -> None:
         times = _recent(ip, now)
         if not times:
             # Penceresi dolmuş IP sözlükte kalmasın: adres değiştirerek deneyen biri
-            # her adresle bir girdi bırakıp belleği şişirebiliyordu (kod incelemesi, 05.10.2026).
+            # her adresle bir girdi bırakıp belleği şişirebiliyordu.
             _failures.pop(ip, None)
             return
         if len(times) < MAX_FAILURES:

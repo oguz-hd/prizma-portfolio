@@ -1,3 +1,13 @@
+"""
+İlk açılış verisi — sitenin içeriğinin ilk hâli.
+
+İçeriğin tek kaynağı veritabanı. Her düzenleme panelden — buradaki metinler yalnızca BOŞ bir veritabanını
+(ilk kurulum, `down -v`) doldurur.
+
+⚠️ Bu bir GÖÇ değil, TOHUM. Veritabanı boşsa doldurur, doluysa hiç dokunmaz.
+Yoksa panelden yapılan her düzenleme yeniden başlatmada silinirdi.
+"""
+
 import json
 
 from sqlmodel import Session, select
@@ -15,18 +25,6 @@ from app.models import (
     SkillGroup,
     Translation,
 )
-
-"""
-İlk açılış verisi — sitenin içeriğinin ilk hâli.
-
-Faz 6'dan beri içeriğin tek kaynağı veritabanı: `web/src/content/site.ts` silindi
-(silinmeden önce bu dosyanın çıktısıyla alan alan karşılaştırıldı, birebir aynıydı).
-Sonraki her düzenleme panelden — buradaki metinler yalnızca BOŞ bir veritabanını
-(ilk kurulum, `down -v`) doldurur.
-
-⚠️ Bu bir GÖÇ değil, TOHUM. Veritabanı boşsa doldurur, doluysa hiç dokunmaz.
-Yoksa panelden (Faz 7) yapılan her düzenleme yeniden başlatmada silinirdi.
-"""
 
 P = "\n\n"  # paragraf ayracı (models.py → Translation'daki nota bak)
 
@@ -49,7 +47,7 @@ def seed(session: Session) -> bool:
     # ── Ayarlar ─────────────────────────────────────────────────────────────
     # Seçilen palet — docs/DESIGN.md § E
     rows.append(SiteSettings(id="settings", preset="tayf"))
-    # Sekme adı yalnızca isim (kullanıcı isteği, Oturum 3).
+    # Sekme adı yalnızca isim.
     rows += _t(
         "settings", "settings", "metaTitle",
         "Oğuz Han Duran",
@@ -64,11 +62,9 @@ def seed(session: Session) -> bool:
 
     # ── Profil ──────────────────────────────────────────────────────────────
     rows.append(Profile(id="profile", name="Oğuz Han Duran"))
-    # Oturum 3: "Full-stack" kullanıcıya fazla iddialı geldi.
     rows += _t("profile", "profile", "title", "Yazılım geliştirici", "Software developer")
     rows += _t("profile", "profile", "location", "İzmir", "İzmir, Türkiye")
-    # ⚠️ Girişte artık GÖSTERİLMİYOR (kullanıcı isteği, Oturum 2: "mottoyu
-    # kaldırmalıyız"). Alan sözleşmede (types.ts ↔ schemas.py) kaldığı için duruyor.
+    # ⚠️ Girişte artık GÖSTERİLMİYOR. Alan sözleşmede (types.ts ↔ schemas.py) kaldığı için duruyor.
     rows += _t(
         "profile", "profile", "tagline",
         "E-postayla dönen işleri tek ekrana indiriyorum — arayüzünden veritabanına kadar.",
@@ -77,8 +73,8 @@ def seed(session: Session) -> bool:
     )
     rows += _t(
         "profile", "profile", "bio",
-        # Mezuniyet paragrafı kullanıcı isteğiyle çıktı (Oturum 2) — bilgi
-        # Deneyim ve Eğitim slaytında, eğitim kaydının notunda duruyor.
+        # Mezuniyet paragrafı yok — bilgi Deneyim ve Eğitim slaytında,
+        # eğitim kaydının notunda duruyor.
         P.join([
             "İşin iki ucunu da seviyorum: React ve Vue ile arayüz, FastAPI ve .NET Core ile "
             "servis, MySQL ve MSSQL ile veri. Bir ürünün nasıl göründüğü kadar nasıl ayakta "
@@ -99,11 +95,8 @@ def seed(session: Session) -> bool:
 
     # ── Yetenekler ──────────────────────────────────────────────────────────
     # Teknoloji adları çevrilmez — React her dilde React; açıklama `note`'a gider.
-    # trex-portfolio Oturum 15'te sadeleşti (~20 → 10): yalnızca projelerde ve
-    # deneyimde kanıtlanan teknolojiler. curious.page: "içerik > teknoloji listesi".
-    # Sıra bio'nun cümlesini izliyor: arayüz → servis → veri. Çıkanlar: C, Django,
-    # Node.js, Express, JavaScript (TypeScript kapsıyor), Flutter, SQLite, Redis,
-    # RabbitMQ, Git.
+    # Yalnızca projelerde ve deneyimde kanıtlanan teknolojiler.
+    # Sıra bio'nun cümlesini izliyor: arayüz → servis → veri.
     skills = [
         ("frontend", ["React.js", "TypeScript", "Vue.js"], "Ön yüz", "Front end", None),
         ("backend", ["FastAPI", "Python", ".NET Core 8"], "Servis", "Back end", None),
@@ -219,11 +212,10 @@ def seed(session: Session) -> bool:
     # ── Bölümler ────────────────────────────────────────────────────────────
     # `body` = başlığın altına düşen serbest metin. Hakkımda ve Deneyim'de boş:
     # içerikleri bileşenlerde (bio, zaman çizelgesi, linkler) üretiliyor.
-    # İletişim'in müsaitlik cümlesi kullanıcı isteğiyle kalktı (Oturum 4).
-    # Projeler bölümü kullanıcı isteğiyle kalktı (Oturum 2); proje KAYITLARI
-    # duruyor — panelden "Projeler" türünde bölüm eklenince sitede görünür (Faz 9).
+    # Projeler bölümü yok; proje KAYITLARI duruyor — panelden "Projeler"
+    # türünde bölüm eklenince sitede görünür.
     # `nav_label` = üst menüdeki kısa ad; yoksa menü başlığı kullanır.
-    # `kind`: hangi bileşen çizer (Faz 9) — bu üçü hazır tür, silinmez.
+    # `kind`: hangi bileşen çizer — bu üçü hazır tür, silinmez.
     for sid, slug, kind, order, heading, nav_label, body in [
         ("hakkimda", "hakkimda", "about", 1, ("Hakkımda", "About"), None, None),
         ("deneyim", "deneyim", "experience", 2, ("Deneyim ve Eğitim", "Experience & Education"),

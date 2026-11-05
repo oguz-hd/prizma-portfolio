@@ -5,7 +5,7 @@ from sqlalchemy import create_engine, text
 
 from app.migrations import LATEST, migrate
 
-# Faz 9 öncesi şema (göç 0): bölümlerde tür yok, milestones'ta section_id yok.
+# Eski şema (göç 0): bölümlerde tür yok, milestones'ta section_id yok.
 V0 = """
 CREATE TABLE profile (id VARCHAR PRIMARY KEY, name VARCHAR NOT NULL);
 CREATE TABLE sections (id VARCHAR PRIMARY KEY, slug VARCHAR NOT NULL, "order" INTEGER NOT NULL);

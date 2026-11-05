@@ -1,10 +1,5 @@
-from datetime import UTC, datetime
-from html import escape
-
-from app.schemas import LocalizedList, LocalizedText, SiteContentOut
-
 """
-Keşif dosyaları (yayın kontrol listesi, 05.10.2026) — arama motorları ve dil modelleri için.
+Keşif dosyaları — arama motorları ve dil modelleri için.
 
     robots.txt    her zaman; alan adı varsa Sitemap satırıyla
     sitemap.xml   yalnızca alan adı varsa (mutlak adres zorunlu)
@@ -14,6 +9,11 @@ Keşif dosyaları (yayın kontrol listesi, 05.10.2026) — arama motorları ve d
 publish.py hepsini content.json'la birlikte yazar, Caddy /data'dan sunar. İngilizce:
 site İngilizce açılıyor (web/src/i18n/types.ts → DEFAULT_LOCALE), kart da öyle.
 """
+
+from datetime import UTC, datetime
+from html import escape
+
+from app.schemas import LocalizedList, LocalizedText, SiteContentOut
 
 LOCALE = "en"
 

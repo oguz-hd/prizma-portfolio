@@ -1,5 +1,3 @@
-from sqlmodel import Field, SQLModel
-
 """
 Veritabanı şeması — docs/ARCHITECTURE.md § 5 içerik modelinin karşılığı.
 
@@ -12,6 +10,8 @@ değil. Sebebi: `slug`lar URL'de görünüyor (bölüm bileşenini `kind` seçiy
 panelden içerik taşınırken kimliğin sabit kalması gerekiyor.
 """
 
+from sqlmodel import Field, SQLModel
+
 
 class Translation(SQLModel, table=True):
     """
@@ -19,7 +19,7 @@ class Translation(SQLModel, table=True):
 
     ⚠️ Dizi alanları (`bio`, `description`, `body`) burada TEK metin olarak durur;
     paragraflar boş satırla ayrılır ve okunurken bölünür. JSON gömmek yerine bu
-    seçildi çünkü panelde (Faz 7) bu alanlar bir textarea olacak — yazarın
+    seçildi çünkü panelde bu alanlar bir textarea olacak — yazarın
     gördüğü şeyle saklanan şey aynı olmalı.
     """
 
@@ -69,7 +69,7 @@ class Milestone(SQLModel, table=True):
     __tablename__ = "milestones"
 
     id: str = Field(primary_key=True)
-    # "experience" | "education" (profil) · "timeline" (zaman çizelgesi bölümü, Faz 9)
+    # "experience" | "education" (profil) · "timeline" (zaman çizelgesi bölümü)
     kind: str = Field(index=True)
     org: str
     period: str = ""
@@ -102,9 +102,8 @@ class Project(SQLModel, table=True):
 
 class Section(SQLModel, table=True):
     """
-    Bölüm = sitede bir slayt. `kind` hangi bileşenin çizeceğini söyler (Faz 9;
-    eskiden eşleme slug'a göre kodda elleydi). Hazır türler (about, experience,
-    contact) silinmez, gizlenir; panelden eklenenler silinebilir — schemas.py.
+    Bölüm = sitede bir slayt. `kind` hangi bileşenin çizeceğini söyler. Hazır türler
+    (about, experience, contact) silinmez, gizlenir; panelden eklenenler silinebilir — schemas.py.
     Çevrilen alanlar: heading, nav_label, body, link_label (duyuru).
     """
 
@@ -124,7 +123,7 @@ class Section(SQLModel, table=True):
 
 class Media(SQLModel, table=True):
     """
-    Yüklenen görsel (Faz 9, media.py). Dosyalar `/data/uploads/{id}-{genişlik}.webp`;
+    Yüklenen görsel (media.py). Dosyalar `/data/uploads/{id}-{genişlik}.webp`;
     orijinal SAKLANMIYOR (EXIF/GPS içerir). `alt` çeviri tablosunda.
     """
 

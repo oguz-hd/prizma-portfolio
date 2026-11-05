@@ -1,3 +1,16 @@
+"""
+Görsel yükleme — dosyayı web'e hazır WebP'lere çevirir.
+
+    yükleme ──Pillow──> /data/uploads/{id}-640.webp, -1280, -1920 (orijinalden küçük olanlar)
+
+★ Orijinal SAKLANMIYOR ve EXIF hiç yazılmıyor: telefon fotoğrafları çekildiği yerin
+GPS konumunu taşır; yayınlanan bir görselde bu, ev adresini vermek demek. Yönlendirme
+(EXIF Orientation) önce piksellere uygulanıyor (`exif_transpose`), sonra etiket atılıyor.
+
+Biçim dosya adından değil İÇERİKTEN anlaşılıyor (Pillow açabiliyor mu, ne açtı).
+Caddy dosyaları `/uploads/` altında sunuyor (Caddyfile); ziyaretçi API'ye hiç gitmiyor.
+"""
+
 import io
 import json
 import secrets
@@ -10,25 +23,12 @@ from PIL import Image, ImageOps, UnidentifiedImageError
 from app.config import get_settings
 from app.models import Media
 
-"""
-Görsel yükleme (Faz 9) — dosyayı web'e hazır WebP'lere çevirir.
-
-    yükleme ──Pillow──> /data/uploads/{id}-640.webp, -1280, -1920 (orijinalden küçük olanlar)
-
-★ Orijinal SAKLANMIYOR ve EXIF hiç yazılmıyor: telefon fotoğrafları çekildiği yerin
-GPS konumunu taşır; yayınlanan bir görselde bu, ev adresini vermek demek. Yönlendirme
-(EXIF Orientation) önce piksellere uygulanıyor (`exif_transpose`), sonra etiket atılıyor.
-
-Biçim dosya adından değil İÇERİKTEN anlaşılıyor (Pillow açabiliyor mu, ne açtı).
-Caddy dosyaları `/uploads/` altında sunuyor (Caddyfile); ziyaretçi API'ye hiç gitmiyor.
-"""
-
 settings = get_settings()
 
 MAX_BYTES = 15 * 1024 * 1024
 #: Sıkıştırma bombası: küçük dosya, devasa piksel. ⚠️ Pillow'un kendi sınırı yalnızca
-#: 2 KATINI aşınca hata veriyor, arası uyarıyla açılıyordu (40-80 MP → yüzlerce MB bellek;
-#: güvenlik taraması) — sınır aşağıda başlıktan, piksel açılmadan uygulanıyor.
+#: 2 KATINI aşınca hata veriyor, arası uyarıyla açılıyordu (40-80 MP → yüzlerce MB bellek) —
+#: sınır aşağıda başlıktan, piksel açılmadan uygulanıyor.
 MAX_PIXELS = 40_000_000
 Image.MAX_IMAGE_PIXELS = MAX_PIXELS
 #: Açılış çözücüleri. Telefon JPEG'leri (portre, HDR) birden çok kare taşır: JPEG çözücüsü açar,

@@ -55,7 +55,7 @@ def refuse_insecure_defaults(session: Session) -> None:
     if settings.jwt_secret == INSECURE_DEFAULT_SECRET:
         problems.append("JWT_SECRET varsayılan değerde (token'lar taklit edilebilir)")
     elif len(settings.jwt_secret) < MIN_SECRET_LENGTH:
-        # HS256 anahtarı kısaysa çevrimdışı kaba kuvvetle bulunur (güvenlik taraması).
+        # HS256 anahtarı kısaysa çevrimdışı kaba kuvvetle bulunur.
         problems.append(f"JWT_SECRET {MIN_SECRET_LENGTH} karakterden kısa")
     admins = session.exec(select(AdminUser)).all()
     if any(verify_password(INSECURE_DEFAULT_PASSWORD, a.password_hash) for a in admins):

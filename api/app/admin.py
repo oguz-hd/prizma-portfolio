@@ -1,3 +1,18 @@
+"""
+Yönetim uç noktaları — paneli besliyor.
+
+Hepsi JWT ister (router düzeyinde `get_current_admin`). Her yazma aynı yolu izler:
+veritabanı → commit → publish() → /data/content.json güncel (docs/ARCHITECTURE.md § 3).
+
+Okuma: `GET /api/admin/content` — herkese açık içerikle aynı şekil, artı gizli
+bölümler, yayında olmayan projeler ve medya kitaplığı. Yazmalar 204 döner;
+panel kaydettikten sonra içeriği yeniden çeker.
+
+⚠️ Sıralama yolları (`…/order`) kimlikli yollardan ÖNCE tanımlı: FastAPI yolları
+sırayla eşliyor, sonra tanımlansa "order" bir kayıt kimliği sanılırdı (schemas.py
+→ Slug bu adı yasaklıyor).
+"""
+
 import json
 from collections.abc import Sequence
 
@@ -46,21 +61,6 @@ from app.schemas import (
     SkillGroupIn,
     TimelineItemCreate,
 )
-
-"""
-Yönetim uç noktaları (Faz 7a) — paneli (Faz 7b) besliyor.
-
-Hepsi JWT ister (router düzeyinde `get_current_admin`). Her yazma aynı yolu izler:
-veritabanı → commit → publish() → /data/content.json güncel (docs/ARCHITECTURE.md § 3).
-
-Okuma: `GET /api/admin/content` — herkese açık içerikle aynı şekil, artı gizli
-bölümler, yayında olmayan projeler ve medya kitaplığı (Faz 9). Yazmalar 204 döner;
-panel kaydettikten sonra içeriği yeniden çeker.
-
-⚠️ Sıralama yolları (`…/order`) kimlikli yollardan ÖNCE tanımlı: FastAPI yolları
-sırayla eşliyor, sonra tanımlansa "order" bir kayıt kimliği sanılırdı (schemas.py
-→ Slug bu adı yasaklıyor).
-"""
 
 router = APIRouter(prefix="/api/admin", tags=["admin"], dependencies=[Depends(get_current_admin)])
 
@@ -120,7 +120,6 @@ def _ensure_new(session: Session, model: type[SQLModel], item_id: str) -> None:
 
 
 def _next_order(rows: Sequence[Ordered]) -> int:
-    """Yeni kayıt listenin sonuna."""
     return max((r.order for r in rows), default=0) + 1
 
 
@@ -332,7 +331,7 @@ def create_section(data: SectionCreate, session: SessionDep) -> None:
         raise HTTPException(status.HTTP_409_CONFLICT, detail=f"'{data.id}' ayrılmış bir ad")
     _ensure_new(session, Section, data.id)
     rows = sorted(session.exec(select(Section)).all(), key=lambda s: s.order)
-    # İletişim kapanış karesi (Oturum 2): yeni bölüm onun ÖNÜNE girer, o sonda kalır.
+    # İletişim kapanış karesi: yeni bölüm onun ÖNÜNE girer, o sonda kalır.
     # Panelden sonra elle sona taşınabilir — bu yalnızca varsayılan yer.
     closing = next((s for s in rows if s.kind == "contact"), None)
     if closing:

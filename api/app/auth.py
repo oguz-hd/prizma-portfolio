@@ -1,3 +1,8 @@
+"""
+Tek admin kullanıcı, JWT ile giriş (docs/ARCHITECTURE.md § 2).
+Rol sistemi yok — çok kullanıcı olmadığı için karmaşıklığa gerek yok.
+"""
+
 import hashlib
 from datetime import UTC, datetime, timedelta
 from typing import Annotated
@@ -14,14 +19,8 @@ from app.db import SessionDep
 from app.models import AdminUser
 from app.schemas import AdminOut, LoginIn, PasswordChangeIn, TokenOut
 
-"""
-Tek admin kullanıcı, JWT ile giriş (docs/ARCHITECTURE.md § 2).
-Rol sistemi yok — çok kullanıcı olmadığı için karmaşıklığa gerek yok.
-"""
-
 settings = get_settings()
 
-# argon2 varsayılan; pwdlib passlib'in güncel halefi.
 password_hash = PasswordHash.recommended()
 
 bearer_scheme = HTTPBearer(auto_error=False)
@@ -96,7 +95,6 @@ router = APIRouter(prefix="/api/auth", tags=["auth"])
 
 @router.post("/login")
 def login(data: LoginIn, session: SessionDep, request: Request) -> TokenOut:
-    # Parola tahminine karşı: aynı IP'den çok hatalı deneme → 429 (throttle.py).
     ip = throttle.client_ip(request)
     throttle.check(ip)
     user = session.exec(select(AdminUser).where(AdminUser.email == data.email)).first()

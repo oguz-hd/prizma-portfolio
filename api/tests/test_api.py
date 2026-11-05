@@ -232,7 +232,7 @@ def test_projects_crud_and_unpublished(client: TestClient, auth: dict, data_dir:
     assert client.delete(f"/api/admin/media/{cover}", headers=auth).status_code == 204
 
 
-# ── Güvenlik taraması (Oturum 6) ─────────────────────────────────────────────
+# ── Güvenlik ─────────────────────────────────────────────────────────────────
 
 
 def test_unauthenticated_upload_is_rejected_before_body(client: TestClient) -> None:
