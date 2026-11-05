@@ -99,7 +99,8 @@ Kullanıcı notu (Claude Docs, API'yi denerken): https://claude.ai/code/artifact
   yalnız kurulurken okur; sayı değişirse geçişte renk zıplar). Etkiler `theme/light.css` (**App'ten sonra yüklenir**,
   yoksa prism.css/starfield.css ezer).
 - Geçiş `theme/sweep.ts`: tayf bandı + dalgalı sıvı cam ucu (squircle+Snell kırılma haritası, `backdrop-filter: url()`
-  yalnız Chromium). Yedekler: Safari/Firefox bulanık cam, `data-lite`/azaltılmış saydamlık yalnız bant, hareket azalt anında.
+  yalnız Chromium). Cam görünümü **D "Parlak damla"** (Oğuz seçimi; denenen A–E: `docs/tasarim/sivi-cam/`): berrak cam,
+  yukarıdan aydınlanan kenar, dalga tepelerinde kayan parlamalar. Süre tam 2,1 sn / dengeli 1,6 / hafif 1,3. Yedekler: Safari/Firefox bulanık cam, `data-lite`/azaltılmış saydamlık yalnız bant, hareket azalt anında.
   Dalga ~60 Hz, renk karışımı 30 adım (GPU yükü yenileme hızıyla orantılı). `html[data-sweeping]` etkileri yumuşatır.
 - **Performans kademesi** (`perf.ts`, `html[data-perf]`): `full` (her şey) / `balanced` (cam kırılmasız, küçük hale, yarı yıldız,
   60 fps, kısa geçiş) / `lite` (bulanıklık ve hale yok, yalnız bant; `data-lite` de açık). Başlangıç tahmini çekirdek, bellek,
@@ -111,8 +112,9 @@ Kullanıcı notu (Claude Docs, API'yi denerken): https://claude.ai/code/artifact
 
 ## Sırada
 
-1. **Tema geçişi:** sıvı cam görünümü iyileştirilecek (Oğuz: yeterince iyi değil); küçük kasma → performans
-   kademeleri (tam / dengeli / hafif: `hardwareConcurrency`, `deviceMemory`, kare ölçümü; isteğe bağlı elle seçim).
+1. **Canlıya alma (Oğuz, adım adım):** bu blok (açık tema, cam, kademeler, düzeltmeler) sunucuya çıkacak; Caddyfile'daki
+   `/sites/*` kapatma ve önbellek başlıkları da onunla. Sonra performans kademesi için küçük bir ayar arayüzü
+   (Otomatik / Tam / Hafif) istenirse eklenir; şimdilik `?perf=`.
 2. Skill ve plugin konuşması + araştırma (hafıza: `skill-plugin-konusmasi-hatirlat`).
 3. **Temaya özgü / uyum animasyonları, içerik düzenlemeleri, araştırmalar** (Oğuz, 05.11).
 4. API bağımlılıkları kilitsiz: `uv lock` + `uv sync --frozen`, uv/alpine/caddy/node imajlarını sabitle (hafıza: `prizma-uv-lock-hatirlat`).
