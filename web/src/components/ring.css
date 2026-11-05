@@ -16,9 +16,9 @@
   font-family: var(--font-display, var(--font-mono));
 }
 
-/* Üst yaydaki büyük başlık (isim, İLETİŞİM). Büyük harf (Oturum 2); <html lang>
+/* Üst yaydaki büyük başlık (isim, İLETİŞİM). Büyük harf; <html lang>
    doğru olduğu için Türkçe büyük harf kuralları (i → İ) tarayıcıdan geliyor.
-   ★ Kalın (Oturum 4, kullanıcı: "ismim daha kalın yazılsın"): Departure Mono'nun
+   ★ Kalın: Departure Mono'nun
    tek ağırlığı var ve sahte kalın pikselleri bulaştırıyor (kural 11). Onun
    yerine harfin kendi renginde kontur — köşeler keskin (miter), piksel hissi
    kalıyor. Kontur dolgunun ALTINDA (paint-order), içi boşalmıyor. */

@@ -7,8 +7,7 @@ import type { AbsorptionLine } from '../prism/optics'
 /**
  * 404 — "404 nm".
  *
- * trex-portfolio'daki offline şakası dinoya aitti; burada yerini tayf şakası
- * alıyor. Aynı prizma, aynı ışık — ama tayfta yalnızca TEK karanlık çizgi var,
+ * Aynı prizma, aynı ışık — ama tayfta yalnızca TEK karanlık çizgi var,
  * 404 nm'de: "aradığın sayfa bu dalga boyunda soğurulmuş".
  *
  * ★ Uydurma değil: 404.66 nm cıvanın gerçek "h" çizgisi (Hg I), tayf

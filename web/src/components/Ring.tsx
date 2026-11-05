@@ -10,8 +10,7 @@ import {
 import './ring.css'
 
 /**
- * Prizmayı çevreleyen görünmez daire — Giriş ve İletişim aynı yerleşimde
- * (Oturum 2: giriş; Oturum 4, kullanıcı: "iletişim de intro gibi dairesel olsun").
+ * Prizmayı çevreleyen görünmez daire — Giriş ve İletişim aynı yerleşimde.
  *
  * Daire görünmüyor, yalnızca yazıların dizildiği yol. Merkezi ekranın ortası,
  * yani prizmanın kutusunun merkezi (PrismStage aynı noktaya oturtuyor).
@@ -59,7 +58,7 @@ function measureAdv(): number {
 /** Başlığın harf aralığı (em) — ring.css → .ring-title ile aynı. */
 const TITLE_TRACKING = 0.06
 /**
- * Başlık harfleri yatayda bu kat geniş (Oturum 3: "harflerin genişliği artsın").
+ * Başlık harfleri yatayda bu kat geniş.
  * Departure Mono'nun tek genişliği var; `textLength` + `spacingAndGlyphs` geriyor.
  */
 const TITLE_STRETCH = 1.3
@@ -67,11 +66,9 @@ const TITLE_STRETCH = 1.3
 export const INNER_GAP = 30
 
 /**
- * Masaüstünde daire eskisinin %90'ı (Oturum 5, kullanıcı: önce "çapı %20
- * azalsın", görünce "%10 geri büyüsün"). Başlık boyu yarıçaptan türüyor:
- * %80'de isim her dizüstü boyunda 44 → 33 px'e iniyordu; %90'da 1440×900'de
- * 44 kalıyor, 1366×768'de 33. Telefonda yok: orada daire zaten ekranın eninden
- * sınırlı; küçülünce isim 33 → 22 px'e iniyordu (hesaplandı, 390×844).
+ * Masaüstünde daire tam çapın %90'ı. Başlık boyu yarıçaptan türüyor: %80'de
+ * isim her dizüstü boyunda 33 px'e iniyordu; %90'da 1440×900'de 44 kalıyor.
+ * Telefonda yok: orada daire zaten ekranın eninden sınırlı.
  */
 const DESKTOP_SCALE = 0.9
 
@@ -138,8 +135,8 @@ export function useRing(box: RefObject<HTMLElement | null>, sizeChars: number): 
 }
 
 /**
- * Yay yazısının kaplayabileceği en geniş açı (rad, ~130°). Oturum 6, büyüyen içerik
- * testi: 8 bağlantı alt yayda ~200° dolanıp tayfın üstüne çıkıyordu, uzun unvan·konum
+ * Yay yazısının kaplayabileceği en geniş açı (rad, ~130°). Sınırsızken
+ * 8 bağlantı alt yayda ~200° dolanıp tayfın üstüne çıkıyordu, uzun unvan·konum
  * iç yayın ucundan taşıp kesiliyordu. Bu açıda uçlar yatayın epey içinde kalıyor.
  */
 export const MAX_SPAN = 2.3
@@ -164,7 +161,7 @@ export function arc(geo: RingGeo, r: number, sweep: 0 | 1): string {
  *
  * ⚠️ `textAnchor="middle"` KULLANILMIYOR: WebKit (iPhone Safari) ortalamayı
  * `textLength` germesinden ÖNCEKİ genişlikle yapıyor, fazlalık yalnızca sağa
- * taşıyor ve yazı yayda kayıyordu (ölçüldü, 30.09.2026). Başlangıç elle:
+ * taşıyor ve yazı yayda kayıyordu (ölçüldü). Başlangıç elle:
  * yarım dairenin boyu πr, başlık tam ortasına.
  */
 export function RingTitle({ geo, path, text }: { geo: RingGeo; path: string; text: string }) {
@@ -190,8 +187,8 @@ export type RingLink = { id: string; href: string; label: string }
  *
  * ⚠️ Eskiden tek `<text>` → `<textPath>` → `<a>` → `<tspan>` idi. WebKit (Safari,
  * iPhone) isabeti `<text>`'te bırakıp içteki `<a>`'ya hiç indirmiyor: Safari'de
- * bağlantıların hiçbiri tıklanmıyordu (canlıda 0/6, `tools/safari/tikla.mjs`,
- * 05.10.2026). `<text>`'e pointer-events vermek yetmedi — isabet `<text>`'te kaldı.
+ * bağlantıların hiçbiri tıklanmıyordu (canlıda 0/6, `tools/safari/tikla.mjs`).
+ * `<text>`'e pointer-events vermek yetmedi — isabet `<text>`'te kaldı.
  * `<a>` dışta olunca her tarayıcı aynı.
  *
  * Yer elle: Departure Mono eş aralıklı, her harf `(adv + track) × size` px. Satır

@@ -7,7 +7,7 @@ import { lockDeck, unlockDeck } from '../deck/deck'
 import { useStrings } from '../i18n/strings'
 
 /**
- * Tam ekran büyütme (Faz 9, kullanıcı seçimi L1) — galerinin fotoğrafları.
+ * Tam ekran büyütme — galerinin fotoğrafları.
  *
  * Yerleşik <dialog> + showModal(): odak içeride kalıyor, Esc kapatıyor, arka plan
  * erişilebilirlik ağacından düşüyor — elle yazılmadı. Açıkken deck KİLİTLİ: oklar

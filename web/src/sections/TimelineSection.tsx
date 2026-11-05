@@ -2,7 +2,7 @@ import { Timeline } from './Experience'
 import { Section, type SectionProps } from './Section'
 
 /**
- * Zaman çizelgesi bölümü (Faz 9) — panelden eklenen tarihli maddeler (ör. Ödüller,
+ * Zaman çizelgesi bölümü — panelden eklenen tarihli maddeler (ör. Ödüller,
  * Gönüllülük). Deneyim'in Timeline'ı; tek liste olduğu için geniş ekranda maddeler
  * iki sütuna diziliyor (theme.css → .timeline-wide).
  */

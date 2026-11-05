@@ -23,7 +23,7 @@ import { isLab, isNotFound } from './route'
 import { watchFrameRate } from './lite'
 
 /**
- * Bölüm TÜRÜ → bileşen (Faz 9; eskiden slug'a göre elle). Panelden eklenen her
+ * Bölüm TÜRÜ → bileşen. Panelden eklenen her
  * bölüm kod değişmeden slayt olur.
  *
  * Başlıklar ve sıra useContent().sections'tan geliyor — nav ve ray ile AYNI
@@ -40,7 +40,6 @@ const SECTION_COMPONENTS: Record<SectionKind, ComponentType<SectionProps>> = {
   contact: Contact,
   text: TextSection,
   timeline: TimelineSection,
-  // Görünüşler seçenek sayfasından: A1 · B2 · L1 · C2 (Faz 9b).
   projects: ProjectsSection,
   announcement: AnnouncementSection,
   gallery: GallerySection,
@@ -49,7 +48,7 @@ const SECTION_COMPONENTS: Record<SectionKind, ComponentType<SectionProps>> = {
 /**
  * Katmanlar (arkadan öne):
  *   Starfield    gece göğü
- *   PrismStage   ★ merkezdeki prizma — her slaytta ortada (kullanıcı kararı)
+ *   PrismStage   ★ merkezdeki prizma — her slaytta ortada
  *   Deck         slaytlar; içerik slaytlarında cam panel prizmanın önünde
  *   SiteHeader   sabit üst çubuk
  *   SlideRail    sağ kenarda tayf rayı

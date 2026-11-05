@@ -20,7 +20,7 @@
 
 :root {
   /* --- Tipografi ------------------------------------------------------
-     ★ İki font (Oturum 3): Departure Mono kimlik ve arayüz, Atkinson
+     ★ İki font: Departure Mono kimlik ve arayüz, Atkinson
      Hyperlegible Next yalnızca DÜZYAZI (.prose — aşağıda). Sayfanın varsayılanı
      mono; düzyazı olan blok kendini işaretler. → fonts.css */
   --font-mono: 'Departure Mono', ui-monospace, 'Cascadia Mono', Consolas, monospace;
@@ -288,7 +288,7 @@ html[data-intro='pending'] :is([data-reveal], [data-reveal-panel], [data-reveal-
   padding-block: calc(var(--header-h) + var(--space-8)) var(--space-12);
   scrollbar-width: thin;
   scrollbar-color: var(--line) transparent;
-  /* Oturum 3: kaydırma çubuğunun yeri HER slaytta ayrılı. Yalnızca taşan
+  /* Kaydırma çubuğunun yeri HER slaytta ayrılı. Yalnızca taşan
      slaytta çıkınca içerik ~10 px sola kayıyordu — İletişim'e gelince titreme
      gibi okunuyordu (1366×768, ölçüldü). İki kenardan: ortası prizmayla hizalı. */
   scrollbar-gutter: stable both-edges;
@@ -299,7 +299,7 @@ html[data-intro='pending'] :is([data-reveal], [data-reveal-panel], [data-reveal-
 }
 
 /* --- Sabit üst çubuk ------------------------------------------------------
-   Oturum 2: alt çizgi YOK. Sert kenarlı bulanık bant da yok — zemin aşağı
+   Alt çizgi YOK. Sert kenarlı bulanık bant da yok — zemin aşağı
    doğru sönüyor, çubukla sayfa arasında bir çizgi okunmuyor. */
 
 .site-header {
@@ -318,8 +318,8 @@ html[data-intro='pending'] :is([data-reveal], [data-reveal-panel], [data-reveal-
   gap: var(--space-2) var(--space-8);
 }
 
-/* Girişe dönüş: "INTRO / GİRİŞ" — harfler akan tayfla dolu, etrafında ışıma
-   (Oturum 4; eskiden aynı tayfla dolu dönen bir üçgendi). Tayf yazının iki
+/* Girişe dönüş: "INTRO / GİRİŞ" — harfler akan tayfla dolu, etrafında ışıma.
+   Tayf yazının iki
    katı genişlikte ve kayıyor: renkler harflerin üstünden akıyor. */
 .brand {
   position: relative;
@@ -353,8 +353,8 @@ html[data-intro='pending'] :is([data-reveal], [data-reveal-panel], [data-reveal-
 
 /* --- Navigasyon ve dil ---------------------------------------------------- */
 
-/* Oturum 2: bölümler SOLDA, işaretin hemen yanında; dil seçici sağa yaslı.
-   Faz 9 (D2): sığmazsa yatay kayar, taşan kenar söner (Nav.tsx → data-fade).
+/* Bölümler SOLDA, işaretin hemen yanında; dil seçici sağa yaslı.
+   Sığmazsa yatay kayar, taşan kenar söner (Nav.tsx → data-fade).
    Alt boşluk: kaydırma kabı dikeyde de kırpıyor, alt çizgi (::after) kesilmesin. */
 .nav {
   display: flex;
@@ -457,11 +457,11 @@ html[data-intro='pending'] :is([data-reveal], [data-reveal-panel], [data-reveal-
   color: var(--ink);
 }
 
-/* Telefonda tek satır. Oturum 3: menü içerikteki KISA adları gösteriyor
+/* Telefonda tek satır. Menü içerikteki KISA adları gösteriyor
    (`navLabel` — "Deneyim ve Eğitim" yerine "Deneyim"); 360 px'te üçü de sığıyor.
    Daha dar ekranda menü yatay kayar, sağ kenarı sönerek "devamı var" der;
-   dil seçici hep görünür. Eskiden bu sönme her telefonda vardı ve son bağlantı
-   ("İletişim") yarım görünüyordu — menü sığmıyormuş gibi okunuyordu. */
+   dil seçici hep görünür. Sığan telefonda sönme yok: yarım görünen son bağlantı
+   menü sığmıyormuş gibi okunuyor. */
 @media (max-width: 767px) {
   .site-header-inner {
     gap: var(--space-3);
@@ -483,8 +483,8 @@ html[data-intro='pending'] :is([data-reveal], [data-reveal-panel], [data-reveal-
 
 }
 
-/* Oturum 4: üçgenin yerine "INTRO" yazısı (42 px, üçgen 28 px) geldi; dar
-   telefonda menü 4–32 px taşıyordu. Aralıklar sıkılaşıyor. */
+/* "INTRO" yazısı (42 px) dar telefonda menüyü 4–32 px taşırıyordu.
+   Aralıklar sıkılaşıyor. */
 @media (max-width: 420px) {
   .site-header-inner,
   .nav {
@@ -533,9 +533,9 @@ html[data-intro='pending'] :is([data-reveal], [data-reveal-panel], [data-reveal-
   bottom: -1px;
   height: 1px;
   background: var(--lead);
-  /* ⚠️ Yalnızca scaleX(0) yetmiyor (Oturum 3): dil geçişinde üst çubuk solup
-     kayarken Chrome çizgiyi bir kare tam boy boyayabiliyordu — kullanıcı ekranında
-     "görünüp kayboluyor". Saydamlık da sıfır: katman ne yaparsa yapsın görünmez. */
+  /* ⚠️ Yalnızca scaleX(0) yetmiyor: dil geçişinde üst çubuk solup
+     kayarken Chrome çizgiyi bir kare tam boy boyayabiliyordu — çizgi
+     görünüp kayboluyordu. Saydamlık da sıfır: katman ne yaparsa yapsın görünmez. */
   opacity: 0;
   transform: scaleX(0);
   transform-origin: 0 50%;
@@ -603,7 +603,7 @@ html[data-intro='pending'] :is([data-reveal], [data-reveal-panel], [data-reveal-
   opacity: 1;
 }
 
-/* Alt sayfalar (Oturum 4 · A1): etkin slaytın altında kısa çizgiler. */
+/* Alt sayfalar: etkin slaytın altında kısa çizgiler. */
 .rail-pages {
   display: grid;
   justify-items: end;
@@ -652,8 +652,7 @@ html[data-intro='pending'] :is([data-reveal], [data-reveal-panel], [data-reveal-
     right: var(--space-2);
   }
 
-  /* Görünmez ama ekran okuyucuda: bağlantının adı bu (Lighthouse, güvenlik taraması
-     Oturum 6 — `display: none` adı da siliyordu, ray bağlantıları adsız kalıyordu). */
+  /* Görünmez ama ekran okuyucuda: bağlantının adı bu (Lighthouse — `display: none` adı da siliyordu, ray bağlantıları adsız kalıyordu). */
   .rail-label {
     position: absolute;
     width: 1px;
@@ -696,7 +695,7 @@ html[data-intro='pending'] :is([data-reveal], [data-reveal-panel], [data-reveal-
   text-transform: uppercase;
 }
 
-/* Telefonda küçük yazı (Oturum 4, kullanıcı: "unvan ve konum mobilde büyük").
+/* Telefonda küçük yazı (unvan, konum).
    11'in 2/3'ü: 3x ekranda her font pikseli tam 2 cihaz pikseli — keskin kalıyor
    (390×844 @3x'te ölçüldü; kural 11'in tek istisnası, 2x ekranda hafif yumuşar). */
 @media (max-width: 767px) {
@@ -774,8 +773,8 @@ html[data-intro='pending'] :is([data-reveal], [data-reveal-panel], [data-reveal-
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   404 — ortası prizmaya boş bırakılmış ızgara (İletişim Oturum 4'te daireye
-   geçti, bu ızgarayı artık yalnızca 404 kullanıyor).
+   404 — ortası prizmaya boş bırakılmış ızgara (yalnızca 404
+   kullanıyor).
    Orta satır prizmanın GERÇEK boyu (--prism-box, PrismStage yazıyor); 1fr'ler
    eşit kaldıkça boşluk tam ekranın ortasında, yani prizmanın üstünde.
    ═══════════════════════════════════════════════════════════════════════════ */
@@ -924,7 +923,7 @@ html[data-lite] .panel {
   font-size: var(--text-heading);
 }
 
-/* Zaman çizelgesi bölümü (Faz 9): tek liste, geniş ekranda iki sütun. */
+/* Zaman çizelgesi bölümü: tek liste, geniş ekranda iki sütun. */
 @media (min-width: 768px) {
   .timeline-wide .timeline {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -932,14 +931,14 @@ html[data-lite] .panel {
   }
 }
 
-/* ── Alt sayfalar (Oturum 4 · A1, deck/paginate.ts) ─────────────────────────
+/* ── Alt sayfalar (deck/paginate.ts) ─────────────────────────
    İlk sayfadan sonra başlık küçülür ama kalır;
    bölüm numarasının yanında sayaç. Öznitelikleri paginate.ts yazıyor. */
 [data-page-off] {
   display: none !important;
 }
 
-/* Geniş ekranda iki sütun KALIR (Oturum 6, büyüyen içerik testi: tek sütuna inince
+/* Geniş ekranda iki sütun KALIR (tek sütuna inince
    sağ yarı boş kalıyor, sayfa sayısı artıyordu). Bir sayfada sütunlardan biri
    bittiyse kalan tam genişliğe yayılır; maddeleri (yetenek grubu, zaman çizelgesi)
    iki sütuna dizilir. Düzyazı tek sütunda kalır — paragraflar yan yana okunmaz.
@@ -1149,11 +1148,10 @@ html[data-lite] .panel {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   Faz 9 — panelden eklenen bölüm türleri (seçimler: A1 · B2 · L1 · C2 · D2,
-   https://claude.ai/artifact/QyDBsuQRTQ2Pi7u8EoCR5f)
+   Panelden eklenen bölüm türleri
    ═══════════════════════════════════════════════════════════════════════════ */
 
-/* --- Duyuru (A1): başlığın üstünde ışıyan nokta + tarih, altta tek düğme --- */
+/* --- Duyuru: başlığın üstünde ışıyan nokta + tarih, altta tek düğme --- */
 
 .announcement-mark {
   display: flex;
@@ -1194,7 +1192,7 @@ html[data-lite] .panel {
   outline: none;
 }
 
-/* --- Galeri (B2): ilk fotoğraf iki sütun × iki sıra, sonra üçlü sıralar --- */
+/* --- Galeri: ilk fotoğraf iki sütun × iki sıra, sonra üçlü sıralar --- */
 
 .gallery {
   list-style: none;
@@ -1285,7 +1283,7 @@ html[data-lite] .panel {
   }
 }
 
-/* --- Büyütme (L1, components/Lightbox.tsx) --------------------------------- */
+/* --- Büyütme (components/Lightbox.tsx) --------------------------------- */
 
 .lightbox {
   width: 100%;
@@ -1363,7 +1361,7 @@ html[data-lite] .panel {
   outline: none;
 }
 
-/* --- Projeler (C2): kapaklı kartlar --------------------------------------- */
+/* --- Projeler: kapaklı kartlar --------------------------------------- */
 
 .project-list {
   list-style: none;

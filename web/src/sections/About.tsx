@@ -4,8 +4,7 @@ import { Section, type SectionProps } from './Section'
 /**
  * Hakkımda — bio ve yetenekler, iki sütun.
  *
- * Oturum 2 (kullanıcı isteği): mezuniyet paragrafı çıktı, deneyim ve eğitim
- * kendi slaytına taşındı (Experience.tsx). Tümü useContent()'ten geliyor;
+ * Deneyim ve eğitim kendi slaytında (Experience.tsx). Tümü useContent()'ten geliyor;
  * bu dosyada tek bir içerik dizesi yok.
  */
 export function About(props: SectionProps) {

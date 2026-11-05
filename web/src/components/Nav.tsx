@@ -13,7 +13,7 @@ import { reducedMotion } from '../motion'
  *
  * Etkin bölüm aria-current ile işaretleniyor: slayt 0 giriş, bölümler 1'den başlıyor.
  *
- * ★ Kayan menü (Faz 9, kullanıcı seçimi D2): bölümler panelden eklendikçe menü
+ * ★ Kayan menü: bölümler panelden eklendikçe menü
  * sığmayabilir. Tek satırda kalır, yatay kayar; taşan kenar söner (`data-fade`,
  * ölçülerek — sığıyorsa hiç sönme yok) ve etkin bölüm kendiliğinden görünür alana
  * kayar. `data-fade` JSX'te değil (kural 8): dil değişiminde React ezmesin.

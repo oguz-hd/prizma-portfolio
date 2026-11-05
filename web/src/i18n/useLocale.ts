@@ -5,7 +5,7 @@ import { DEFAULT_LOCALE, isLocale, type Locale } from './types'
 /**
  * Dil durumu. React ağacının dışında yaşıyor çünkü:
  *   - main.tsx mount'tan ÖNCE okuması gerek (<html lang> ilk kareden doğru olsun)
- *   - Faz 6'da content.json yüklemesi de mount öncesi olacak, aynı yerde
+ *   - content.json yüklemesi de mount öncesi, aynı yerde
  *
  * useSyncExternalStore ile bağlanıyor — Context sarmalayıcısı gerekmiyor.
  */

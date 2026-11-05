@@ -12,8 +12,6 @@ import { useLocale } from './useLocale'
  *   düzenlenebilir veri  ↔  sabit sistem
  *
  * ⚠️ Bileşenlerde sabit metin yazılmayacak. Yeni bir etiket lazımsa buraya eklenir.
- * (trex-portfolio'da bu kural iki kez çiğnendi, ikisinde de İngilizce'de Türkçe kaldı.
- *  Üçüncüsü oradaki Nav'ın aria-label'ıydı — "Bölümler" — burada düzeltildi.)
  */
 
 const STRINGS = {
@@ -21,7 +19,7 @@ const STRINGS = {
   education: { tr: 'Eğitim', en: 'Education' },
   emailMe: { tr: 'Bana yaz', en: 'Email me' },
 
-  // Faz 9 — panelden eklenen bölüm türleri
+  // Panelden eklenen bölüm türleri
   announcement: { tr: 'Duyuru', en: 'Announcement' },
   tech: { tr: 'Kullanılan teknolojiler', en: 'Tech used' },
   source: { tr: 'Kaynak kodu', en: 'Source code' },

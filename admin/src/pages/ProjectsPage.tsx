@@ -6,8 +6,8 @@ import { usePanel } from '../panel'
 import { Page } from './Page'
 
 /**
- * Projeler (Faz 9). Kayıtlar her zaman burada; sitede yalnızca Bölümler'de
- * "Projeler" türünde bir bölüm varsa görünür (kullanıcı kararı).
+ * Projeler. Kayıtlar her zaman burada; sitede yalnızca Bölümler'de
+ * "Projeler" türünde bir bölüm varsa görünür.
  */
 type Draft = {
   title: Loc

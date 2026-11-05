@@ -4,7 +4,7 @@ import type { Milestone } from '../content/types'
 import { Section, type SectionProps } from './Section'
 
 /**
- * Deneyim ve Eğitim — Projeler slaytının yerinde (kullanıcı isteği, Oturum 2).
+ * Deneyim ve Eğitim.
  *
  * İki sütun: solda deneyim, sağda eğitim. Aynı şekle sahipler (kurum + rol +
  * dönem + not) → tek Timeline bileşeni.

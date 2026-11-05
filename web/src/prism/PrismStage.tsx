@@ -42,16 +42,13 @@ gsap.ticker.fps(74)
  * Şeridin üstünde gerçek soğurma çizgileri var — bir yıldızın ne olduğu bu
  * çizgilerden okunur (docs/DESIGN.md § 0).
  *
- * Oturum 2 (kullanıcı isteği):
- *   - "Renkler daha parlak ve göz alıcı" → tayf daha opak; altında bulanık,
- *     doygun bir hale katmanı (`.prism-glow`, aynı şekillerin <use> kopyası);
- *     camın içinde soluk bir gökkuşağı. (Sol kenardaki parıltı çizgisi Oturum 3'te
- *     kalktı: kenara paralel değildi, ikinci ve eğri bir kenar gibi okunuyordu.)
- *   - "Fareye bağlı olmasın, kendi hâlinde hareket etsin — mobilde fare yok"
- *     → imleç takibi KALKTI. Işık iki dalgalı yavaş bir salınımla kendi
- *     kendine dönüyor ve ışık darbeleri akıyor: huzmede parlak bir parçacık
- *     prizmaya koşuyor, çıkınca tayfın üstünden bir dalga olarak geçiyor.
- *     Dokunmatikte de birebir aynı.
+ * Tayf opak; altında bulanık, doygun bir hale katmanı (`.prism-glow`, aynı
+ * şekillerin <use> kopyası), camın içinde soluk bir gökkuşağı var.
+ *
+ * Fareye bağlı değil (mobilde fare yok): ışık iki dalgalı yavaş bir salınımla
+ * kendi kendine dönüyor ve ışık darbeleri akıyor — huzmede parlak bir parçacık
+ * prizmaya koşuyor, çıkınca tayfın üstünden bir dalga olarak geçiyor.
+ * Dokunmatikte de birebir aynı.
  *
  * Bu bileşen yalnızca ÇİZER. Ne zaman neyin görüneceğine karar vermez:
  * `scene` (scene.ts) her karede okunur — açılış ve slayt geçişi onu sürer.
@@ -65,7 +62,7 @@ gsap.ticker.fps(74)
 const NO_LINES: AbsorptionLine[] = []
 
 type Props = {
-  /** Soğurma çizgileri. Varsayılan yok (sade tayf, Oturum 4); 404 kendi çizgisini veriyor. */
+  /** Soğurma çizgileri. Varsayılan yok (sade tayf); 404 kendi çizgisini veriyor. */
   lines?: AbsorptionLine[]
   /** Çizgileri vurgula (404: tek, kalın, lider renkli etiket). */
   mark?: boolean
@@ -157,9 +154,8 @@ export function PrismStage({ lines = NO_LINES, mark = false }: Props) {
       glow!.setAttribute('viewBox', vb)
       // Şerit ekranın sağ kısmında. Telefonda etiket yok; ama sağ kenarda slayt
       // rayı var — şerit ona binmesin diye kenardan ~50px içeride.
-      // Masaüstünde (Oturum 3, kullanıcı: "tayf daha uzun olsun") şerit, etiketleri
-      // raya değmeden sığabilecek en sağa gidiyor. Önceki W×0.33, 1440'ta sağda
-      // ~80px boş bırakıyor, 1024'te ise etiketi rayın 4px yanına kadar itiyordu (ölçüldü).
+      // Masaüstünde şerit, etiketleri raya değmeden sığabilecek en sağa gidiyor
+      // (sabit bir W oranı 1440'ta sağda boşluk bırakıyor, 1024'te rayla çakışıyordu).
       const labelW = Math.max(0, ...labelRefs.current.map((el) => el?.offsetWidth ?? 0))
       const first = labelRefs.current[0]
       const labelStep = first ? parseFloat(getComputedStyle(first).fontSize) * 1.3 : 0

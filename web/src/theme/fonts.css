@@ -1,11 +1,10 @@
 /*
   Font varlık bildirimi.
 
-  ★ İki font, iki rol (Oturum 3, kullanıcı isteği: okunabilirlik).
+  ★ İki font, iki rol (okunabilirlik).
     Departure Mono               kimlik — isim, başlıklar, menü, etiketler, veri
     Atkinson Hyperlegible Next   düzyazı — bio, bölüm girişleri, notlar
-  Oturum 2'de site tek fonta (Departure Mono) inmişti; piksel font uzun
-  paragrafta, hele telefonda 11 px'te, yoruyordu. Atkinson okunabilirlik için
+  Piksel font uzun paragrafta, hele telefonda 11 px'te, yoruyor. Atkinson okunabilirlik için
   tasarlandı (Braille Institute): benzer harfler (I l 1, O 0) birbirinden ayrık.
 
   Monospace PİKSEL font: yalnızca 11 px'in katlarında keskin (11, 22, 33, 44 …).

@@ -11,11 +11,11 @@ import { deg, slideAccent, slideAngle } from './optics'
  * PrismStage her karede bunu okuyup çizer; kimse SVG'ye doğrudan dokunmaz.
  * Açılış (intro.ts) ve slayt geçişi (deck.ts) bu alanları GSAP ile tween'liyor.
  *
- * ── Sahiplik (trex-portfolio kural 5'in karşılığı: her alanın tek sahibi) ──
+ * ── Sahiplik (her alanın tek sahibi) ──
  *   frame · beam · fan · labels   → açılış (intro.ts); sonra hep 1
  *   base · dim · accent · focus   → slayt geçişi (prismFocus, aşağıda)
  *   surge                         → slayt geçişi: tayfın büyüyüp hızlandığı dalga
- *   gerçek açı (theta)            → PrismStage — base'e imleç + nefes eklenip yumuşatılıyor
+ *   gerçek açı (theta)            → PrismStage — base'e nefes eklenip yumuşatılıyor
  * İki şey aynı alanı sürerse GSAP'te biri diğerini yer; bu yüzden ayrık.
  *
  * ⚠️ İçerikten bağımsız: sahne bölüm adı bilmez. Deck yalnızca sıra numarası
@@ -54,7 +54,7 @@ export const DIM = 0.8
 /**
  * Tayfın ton sayısı — ekranda uygulanmış paletten, içerikten değil (kural 5:
  * prizma içerikten bağımsız). Böylece sahne içerik yüklenmeden de çiziliyor:
- * yönetim panelinin giriş ekranı onu içeriksiz kullanıyor (Oturum 5).
+ * yönetim panelinin giriş ekranı onu içeriksiz kullanıyor.
  * Tema her zaman önce uygulanıyor (main.tsx); yedek yalnızca güvence.
  */
 export function accentCount(): number {
@@ -68,9 +68,7 @@ export function darkenScene(): void {
 }
 
 /**
- * Geçiş dalgası (Oturum 4, kullanıcı: "bölümler arası geçerken tayf daha
- * hareketli ve büyük bir efekt yapsın"). Sitede `?fx=0…3` ile dört seçenek
- * denendi; kullanıcı hafif olanı seçti (fx=1).
+ * Geçiş dalgası: bölümler arası geçerken tayf hareketlenir ve büyür.
  *   spread  tayf yelpazesinin açılma payı (0.9 → yaklaşık iki katı); dalgada
  *           soğurma çizgileri söner (yalnızca 404'te var)
  *   pulse   ışık darbelerinin hızlanma payı

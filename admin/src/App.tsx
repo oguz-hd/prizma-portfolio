@@ -18,7 +18,7 @@ import { SettingsPage } from './pages/SettingsPage'
 import { SkillsPage } from './pages/SkillsPage'
 
 /**
- * Yönetim paneli (Faz 7b). Ayrı build — ziyaretçi bu kodu hiç indirmiyor.
+ * Yönetim paneli. Ayrı build — ziyaretçi bu kodu hiç indirmiyor.
  * Router yok: sayfa adresin #'inde (/admin/#profil), yenileyince yerinde kalır.
  */
 

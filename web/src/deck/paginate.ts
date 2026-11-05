@@ -1,10 +1,9 @@
 /**
- * Alt sayfalar — ekrana sığmayan slayt birimlerine bölünür (Oturum 4, kullanıcı
- * seçimi A1: https://claude.ai/artifact/H68nPe34Qt5XwJ5ZF8ctao).
+ * Alt sayfalar — ekrana sığmayan slayt birimlerine bölünür.
  *
  * Neden: taşan slaytın içi kayıyordu; telefonda bir sonraki slayta geçmek için
  * iki kez kaydırmak gerekiyordu. iPhone SE'de (375×553 görünür) Hakkımda 268 px
- * taşıyordu — yazı küçültmekle kapanacak fark değil (ölçüldü, 30.09.2026).
+ * taşıyordu — yazı küçültmekle kapanacak fark değil (ölçüldü).
  * Artık her hareket bir adım: önce slaytın sonraki sayfası, sonra sonraki slayt.
  *
  * İçerikten bağımsız. İçerik yazarının işaretleri:

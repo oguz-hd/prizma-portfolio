@@ -12,13 +12,10 @@ import { proseOf, scramble, settleScramble, snapshot } from '../scramble'
  * docs/DESIGN.md § F/6: hiçbir bilgi yalnızca renkle taşınmaz — aktif dil
  * hem renkle, hem çerçeveyle, hem aria-current ile belirtiliyor.
  *
- * ── Geçiş animasyonu (Oturum 3, kullanıcı seçimi) ───────────────────────────
+ * ── Geçiş animasyonu ───────────────────────────
  * Dil ANINDA değişir; Departure Mono'daki her harf bir süre Katakana'dan ve
  * tayfın tonlarından geçip yeni harfine oturur (scramble.ts). Düzyazı
  * (Atkinson, orantılı) harf harf çözülürse satır titrer — o yumuşakça belirir.
- *
- * Eskiden bloklar süzülüp sönüyordu; o sırada üst çubuk ayrı bir katmana
- * alınıyor, menü alt çizgisi bir kare görünüp kayboluyordu (kullanıcı ekranında).
  */
 
 /** Geçişe katılan bloklar bu işareti taşıyor. Dil seçicinin kendisi taşımıyor.

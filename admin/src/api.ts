@@ -9,7 +9,7 @@ import type { RawMedia, RawSiteContent } from '@site/content/types'
  * Yazmalar gövdesiz 204 döner (api/app/admin.py); panel kaydettikten sonra
  * içeriği `GET /api/admin/content`'ten yeniden çeker — tek doğruluk kaynağı sunucu.
  * O çıktı herkese açık içerikle aynı şekil + gizli bölümler, yayında olmayan
- * projeler ve medya kitaplığı (Faz 9).
+ * projeler ve medya kitaplığı.
  */
 
 // ── Oturum ──────────────────────────────────────────────────────────────────
@@ -197,7 +197,7 @@ export const api = {
   /**
    * Ziyaretçinin gördüğü içerik — oturum gerekmez. Giriş ekranı sitenin paletini
    * buradan alıyor (theme.ts → paintLogin). ⚠️ `content()` korumalı: giriş ekranında
-   * çağrılırsa 401 alır, giriş ekranı varsayılan palete düşer (Oturum 6'da oldu).
+   * çağrılırsa 401 alır, giriş ekranı varsayılan palete düşer.
    */
   publicContent: () => request<RawSiteContent>('GET', '/content'),
 

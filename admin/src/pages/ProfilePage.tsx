@@ -11,7 +11,7 @@ function toDraft(content: RawSiteContent) {
     name: p.name,
     title: { ...p.title },
     location: { ...p.location },
-    // Sitede gösterilmiyor (Oturum 2) ama sözleşmede — formda yok, olduğu gibi geri gider.
+    // Sitede gösterilmiyor ama sözleşmede — formda yok, olduğu gibi geri gider.
     tagline: { ...p.tagline },
     bio: paragraphsText(p.bio),
   }

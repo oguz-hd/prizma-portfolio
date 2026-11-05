@@ -12,12 +12,11 @@ import { TextInput } from './fields'
 import { paintLogin, type LoginLook } from './theme'
 
 /**
- * Giriş ekranı — sitenin GERÇEK prizması (Oturum 5 sonu, kullanıcı: "kalite intro
- * sayfamızdaki gibi", "404'te zaten bu prizma var, oradan uydur").
+ * Giriş ekranı — sitenin GERÇEK prizması.
  *
  *   Düzen   ortada prizma (`PrismStage` + `Starfield`), ADMIN onu çevreleyen
  *           dairenin üst yayında — Giriş slaytındaki isim gibi, aynı `Ring` ve
- *           aynı boyda (sitedeki ismin uzunluğundan; kullanıcı: "genel bir uyum").
+ *           aynı boyda (sitedeki ismin uzunluğundan; genel uyum için).
  *           Altta form, alanlar alt alta. Prizma ve daire ortanın biraz üstünde (--lift).
  *   Açılış  sitenin intro.ts zamanlamaları, `scene` üzerinde: kenarlar çizilir,
  *           ışık gelir, tayf açılır; ADMIN harf harf çözülür (Katakana + tayf).
@@ -125,7 +124,7 @@ function LoginScreen({ accents, nameChars, onSignedIn }: ScreenProps) {
     const zoom = Math.min(40, Math.max(8, (2.4 * window.innerHeight) / fan.height))
     // Ayrı katman: sahne bir kez çizilip doku olarak büyüsün. Yoksa tarayıcı her karede
     // 8-40× ölçekte yeniden çiziyordu (hale blur(22px) dahil) — ölçüldü: 113-267 ms'lik
-    // takılmalar (Oturum 6, kullanıcı: "giriş animasyonu kasıyor").
+    // takılmalar.
     stage.style.willChange = 'transform'
     // Giriş animasyona bağlı kalmasın (site kuralı 6): sekme arka plana geçip rAF dururse emniyet kaydeder.
     let signedIn = false
@@ -227,7 +226,7 @@ function LoginScreen({ accents, nameChars, onSignedIn }: ScreenProps) {
 
 /**
  * Harf çözülmesi — sitenin scramble.ts'inin kısası (Katakana + tayf, soldan sağa
- * yerleşir). Sitenin modülü doğrudan alınamıyor: sahnenin durumuna ve içeriğe bağlı.
+ * yerleşir).
  * Hedef dairedeki <textPath>: harfler <tspan>, renk dolgu ve konturda (başlığın
  * kalınlığı kontur, .ring-title). `textLength` yayda boyu sabit tutuyor.
  */

@@ -17,7 +17,7 @@ import { useSlideIndex, useSlidePages } from './deck'
  * § F/6: bilgi yalnızca renkle taşınmıyor — etkin slayt hem daha uzun çizgi,
  * hem görünür etiket, hem aria-current.
  *
- * Alt sayfalar (Oturum 4 · A1): etkin slayt bölündüyse altında her sayfa için
+ * Alt sayfalar: etkin slayt bölündüyse altında her sayfa için
  * kısa bir çizgi, bakılan sayfanınki uzun. Dekoratif — sayaç başlıkta ("1/2").
  */
 export function SlideRail() {

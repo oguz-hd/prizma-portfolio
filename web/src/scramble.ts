@@ -3,8 +3,7 @@ import { accentCount } from './prism/scene'
 
 /**
  * Harf çözülmesi — her harf bir süre Katakana karakterlerinden geçip doğru
- * harfe oturur; dönen harfler tayfın tonlarından akar (Oturum 3, kullanıcı
- * seçimi: örnek sayfasındaki A7 "Katakana yağmuru" + A5 "tayf renkli").
+ * harfe oturur; dönen harfler tayfın tonlarından akar.
  * Açılışta ve dil geçişinde çalışıyor.
  *
  * Yalnızca Departure Mono'daki metin çözülür: tek aralıklı olduğu için harfler
@@ -23,15 +22,13 @@ import { accentCount } from './prism/scene'
  * ⚠️ Sabitlenen yay ortalanıyorsa (`text-anchor="middle"`) sabitleme süresince
  * elle ortalanıyor: WebKit (iPhone Safari) ortalamayı `textLength`'ten ÖNCEKİ
  * — Katakana'yla daha geniş — boyla yapıyor, yazı sola kayıp bitişte yerine
- * sıçrıyordu (ölçüldü, 30.09.2026). Hero'daki isim de aynı sebeple elle ortalı.
+ * sıçrıyordu (ölçüldü). Hero'daki isim de aynı sebeple elle ortalı.
  */
 
 const KATAKANA = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワン'
 const TICK = 45
 /**
- * Bir çözülmenin süresi (ms) — açılışta da dil geçişinde de AYNI (kullanıcı
- * isteği: "ikisi aynı olsun, uzun olan"). Eskiden dil 800, açılış 900 (üst
- * çubuk 700), tekrar ziyarette açılışla birlikte 3× kısalıyordu (300).
+ * Bir çözülmenin süresi (ms) — açılışta da dil geçişinde de AYNI.
  */
 export const SCRAMBLE_MS = 900
 const SVG_NS = 'http://www.w3.org/2000/svg'

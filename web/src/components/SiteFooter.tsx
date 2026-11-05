@@ -17,7 +17,7 @@ export function SiteFooter({ ref }: { ref?: Ref<HTMLElement> }) {
   return (
     <footer ref={ref} className="site-footer" data-reveal data-i18n-fade>
       {/* "©" YOK: site artık tümüyle Departure Mono ve fontta o glif yok — yerine
-          garip bir işaret basıyordu (trex-portfolio'da görülmüştü). */}
+          garip bir işaret basıyordu. */}
       <p className="label site-footer-note">
         {new Date().getFullYear()} · {profile.name}
       </p>

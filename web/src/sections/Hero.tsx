@@ -17,9 +17,8 @@ import { useStrings } from '../i18n/strings'
 /**
  * Giriş slaytı — isim ve bağlantılar prizmayı çevreleyen bir dairenin üstünde.
  *
- * Kullanıcının tarifi (Oturum 2): "Prizma üçgenini merkezde olan bir daire hayal
- * edin; ismim üst kısımda o dairenin çizgisine uygun şekilde bükülmüş, alt
- * kısımda linkler de o çizgiye uysun. Mottoyu kaldıralım."
+ * Fikir: prizma üçgeni merkezde olan bir daire; isim üst kısımda o dairenin
+ * çizgisine uygun bükülmüş, alt kısımda bağlantılar da aynı çizgiye uyuyor.
  *
  * Daire ve ölçüleri İletişim'le ortak → components/Ring.tsx.
  *
@@ -34,11 +33,9 @@ import { useStrings } from '../i18n/strings'
 /**
  * Alt yaydaki bağlantıların boyu (px).
  *
- * Oturum 4 (kullanıcı: "daha küçük olmalı, özellikle mobilde çok büyük"): her
- * yerde 22 → 11. Oturum 5 (kullanıcı: "biraz büyüsün, çok görünmüyorlar"):
- * masaüstünde 16.5 = 11 × 1.5 — iki basamağın ortası. 11'in katı değil (kural 11'in
+ * Telefonda 11, masaüstünde 16.5 = 11 × 1.5. 11'in katı değil (kural 11'in
  * istisnası, telefondaki 11 × 2/3 gibi): 2x ekranda her font pikseli tam 3 cihaz
- * pikseli, keskin; 1x ekranda hafif yumuşar. Telefonda 11 kaldı.
+ * pikseli, keskin; 1x ekranda hafif yumuşar.
  * Dokunma alanı küçülmesin diye harflerin görünmez kalın bir çerçevesi var
  * (theme.css → .ring-links a).
  */
@@ -96,7 +93,7 @@ export function Hero() {
         : `${profile.title.slice(0, maxChars - 1).trimEnd()}…`
 
   /*
-    İpucu bağlantı yayının hemen ALTINDA (Oturum 3). Ekranın dibine sabitken
+    İpucu bağlantı yayının hemen ALTINDA. Ekranın dibine sabitken
     1024×768, 1280×720, 1366×768'de yaya biniyordu (ölçüldü). Sığmazsa önce
     hareketli çizgisi kalkar, o da sığmazsa gizlenir → Ring.tsx usePlaceBelow.
   */
@@ -146,8 +143,7 @@ export function Hero() {
                 </text>
               </g>
 
-              {/* İsim çevrilmiyor ama dil geçişine katılıyor (Oturum 3, kullanıcı
-                  isteği): harfleri Katakana'dan geçip yine kendine oturuyor. */}
+              {/* İsim çevrilmiyor ama dil geçişine katılıyor: harfleri Katakana'dan geçip yine kendine oturuyor. */}
               <g aria-hidden="true" data-reveal data-i18n-fade>
                 <RingTitle geo={geo} path={ids.top} text={profile.name} />
               </g>

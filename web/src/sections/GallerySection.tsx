@@ -6,7 +6,7 @@ import { useStrings } from '../i18n/strings'
 import { Section, type SectionProps } from './Section'
 
 /**
- * Galeri (Faz 9, kullanıcı seçimi B2 + L1) — ilk fotoğraf büyük, yanında küçükler;
+ * Galeri — ilk fotoğraf büyük, yanında küçükler;
  * sonrakiler üçlü sıralar hâlinde. Tıklayınca tam ekran (components/Lightbox.tsx).
  *
  * Her fotoğraf bir sayfa birimi: sığmayan galeri alt sayfalara bölünür. `width/height`

@@ -1,13 +1,11 @@
 /**
  * Prizmanın fiziği — DOM bilmez, yalnızca sayı.
  *
- * trex-portfolio'daki hero prizmasından (`components/Prism.tsx`) çıkarıldı ve
- * tam tayfa genişletildi. Orada tayfın yalnızca soğuk ucu (390–500 nm, Aurora)
- * gösteriliyordu; burada ışık bütünüyle ayrışıyor (390–700 nm, Tayf).
+ * Işık bütünüyle ayrışıyor (390–700 nm, Tayf).
  *
  * Fizik: Snell yasası + BK7 camın Cauchy formülü, 60° tepe açılı eşkenar prizma.
  * Renk yayılımı okunabilsin diye 10× abartılı — gerçek camda tayf ~1.5°'ye sığar,
- * burada ~16°. (Eskisi 25× idi; tam tayfta o değer yelpazeyi 40°'ye açıyordu.)
+ * burada ~16°. (25× tam tayfta yelpazeyi 40°'ye açar.)
  *
  * Dünya birimi: prizmanın kenarı 2, ağırlık merkezi orijinde, y YUKARI.
  * Ekrana çevirme (y aşağı, piksel) PrismStage'in işi.
@@ -22,7 +20,7 @@ export const L_MAX = 700
  * Etiket tayfsal simge, arayüz metni değil: her dilde aynı.
  * `label` boşsa çizgi çizilir ama etiketlenmez.
  *
- * Oturum 4 (kullanıcı seçimi, `?lines=0` denemesi): ana sahnede Fraunhofer
+ * Ana sahnede Fraunhofer
  * çizgileri ve etiketleri YOK — yalnızca renk. Tek kullanan 404 ("404 nm").
  */
 export type AbsorptionLine = { nm: number; label: string }

@@ -4,15 +4,12 @@ import { Nav } from './Nav'
 import { SchemeSwitch } from './SchemeSwitch'
 
 /**
- * Sabit üst çubuk: prizma işareti (girişe dönüş) + bölümler solda, dil sağda.
+ * Sabit üst çubuk: "INTRO / GİRİŞ" yazısı (girişe dönüş) + bölümler solda,
+ * tema ve dil düğmeleri sağda.
  *
- * Oturum 2 (kullanıcı isteği): isim çubuktan kalktı — isim girişte zaten
- * dairenin üstünde; alt çizgi (slayt ilerlemesi) kalktı — konum sağdaki rayda.
- *
- * Oturum 4 (kullanıcı isteği): üçgen işaretin yerine "INTRO / GİRİŞ" yazısı —
- * ne olduğu daha anlaşılır. Üçgenin göz alıcılığı yazıda sürüyor: harfler
- * akan tayfla dolu, etrafında aynı ışıma (theme.css → .brand). Dil geçişinde
- * harfleri çözülüyor (data-i18n-fade).
+ * İsim çubukta yok — girişte zaten dairenin üstünde; slayt ilerlemesi de
+ * çubukta değil, sağdaki rayda. Yazının harfleri akan tayfla dolu, etrafında
+ * ışıma var (theme.css → .brand); dil geçişinde harfleri çözülüyor (data-i18n-fade).
  */
 export function SiteHeader() {
   const t = useStrings()

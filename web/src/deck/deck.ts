@@ -23,7 +23,7 @@ import { firstVisibleUnit, pageCount, pageOf, pageOfUnit, paginate, setPage } fr
  * Durum öznitelikleri (data-state, inert, aria-hidden) JSX'te YOK, burada
  * yazılıyor — React aynı değerleri render etmediği için dil değişiminde ezmiyor.
  *
- * ★ Navigasyon animasyondan bağımsız (trex-portfolio kural 6'nın karşılığı):
+ * ★ Navigasyon animasyondan bağımsız:
  * slayt durumu geçişin BAŞINDA değişir; animasyon yalnızca görsel. Sekme
  * arkadayken rAF dursa bile emniyet zamanlayıcısı geçişi bitirir.
  */
@@ -45,7 +45,7 @@ const SWIPE = 48
 /**
  * Geçiş sürerken yeni bir hareket gelirse: sıraya girer, süren geçiş bu kat
  * hızlanır. Önceden bu hareket yutuluyordu — normal hızda kaydıran kullanıcı
- * her slayt için iki kez kaydırmak zorunda kalıyordu (Oturum 3, ölçüldü).
+ * her slayt için iki kez kaydırmak zorunda kalıyordu (ölçüldü).
  */
 const RUSH = 3
 /**
@@ -79,7 +79,7 @@ export function useSlideIndex(): number {
   return useSyncExternalStore(subscribe, () => index, () => 0)
 }
 
-/** Etkin slaytın alt sayfaları — ray bunları kısa çizgilerle gösteriyor (A1). */
+/** Etkin slaytın alt sayfaları — ray bunları kısa çizgilerle gösteriyor. */
 export type SlidePages = { count: number; page: number }
 const NO_PAGES: SlidePages = { count: 1, page: 0 }
 let pages: SlidePages = NO_PAGES

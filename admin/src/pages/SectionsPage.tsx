@@ -22,7 +22,7 @@ import { useAction, useDraft, usePanel } from '../panel'
 import { Page } from './Page'
 
 /**
- * Bölümler = sitedeki slaytlar (Faz 9). Türü bileşeni seçer (web/src/App.tsx).
+ * Bölümler = sitedeki slaytlar. Türü bileşeni seçer (web/src/App.tsx).
  * Hazır türler (Hakkımda, Deneyim, İletişim) silinmez, gizlenir; panelden eklenenler
  * silinir. Türe özgü düzenleyiciler (maddeler, galeri) kartın altında, kendi formuyla.
  */
@@ -41,8 +41,7 @@ const ADDABLE: SectionKind[] = ['text', 'timeline', 'projects', 'announcement', 
 const BUILTIN = new Set<SectionKind>(['about', 'experience', 'contact'])
 
 /**
- * Menüde yazının sığacağı uzunluk (docs/ARCHITECTURE.md § 8). Oturum 3'te
- * "Deneyim ve Eğitim" (17) telefonda menüyü taşırdı; bugünküler en çok 10.
+ * Menüde yazının sığacağı uzunluk (docs/ARCHITECTURE.md § 8). "Deneyim ve Eğitim" (17) telefonda menüyü taşırdı; bugünküler en çok 10.
  */
 const NAV_MAX = 12
 
@@ -140,7 +139,7 @@ function SectionFields({ draft, set, isNew }: { draft: Draft; set: (next: Draft)
         warning={navWarning(draft)}
       />
       {draft.kind === 'contact' ? (
-        // İletişim dairesi bölüm metni göstermiyor (Oturum 4); alan sunulsa yazılan kaybolurdu.
+        // İletişim dairesi bölüm metni göstermiyor; alan sunulsa yazılan kaybolurdu.
         <p className="hint">İletişim dairesi bölüm metni göstermiyor — bu yüzden metin alanı yok.</p>
       ) : (
         <LocalizedInput

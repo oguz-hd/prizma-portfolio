@@ -8,8 +8,7 @@ import { useLocale } from '../i18n/useLocale'
 import type { SectionProps } from './Section'
 
 /**
- * İletişim — kapanış karesi, girişin aynası (Oturum 4, kullanıcı: "iletişimdeki
- * yazıyı kaldıralım, bu bölüm intro gibi dairesel olsun").
+ * İletişim — kapanış karesi, girişin aynası.
  *
  * Aynı görünmez daire (components/Ring.tsx), aynı başlık boyu:
  *   üst yay       İLETİŞİM — geniş, kalın
@@ -19,8 +18,8 @@ import type { SectionProps } from './Section'
  *   dip           altbilgi — e-posta yayının altında; sığmazsa gizlenir
  *                 (daire Giriş'inkiyle birebir aynı kalsın, küçülmesin)
  *
- * Müsaitlik cümlesi (bölüm gövdesi) kalktı; içerikte de boş. curious.page
- * kuralı 4: iletişim bariz — e-posta alt yayda, başlıktan sonra en iri yazı.
+ * Bölüm gövdesi (müsaitlik cümlesi) yok. İletişim bariz: e-posta alt yayda,
+ * başlıktan sonra en iri yazı.
  *
  * Başlık ekran okuyucu için ayrıca görünmez bir <h2>'de; yaydaki kopya
  * aria-hidden. Bağlantılar gerçek SVG <a> — klavyeyle odaklanıyor.

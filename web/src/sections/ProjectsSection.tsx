@@ -4,8 +4,8 @@ import { useStrings } from '../i18n/strings'
 import { Section, type SectionProps } from './Section'
 
 /**
- * Projeler (Faz 9, kullanıcı seçimi C2) — kapaklı kartlar. Kayıtlar panelin Projeler
- * sayfasından; bu bölüm panelden eklenmedikçe sitede görünmüyor (kullanıcı kararı).
+ * Projeler — kapaklı kartlar. Kayıtlar panelin Projeler
+ * sayfasından; bu bölüm panelden eklenmedikçe sitede görünmüyor.
  *
  * Kapağı olmayan kart da yerini korur: aynı oranda boş bir çerçeve ve sıra numarası —
  * sıradaki kartların başlıkları aynı hizada kalsın. Sıra numarası tayf şeridiyle

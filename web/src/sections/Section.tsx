@@ -5,12 +5,12 @@ import type { Section as SectionData } from '../content/types'
 /**
  * İçerik slaytının kabuğu — Hakkımda, Projeler, İletişim aynı iskeleti paylaşıyor.
  *
- * Prizma her slaytta ortada kalıyor (kullanıcı kararı). İçerik onun ÖNÜNDE,
+ * Prizma her slaytta ortada kalıyor. İçerik onun ÖNÜNDE,
  * yarı saydam bir cam panelin üstünde duruyor: sahne panelin arkasından
  * bulanık bir ışık olarak seçiliyor, metin okunur kalıyor.
  *
  * Slayt tek ekrana sığmazsa (telefon, kısa pencere) `data-page-unit` birimleriyle
- * alt sayfalara bölünür (deck/paginate.ts, Oturum 4 · A1); başlık her sayfada
+ * alt sayfalara bölünür (deck/paginate.ts); başlık her sayfada
  * kalır. Tek birim ekrandan büyükse o sayfa `.slide-scroll` içinde kayar.
  *
  * Numaralı etiket (01/02/03) Departure Mono'da: sayfanın "veri" dili.

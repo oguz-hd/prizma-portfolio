@@ -3,7 +3,7 @@ import { useStrings } from '../i18n/strings'
 import { Section, type SectionProps } from './Section'
 
 /**
- * Duyuru (Faz 9, kullanıcı seçimi A1) — diğer bölümler gibi bir slayt: üstte tarih
+ * Duyuru — diğer bölümler gibi bir slayt: üstte tarih
  * işareti, başlık, metin, isteğe bağlı tek düğme. Yayın aralığı dışındaysa bölüm hiç
  * gelmiyor (content/useContent.ts → inWindow); burada yalnızca gösteriliyor.
  */

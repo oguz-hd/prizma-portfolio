@@ -4,8 +4,7 @@ import type { PresetId } from '../theme/types'
 /**
  * İçerik sözleşmesi.
  *
- * Bu tipler Faz 5'teki SQLite şemasının taslağı (docs/ARCHITECTURE.md § 5).
- * Şimdi doğru tasarlanırsa sonra göç olmaz.
+ * Bu tipler SQLite şemasının karşılığı (docs/ARCHITECTURE.md § 5).
  *
  * ── İKİ ŞEKİL ───────────────────────────────────────────────────────────────
  *
@@ -81,7 +80,7 @@ export type Link = {
 }
 
 /**
- * Yüklenen görsel (Faz 9). Dosyalar `/uploads/{id}-{w}.webp`, `widths`'teki her
+ * Yüklenen görsel. Dosyalar `/uploads/{id}-{w}.webp`, `widths`'teki her
  * genişlik için — `content/media.ts` srcset'i buradan kuruyor. Orijinal saklanmıyor.
  */
 export type Media = {
@@ -116,7 +115,7 @@ export type Project = {
 }
 
 /**
- * Bölüm türü = hangi bileşen çizer (Faz 9, App.tsx). Hazırlar (about, experience,
+ * Bölüm türü = hangi bileşen çizer (App.tsx). Hazırlar (about, experience,
  * contact) silinmez; diğerleri panelden eklenir. api/app/schemas.py → SectionKind.
  */
 export type SectionKind =

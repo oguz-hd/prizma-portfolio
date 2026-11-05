@@ -14,7 +14,7 @@ import { darkenScene, scene } from './scene'
  *   1.7–2.5  camın içinden geçer, tayf yelpazesi açılır
  *   2.3–2.9  şerit ve soğurma çizgileri, slaytın tonu yanar
  *   2.3–3.3  arayüz: içerik, sonra üst çubuk ve slayt rayı — belirirken yazılar
- *            Katakana'dan çözülerek oturuyor (Oturum 3, scramble.ts)
+ *            Katakana'dan çözülerek oturuyor (scramble.ts)
  *
  * Açılışın son karesi sitenin kendisi: animasyon bir perde değil, merkezdeki
  * prizmanın kurulma anı. Bitince hiçbir şey yerinden oynamaz.
@@ -25,8 +25,7 @@ import { darkenScene, scene } from './scene'
  *   - Hareket hassasiyetinde hiç oynamaz; site ilk karede tam.
  *   - İçerik DOM'da baştan var (SEO, ekran okuyucu). Gizleme yalnızca
  *     `html[data-intro="pending"]` ile ve animasyon bitince kalkıyor.
- *   - ⚠️ Emniyet: rAF durursa (sekme arkada, tarayıcı paneli gizli — trex-portfolio'da
- *     ölçülmüş tuzak) içerik gizli kalmasın → zamanlayıcı son kareye sarar.
+ *   - ⚠️ Emniyet: rAF durursa (sekme arkada, tarayıcı paneli gizli) içerik gizli kalmasın → zamanlayıcı son kareye sarar.
  *     Sekme ilk açılışta gizliyse açılış görünür olunca başlar.
  */
 

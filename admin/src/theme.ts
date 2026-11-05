@@ -11,11 +11,11 @@ import { api } from './api'
  * ⚠️ Çalışma ekranları her zaman Tayf, sitenin SEÇİLİ paleti değil. Panelin anlamlı
  * renkleri her ön ayarda yok: hata metni tayfın kırmızı ucundan (`--danger`),
  * Aurora'da ise sıcak ton hiç yok — panel seçili paleti izlerken hata camgöbeği
- * görünüyordu (Oturum 5). Palet seçimi sitenin; Genel'deki kartlar her paleti
+ * görünüyordu. Palet seçimi sitenin; Genel'deki kartlar her paleti
  * kendi renkleriyle gösteriyor.
  *
  * Giriş ekranı ise sitenin bir parçası gibi: seçili paletle boyanıyor
- * (`paintLogin`, kullanıcı: "tema seçimlerine göre düzenlensin"). Orada yanlış
+ * (`paintLogin`). Orada yanlış
  * parolayı tayftaki "401 nm" çizgisi de söylüyor, hata yalnızca renge kalmıyor.
  */
 export function paintPanel(): void {

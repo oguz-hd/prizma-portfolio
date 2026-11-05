@@ -1,8 +1,8 @@
 /**
  * Tema sözleşmesi.
  *
- * Bu tipler bir stil tercihinden fazlası: Faz 8'de admin paneli renkleri
- * buradan düzenleyecek. Yani bu sözleşme aynı zamanda panelin de arayüzü.
+ * Bu tipler bir stil tercihinden fazlası: admin paneli renkleri
+ * buradan düzenliyor. Yani bu sözleşme aynı zamanda panelin de arayüzü.
  *
  * Ayrıntı: docs/ARCHITECTURE.md § 4
  */
@@ -46,7 +46,7 @@ export type ThemeTokens = {
   accents: string[]
 
   /**
-   * Zeminin tarafı (beyaz tema, Oturum 6). Renkler token olduğu için çoğu şey
+   * Zeminin tarafı (beyaz tema). Renkler token olduğu için çoğu şey
    * kendiliğinden döner; dönmeyen ETKİLER: koyu zeminde ışık `screen` ile parlar,
    * açık zeminde kâğıda düşen renk gibi `multiply` olur; hale ve yıldızlar sakinleşir.
    * `html[data-scheme]` üstünden CSS'te (prism.css, starfield.css). Yoksa koyu.

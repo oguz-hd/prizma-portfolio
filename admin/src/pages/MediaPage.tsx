@@ -8,7 +8,7 @@ import { useAction, useDraft, usePanel } from '../panel'
 import { Page } from './Page'
 
 /**
- * Medya kitaplığı (Faz 9). Yüklenen görseli sunucu WebP'lere çevirir ve EXIF'ini
+ * Medya kitaplığı. Yüklenen görseli sunucu WebP'lere çevirir ve EXIF'ini
  * (GPS konumu dahil) siler — api/app/media.py. Galeriler ve proje kapakları
  * buradan seçer; kullanılan görsel silinmez, sunucu nerede kullanıldığını söyler.
  */

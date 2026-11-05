@@ -1,7 +1,7 @@
 import type { Media } from './types'
 
 /**
- * Yüklenen görselin adresleri (Faz 9). API her görseli birkaç genişlikte WebP
+ * Yüklenen görselin adresleri. API her görseli birkaç genişlikte WebP
  * olarak yazıyor (`/data/uploads/{id}-{w}.webp`, api/app/media.py); Caddy
  * `/uploads/` altında sunuyor. Tarayıcı `srcset` + `sizes` ile ekrana uygun olanı seçer.
  */

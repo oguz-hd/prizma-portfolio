@@ -18,8 +18,8 @@ const META_MARKER = '<!--site-meta-->'
  * Paylaşım kartı ve arama sonucu etiketleri — İÇERİKTEN, sunucu tarafında.
  *
  * Sosyal ağların ve arama motorlarının tarayıcıları JS çalıştırmaz: etiketler
- * statik HTML'de olmak zorunda. İçerik ise artık build sırasında elde değil
- * (Faz 6: tek kaynak veritabanı) — etiketleri API üretiyor (api/app/content.py
+ * statik HTML'de olmak zorunda. İçerik ise build sırasında elde değil
+ * (tek kaynak veritabanı) — etiketleri API üretiyor (api/app/content.py
  * → render_meta), sunucu HTML'e gömüyor:
  *
  *   build  → Caddy şablonu: yayın anında /data/meta.html okunur (Caddyfile →
@@ -84,7 +84,7 @@ export default defineConfig({
     // burada API aynı içeriği canlı üretiyor (api/app/content.py → read_content).
     proxy: {
       '/content.json': { target: API_ORIGIN, rewrite: () => '/api/content' },
-      // Yüklenen görseller (Faz 9) — yayında Caddy sunuyor.
+      // Yüklenen görseller — yayında Caddy sunuyor.
       '/uploads': API_ORIGIN,
     },
     watch: {

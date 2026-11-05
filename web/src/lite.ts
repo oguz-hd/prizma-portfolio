@@ -3,7 +3,7 @@ import gsap from 'gsap'
 /**
  * Hafif kip — zayıf GPU'da cam panelin bulanıklığını kaldırır (`html[data-lite]`).
  *
- * Ölçüm (CALISTIRMA "Performans ölçümü", 01.10.2026): GPU hızlandırması olmayan
+ * Ölçüm (CALISTIRMA "Performans ölçümü"): GPU hızlandırması olmayan
  * cihazda içerik slaytı 41 fps'e düşüyor, karelerin %80'i kaçıyordu; panelin
  * `backdrop-filter`'ı kapatılınca 96 fps. Hale ya da ana iş parçacığı değil.
  *

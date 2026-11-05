@@ -13,7 +13,7 @@ import type {
 /**
  * ★ İÇERİĞİN OKUNDUĞU TEK NOKTA.
  *
- * Kaynak `/content.json` (Faz 6): API veritabanından yazıyor, Caddy sunuyor —
+ * Kaynak `/content.json`: API veritabanından yazıyor, Caddy sunuyor —
  * ziyaretçi tarafı veritabanını hiç görmüyor (docs/ARCHITECTURE.md § 3).
  * Geliştirmede Vite aynı adresi API'ye yönlendiriyor (vite.config.ts).
  *
@@ -22,7 +22,7 @@ import type {
  *
  * ⚠️ Senkron — loading/error durumu yok. main.tsx içeriği React mount'tan ÖNCE
  * bekliyor (`loadContent`); gelmezse site hiç mount edilmiyor, yerine hata ekranı.
- * Yedek içerik bilerek yok (kullanıcı kararı, Faz 6): tek kaynak veritabanı.
+ * Yedek içerik bilerek yok: tek kaynak veritabanı.
  */
 
 let raw: RawSiteContent | null = null
