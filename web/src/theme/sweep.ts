@@ -119,6 +119,7 @@ export function sweepTo(next: Scheme): void {
   busy = true
 
   const root = document.documentElement
+  root.dataset.sweeping = '' // light.css/sweep.css: etkiler (hale, gravür, yıldız) tek karede değil, yumuşak geçsin
   const lite = 'lite' in root.dataset
   const glassOk = !lite
   const refract = glassOk && ensureFilter()
@@ -226,8 +227,9 @@ export function sweepTo(next: Scheme): void {
     else {
       overlay.remove()
       if (!flipped) setScheme(next, false)
-      repaint() // tam token'lar (ton sayısı farkı da burada kapanır)
+      repaint() // tam token'lar
       busy = false
+      setTimeout(() => delete root.dataset.sweeping, 700) // etkilerin geçişi bitsin
     }
   }
   requestAnimationFrame(frame)

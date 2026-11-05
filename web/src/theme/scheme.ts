@@ -3,6 +3,7 @@ import { useSyncExternalStore } from 'react'
 import { applyTheme } from './applyTheme'
 import { applyFavicon } from './favicon'
 import { LIGHT_TOKENS, PRESETS } from './presets'
+import { resample } from './mix'
 import type { PresetId, ThemeTokens } from './types'
 
 /**
@@ -29,7 +30,9 @@ function readStored(): Scheme {
 }
 
 function tokensFor(scheme: Scheme): ThemeTokens {
-  return scheme === 'light' ? LIGHT_TOKENS : PRESETS[darkPreset].tokens
+  if (scheme === 'dark') return PRESETS[darkPreset].tokens
+  // Açık palet, koyu ön ayarla aynı sayıda ton taşır (mix.ts → resample).
+  return { ...LIGHT_TOKENS, accents: resample(LIGHT_TOKENS.accents, PRESETS[darkPreset].tokens.accents.length) }
 }
 
 function paint(): void {

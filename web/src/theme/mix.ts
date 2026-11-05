@@ -33,3 +33,14 @@ export function mixTokens(a: ThemeTokens, b: ThemeTokens, t: number): ThemeToken
     scheme: t < 0.5 ? a.scheme : b.scheme,
   }
 }
+
+/**
+ * Paleti `n` tona orantılı örnekler (uçlar korunur). Açık palet 7 tonlu; koyu ön ayar
+ * 6 tonluysa (Turbo) sahnenin duraklarıyla aynı sayıya indirilir: sahne ton sayısını
+ * yalnızca kurulurken okuyor, geçişte sayı değişirse son karede renk zıplıyordu.
+ */
+export function resample(colors: string[], n: number): string[] {
+  if (n === colors.length) return colors
+  if (n <= 1) return [colors[0]]
+  return Array.from({ length: n }, (_, i) => colors[Math.round((i / (n - 1)) * (colors.length - 1))])
+}
