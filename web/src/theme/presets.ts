@@ -23,9 +23,8 @@ export const PRESETS: Record<PresetId, Preset> = {
   /**
    * ✅ SEÇİLEN PALET (prizma-portfolio, kullanıcı kararı).
    * Yedi ton: mor · mavi · camgöbeği · yeşil · sarı · turuncu · kırmızı.
-   * trex-portfolio'daki Tayf altı tondu, camgöbeği eksikti — prizma tam tayfı
-   * gösterdiği için boşluk görünür oluyordu. Camgöbeği lead ile aynı ton: lider
-   * rengin tayfta bir yeri var.
+   * Altı tonlu bir tayfta camgöbeği eksik kalır; prizma tam tayfı gösterdiği için boşluk
+   * görünür olur. Camgöbeği lead ile aynı ton: lider rengin tayfta bir yeri var.
    */
   tayf: {
     id: 'tayf',

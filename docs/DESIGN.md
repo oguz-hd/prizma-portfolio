@@ -1,8 +1,6 @@
 # Tasarım Kararları
 
-> Kaynak: trex-portfolio `docs/DESIGN.md`. § E (tayf içgörüsü), § F (karanlık tema),
-> § G (tipografi) oradan AYNEN geçerli — burada özetlendi. § A (offline sanılmama)
-> ve § B/D (dino) bu projede **yok**: maskot yok, o risk de yok.
+> Sitenin görsel ve davranış kararları: tayf içgörüsü, tema, tipografi, prizma, slaytlar.
 
 ---
 
@@ -11,10 +9,8 @@
 > **Işık sitenin kendisi.** Açılış bir perde değil, merkezdeki prizmanın kurulma
 > anı; slaytlar değiştikçe ışık başka açıyla girip tayfın başka rengini öne çıkarıyor.
 
-Kökü trex-portfolio § E: CV'nin son satırı *teleskopla gözlem* — bir yıldızın ne
-olduğu ışığını prizmadan geçirip tayfına ayırarak anlaşılır. Orada bu fikir renk
-paletinin gerekçesiydi ve hero'nun sağ yarısında küçük bir prizmaydı; burada
-sitenin omurgası.
+Fikrin kökü: CV'nin son satırı *teleskopla gözlem* — bir yıldızın ne olduğu ışığını
+prizmadan geçirip tayfına ayırarak anlaşılır. Bu fikir sitenin omurgası.
 
 ## 1. Kullanıcının tarifi (Oturum 1)
 
@@ -24,7 +20,7 @@ sitenin omurgası.
 | Animasyon, merkezdeki prizma tasarımına dönüşsün | Açılışın son karesi = kalıcı sahne, hiçbir şey yerinden oynamıyor |
 | Solda gelen ışık, sağda renk tayfı | `prism/PrismStage.tsx` — § 2 |
 | Scroll'da sayfa kaymasın, bölümler slayt gibi gelsin | `deck/deck.ts` — § 4 |
-| Dino sitesinin içeriği / istenen unsurlar geçerli | İçerik, iki dillilik, token sistemi, API aynen taşındı |
+| İçerik, iki dillilik, renkler | Veritabanından içerik, TR/EN, renkler token (veri) |
 
 Soruyla netleşen üç karar: palet **Tayf** (tam gökkuşağı) · prizma **her slaytta
 ortada** · **bölüm başına bir slayt** (taşan slayt içinde kayar).
@@ -33,7 +29,7 @@ ortada** · **bölüm başına bir slayt** (taşan slayt içinde kayar).
 
 **Fizik** (`prism/optics.ts`): Snell yasası + BK7 camın Cauchy formülü, 60° tepe
 açılı eşkenar prizma. Yayılım **10× abartılı** (gerçekte ~1.5°, burada ~16°).
-trex'teki 25× yalnızca soğuk uç (390–500 nm) içindi; tam tayfta (390–700 nm) o
+25× yalnızca soğuk uç (390–500 nm) için işe yarar; tam tayfta (390–700 nm) o
 değer yelpazeyi 40°'ye açıyordu. Gelme açısı **40–62°** aralığında kalmalı —
 dışında mor uç tam iç yansımaya giriyor (ölçüldü).
 
@@ -130,12 +126,12 @@ kendisiyle kuruluyor. `noindex`.
 5. Test tuzağı: `/` açıkken `/#x`'e gitmek sayfayı YENİLEMEZ (aynı belge) — eski
    modülle ölçülür. Yenile ya da sorgu ekle.
 
-## 9. Taşınan kurallar (trex-portfolio § E/F/G)
+## 9. Temel kurallar
 
 - **Karanlık tema**: saf siyah yok (`#070A12`), saf beyaz metin yok, kontrast ≥ 4.5:1,
   gökkuşağı gradyan olarak (palet olarak değil), bilgi yalnızca renkle taşınmaz.
-- **Tipografi**: Cabinet Grotesk (başlık) · Satoshi (gövde) · Departure Mono (etiket,
-  11 px'in katları). Kendi sunucumuzda. Inter / Space Grotesk kullanılmaz.
+- **Tipografi**: Departure Mono (kimlik ve arayüz, 11 px'in katları) · Atkinson Hyperlegible Next
+  (yalnızca düzyazı). Kendi sunucumuzda. Inter / Space Grotesk kullanılmaz.
 - Bağlantı etiketleri büyük harfe çevrilmez (`lang="tr"` "GİTHUB" yapıyordu).
 
 ## 10. Oturum 2 — kullanıcı geri bildirimi (hepsi ekranda doğrulandı)
@@ -244,3 +240,30 @@ Seçenek sayfasından (https://claude.ai/artifact/QyDBsuQRTQ2Pi7u8EoCR5f) kullan
 - **Menü (D2):** her genişlikte yatay kayar, taşan kenar söner (ölçülerek), etkin bölüm
   görünür alana kayar. 1440 ve 1024'te sekiz bölüm (EN/TR) taşmadan sığıyor (ölçüldü).
 
+## 15. Açık tema (05.11.2026)
+
+Karar: ziyaretçi seçer, **varsayılan koyu** (site koyu bir gökte tasarlandı; `prefers-color-scheme` bilerek okunmaz).
+Panel hep koyu. Yön **A2·B2·C4·D4·E2 "Cam plaka"**: astronomi plakasının gümüş-gri emülsiyonu. Elenen yönler ve ekran
+görüntüleri: `docs/tasarim/beyaz-tema/`.
+
+| Eksen | Seçim | Ne yapar |
+|---|---|---|
+| A zemin | A2 cam plaka | `ground #E4E7E1`, `surface #F1F3EE`; beyaz değil, renkler bu tonda okunur |
+| B tayf | B2 gravür | tayf soluk boya (`fill-opacity .4`), kenarlar mürekkep tel, ışık ince mürekkep çizgisi |
+| C hale | C4 ışık masası | tonlar ağartılıp geniş yayılır (`blur 30 + brightness 1.75`): arkadan aydınlatılmış cam |
+| D yıldız | D4 réseau | yıldızlar koyu plaka lekesi, 88 px (11×8) ölçü ağı artıları |
+| E vurgu | E2 parlak tayf | koyu temaya yakın parlak tonlar; sarı/yeşil/camgöbeği 3:1 altı (bilinçli kabul), `lead` koyu `#005870` |
+
+- **Kontrast:** `ink` 14:1, `inkDim` 7,3:1, `inkFaint` 6,9:1, `lead` 6,4:1 (11 px ince piksel yazı gri zeminde silik durduğu için
+  `inkFaint`/`lead` sayıda geçenden koyulaştırıldı). Ray çizgileri 3,0–4,8:1 (tonun %45'i mürekkep).
+- **Cam panel:** `blur 2px + saturate .35`. Bulanıklık 8 px'te prizmanın ince çizgisini siler; metne sızan tayfı soluklaştıran
+  renk soluklaştırmadır, bulanıklık değil.
+- **404 soğurma çizgisi:** açıkta `--ink` (koyu zeminde zemin renginde çizgi ışığı keser; açıkta aynı renk beyaz boşluk olurdu).
+- **Geçiş (sweep.ts):** soldan sağa tayf bandı, ön kenarında dalgalanan sıvı cam şerit. Kırılma haritası squircle yüzey
+  `y=(1-(1-x)^4)^(1/4)` ve Snell yasasından (n=1,5) üretilir; kenarda beyaz parlama ve kırmızı/camgöbeği kromatik ayrışma.
+  Renkler şerit ekranın ortasından geçerken akar (30 adım), dalga ~60 Hz. Yedekler: Safari/Firefox kırılmasız bulanık cam,
+  `data-lite` ve azaltılmış saydamlık yalnız bant, hareket azalt anında.
+- **Neden View Transitions değil:** eski sayfanın durağan görüntüsü geçiş boyunca ekranda kalır, prizma donmuş görünür.
+- **Tuzaklar:** `light.css` `prism.css`/`starfield.css`'ten SONRA yüklenmeli; sahne ton sayısını yalnız kurulurken okur
+  (açık palet koyu ön ayarın ton sayısına örneklenir); sitenin `svg{max-width:100%}` kuralı 0 genişlikli üst öğede svg'yi ezer.
+- **Açık:** sıvı cam görünümü iyileştirilecek; performans kademeleri (tam/dengeli/hafif) planlı.

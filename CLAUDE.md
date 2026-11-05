@@ -10,9 +10,6 @@ Oğuz Han Duran'ın kişisel sitesi. Sitenin merkezinde bir **prizma** var: beya
 soldan gelir, prizmadan geçip sağda tayfına ayrılır. Site bu ışığın geçişiyle açılır;
 sayfa kaymaz, bölümler **slayt** olarak bakılan alana gelir.
 
-Kökeni: `C:\Users\drn49\Desktop\ozi\projects\trex-portfolio` (dino maskotlu site).
-Oradaki hero prizması bu projenin fikrini doğurdu; içerik, API, token sistemi ve
-iki dillilik oradan taşındı. **O proje olduğu gibi kalıyor — ona dokunma.**
 
 ## 🛑 Ortam — önce bunu oku
 
@@ -25,9 +22,8 @@ docker compose -f docker-compose.yml -f docker-compose.dev.yml up
 → http://localhost:5175/admin/   yönetim paneli (dev: admin@localhost / degistir)
 → http://localhost:8001/docs     API (OpenAPI arayüzü)
 ```
-Portlar trex-portfolio'dan (5173/8000) **farklı** — iki site aynı anda çalışabilsin.
-Vite konteyner içinde de 5174'te: HMR soketi sayfanın portuna bağlanıyor, 5173'e
-giderse eski sitenin sunucusuna düşer. Sorun çıkarsa → `docs/CALISTIRMA.md`
+Vite konteyner içinde de 5174'te dinler: HMR soketi sayfanın portuna bağlanıyor, başka porta giderse
+başka bir sitenin sunucusuna düşer. Sorun çıkarsa → `docs/CALISTIRMA.md`
 
 **Doğrulama aracı: Chrome DevTools MCP** (başsız). ⚠️ Gizli sekmede/panelde
 `requestAnimationFrame` durur → GSAP ilerlemez. Önce `document.visibilityState`.
@@ -54,7 +50,9 @@ bunlar değişince panelin kapıları da çalıştırılır.
 
 ## ⚠️ Bozulmaz kurallar
 
-1. **Hiçbir renk CSS'e sabit yazılmaz.** Tek istisna `theme/presets.ts` (+ index.html zemin).
+1. **Hiçbir renk CSS'e sabit yazılmaz.** Tek yer `theme/presets.ts`. Bilinçli istisnalar: ilk boyama zeminleri
+   (`web/index.html`, `admin/index.html`, `web/public/theme-init.js`) ve tema geçişindeki ışığın kendisi (`sweep.ts`
+   kenar çizgisi `#fff`, `sweep.css` cam yüzeyi; temaya bağlı değil).
 2. **`accents` mor → kırmızı sıralı** (kısa dalga boyundan uzuna). Prizma tonları
    bu sırayla tayfa diziyor, ray slaytları bu sırayla renklendiriyor.
 3. **İçerik ≠ arayüz metni.** İçerik veritabanında (`/content.json`, ilk hâli
@@ -86,138 +84,52 @@ bunlar değişince panelin kapıları da çalıştırılır.
 13. **Prizma fareye bağlı DEĞİL** — hareketi kendi hâlinde (salınım + ışık darbeleri);
     mobilde de aynı görünmeli (kullanıcı kararı, Oturum 2).
 
-## Durum · 05.10.2026 (yayında)
+## Durum · 05.11.2026
 
-✅ **v1** (Oturum 1) — iskele · taşınan katmanlar · prizma sahnesi · açılış ·
-slayt gösterisi · cam panel · ray · 404 nm · favicon · API kopyası.
-✅ **v2** (Oturum 2) — parlak tayf + hale + ışık darbeleri · isim/bağlantılar
-prizmayı çevreleyen dairede (isim büyük harf) · motto kalktı · üst çubukta çizgi
-ve isim yok, menü solda, dönen tayflı üçgen · tek font · Projeler slaytı kalktı,
-yerine Deneyim ve Eğitim · mezuniyet paragrafı kalktı · İletişim = kapanış karesi.
-Slaytlar: Giriş · Hakkımda · Deneyim ve Eğitim · İletişim.
-✅ **Oturum 3** (30.09.2026) — geçiş sürerken kaydırma sıraya giriyor · üçgendeki
-parıltı çizgisi kalktı · mobil menü `navLabel` ile sığıyor · düzyazı Atkinson ·
-tayf raya kadar uzun · isim harfleri 1.3× geniş · sekme adı yalnız isim, unvan
-"Yazılım geliştirici" · menü alt çizgisi titremesi. → `DESIGN.md` § 11
-· **site İngilizce açılır** (tarayıcı dili okunmaz; seçim hatırlanır) ·
-kapanış karesi kısa ekranda sığıyor, kaydırma çubuğu yeri sabit
-· **harf çözülmesi** (Katakana + tayf, `scramble.ts`) açılışta ve dil geçişinde —
-seçenekler artifact'taydı (https://claude.ai/artifact/LN9aUxFhh1JwEP9kEBX7zi, A7+A5).
+**Yayında: https://oguzhd.com** (DigitalOcean, Caddy; sunucu işleri → `../../SUNUCU.md`, `docs/CALISTIRMA.md` "Yayın (sunucu)").
+Biten: prizma sitesi, iki dil, yönetim paneli (Faz 7), bölüm türleri ve medya (Faz 9), güvenlik taraması + yayın kontrol
+listesi, **beyaz tema**. Faz faz tarihçe: `docs/GUNLUK.md` (eski "Durum/Sırada" metni orada arşivde).
+Kullanıcı notu (Claude Docs, API'yi denerken): https://claude.ai/code/artifact/8a071f83-aa54-4eb2-a4a7-592661b51c62
 
-✅ **Oturum 4** (30.09.2026) — sığmayan slayt alt sayfalara bölünüyor (A1,
-`deck/paginate.ts`; birimler `data-page-unit`) · İletişim kısa telefona sığıyor ·
-geçiş dalgası (`scene.surge`, hafif) · tayfta çizgi/etiket yok (yalnızca 404'te) ·
-navbar'da akan tayflı "INTRO" · çözülme süresi her yerde 900 ms · İletişim girişin
-dairesinde (`components/Ring.tsx` ortak), müsaitlik cümlesi yok · isim kalın ·
-kartların sol üstündeki tayf çizgisi kalktı · kod incelemesi düzeltmeleri (daire
-artık hiç küçülmüyor; altbilgi/ipucu `usePlaceBelow` ile yayın altına) · temizlik
-(ölü CSS/kod) · GitHub'a yüklendi. → `DESIGN.md` § 12
+### Açık tema (05.11.2026)
+- Yön A2·B2·C4·D4·E2 "Cam plaka" (seçenek sayfası, ekran görüntüleri: `docs/tasarim/beyaz-tema/`; ayrıntı: DESIGN § 15).
+- Ziyaretçi seçer: üst çubukta güneş/ay düğmesi (`SchemeSwitch`, dil seçici gibi), `theme/scheme.ts`, localStorage
+  `prizma.scheme`. **Varsayılan koyu** (`prefers-color-scheme` okunmaz). Panel hep koyu.
+- Palet `LIGHT_TOKENS` (presets.ts), koyu ön ayarın ton sayısına örneklenir (`mix.ts → resample`: sahne ton sayısını
+  yalnız kurulurken okur; sayı değişirse geçişte renk zıplar). Etkiler `theme/light.css` (**App'ten sonra yüklenir**,
+  yoksa prism.css/starfield.css ezer).
+- Geçiş `theme/sweep.ts`: tayf bandı + dalgalı sıvı cam ucu (squircle+Snell kırılma haritası, `backdrop-filter: url()`
+  yalnız Chromium). Yedekler: Safari/Firefox bulanık cam, `data-lite`/azaltılmış saydamlık yalnız bant, hareket azalt anında.
+  Dalga ~60 Hz, renk karışımı 30 adım (GPU yükü yenileme hızıyla orantılı). `html[data-sweeping]` etkileri yumuşatır.
+- Yenilemede flaş yok: `public/theme-init.js` → `html[data-boot=light]` (CSP `script-src 'self'` yüzünden dış dosya).
+- ⚠️ Tuzaklar: sitenin `svg{max-width:100%}` kuralı 0 genişlikli üst öğede svg'yi ezer (`.ss-edge{max-width:none}`);
+  `#E4E7E1` (açık zemin) presets.ts, index.html ve theme-init.js'te, birlikte değişmeli.
 
-✅ **Oturum 5 · Faz 6** (01.10.2026) — back-end başladı (kullanıcı kararı: Faz 6 →
-7a admin API → 7b admin paneli, her birinin sonunda dur). **Site içeriği artık
-veritabanından:** API `/data/content.json` + `meta.html` yazıyor (`publish.py`), site
-mount'tan önce onu çekiyor; `site.ts` silindi, **yedek içerik yok** (kullanıcı kararı) —
-gelmezse "İçerik yüklenemedi" ekranı. Meta etiketlerini yayında Caddy şablonu gömüyor.
-Dev volume sıfırlandı (eski müsaitlik cümlesi gitti). Prod'da boş `DOMAIN` Caddy'yi
-açtırmıyordu — düzeltildi. → ARCHITECTURE § 3 "Uygulama"
+## Sırada
 
-✅ **Oturum 5 · Faz 7a** — yönetim API'si (`api/app/admin.py`): ayarlar, profil,
-yetenekler, deneyim/eğitim (`milestones`), bağlantılar, bölümler (yalnızca düzenleme
-+ sıra), parola değiştirme (eski oturumlar düşer). Her yazma → `publish()`. Uçtan uca
-83 kontrol geçti. Swagger ile denemek → CALISTIRMA. Kararlar → ARCHITECTURE § 6.
-
-✅ **Oturum 5 · Faz 7b** — yönetim paneli (`admin/`, ayrı build; dev 5175, yayında
-`/admin/` — web imajı derliyor). Sözleşme ve paletler `@site` alias'ıyla sitenin
-kaynağından. Sayfalar: Genel (palet + meta) · Profil · Yetenekler · Deneyim · Eğitim ·
-Bağlantılar · Bölümler (yalnızca düzenleme + sıra) · Hesap. TR/EN yan yana, yarım
-çeviri uyarısı, kaydedilmemiş değişiklik uyarısı, kart başına kaydet. Panel hep Tayf'ta
-(Aurora'da kırmızı yok → hata rengi kayboluyordu). → ARCHITECTURE § 7
-
-✅ **Oturum 5 · sonrası** — daire masaüstünde %90 (`DESKTOP_SCALE`), girişteki bağlantılar
-16.5 px (DESIGN § 13). Panel girişi İngilizce, seçenek sayfasından **B + E + F** seçildi
-(https://claude.ai/artifact/1CCFheJHSJoFp7dJC7kSBb); ilk sürüm `admin/src/Login.tsx`
-(kendi SVG'si + CSS). Prizma/yıldız stilleri bileşenlerin yanına taşındı
-(`prism/prism.css`, `components/starfield.css`); `scene.accentCount()` artık uygulanmış
-temadan (`applyTheme` → `appliedTokens`), içerikten değil — panel sahneyi içeriksiz kullanabilir.
-
-⏭ **Sırada (kullanıcı, Oturum 5 sonu — yarım kaldı):**
-1. ✅ (Oturum 6) **Panel girişi sitenin prizmasıyla** — `PrismStage` + `Starfield` + `Ring`
-   (@site), intro zamanlamaları, ADMIN dairenin üst yayında, form alt alta, prizma `--lift`
-   kadar yukarıda, hata = "401 nm", giriş = yakınlaşma + örtü (`.veil`). Giriş ekranı
-   sitenin SEÇİLİ paletinde (`paintLogin`), panel Tayf'ta. `.ring`/`.ring-title` stilleri
-   `components/ring.css`'e taşındı. Panel, sitenin `react`/`gsap` importlarını kendi
-   node_modules'una çözüyor (vite `dedupe`, tsconfig `paths`). Tarayıcı MCP'leri yoksa:
-   başsız Chrome'u **PowerShell'den** başlat (Bash'ten port açmıyor) + CDP betiği.
-2. ✅ (Oturum 6) **Büyüyen içerik** — senaryolar kalıcı: `tools/icerik/buyut.mjs` (A/B, ayrı
-   test yığını, CALISTIRMA "Büyüyen içerik testi"). Düzeltildi: bölünen slayt geniş ekranda
-   iki sütunu koruyor (sütunu biten sayfada öbürü tam genişlikte, maddeleri iki sütunda);
-   giriş yaylarına açı sınırı `MAX_SPAN` (~130°, Ring.tsx) — bağlantılar önce 11 px, sonra
-   iki yay; unvan·konum sığmazsa yalnız unvan, o da sığmazsa "…". 25 harflik isim sorun
-   değil (görüldü). Panel girişindeki yakınlaşma takılıyordu → `will-change` (60 fps).
-3. **Beyaz tema** (kullanıcı: back-end'den sonra planlansın; site + panel, farklı estetik,
-   prizma temasını koruyan) → önerilen sıra: Faz 7 bitince, Faz 8'den (tema paneli) ÖNCE.
-4. ✅ (Oturum 6) **Performans** — ölçüm betiği `tools/perf/olcum.mjs` (CALISTIRMA "Performans
-   ölçümü"). Bulgular: JS belleği 3-4 MB, sızıntı yok, arka plan sekmesi %0 CPU; GPU yükü
-   yenileme hızıyla orantılıydı (240 Hz'de dahili GPU %70-90). Yapılan: `gsap.ticker.fps(74)`
-   (PrismStage.tsx başı, neden 74 orada) · hafif kip `lite.ts` → `html[data-lite]` panelin
-   bulanıklığını kaldırır (GPU'suz cihazda içerik slaytı 41 → 60 fps) + "saydamlığı azalt".
-   Kalan aday: `brand-flow` (navbar, background-position + drop-shadow) ve 60 yıldızın
-   `twinkle`'ı hâlâ ekranın yenileme hızında — kullanıcıya önerildi, yanıt yok.
-   Ucuz telefon profili ölçülemedi (pencere arkada kaldı). `Projects.tsx` silindi (kullanıcı).
-5. ✅ (Oturum 6) **Faz 9 · Bölüm türleri ve medya** — panelden bölüm ekleme (serbest metin,
-   zaman çizelgesi, projeler, duyuru, galeri), projeler ve medya sayfaları, fotoğraf yükleme
-   (EXIF/GPS silinir, WebP), bileşeni TÜR seçiyor, göç düzeni + pytest. Görünüş A1·B2·L1·C2·D2
-   (DESIGN § 14). Kararlar ARCHITECTURE § 6. Test yığını/senaryo C → CALISTIRMA.
-6. ✅ **Yayında: https://oguzhd.com** (Oturum 7, 02.10.2026) — DigitalOcean droplet (Frankfurt,
-   1 GB + swap), Cloudflare'de alan adı (DNS gri bulut, www → apex Cloudflare kuralıyla), Let's
-   Encrypt Caddy'de. Canlıda `uctan-uca` 26/26. İçerik TEMİZ başladı (seed; dev içeriği taşınmadı —
-   kullanıcı "önemli değil"); içerik artık yalnızca canlı panelden. Sunucu dışı yedek yok
-   (kullanıcı: "o kadar yedeklik bir şey yok") — içerik birikince yeniden sor. Sunucu, erişim,
-   güncelleme → CALISTIRMA "Yayın (sunucu)". **Sunucu işlerini kullanıcı kendisi yazıyor**
-   (öğrenmek için) — Claude adım adım anlatır, `ssh prizma` ile salt okunur doğrular.
-   ✅ (Oturum 8, 05.10.2026) kontrol listesi: gerçek 404 (`handle_errors`), robots/sitemap/llms.txt +
-   canonical/og:url (`api/app/discovery.py`, alan adı `DOMAIN`'den), `/favicon.svg`, alt metin iki dil
-   uyarısı + sitede diğer dile düşme, token 12 → 4 saat, giriş sayacı temizleniyor, yedek imajı (sqlite
-   gömülü), ruff + oxlint, React 19.3 / Vite 8.3. **Safari bağlantı hatası** düzeldi (Ring.tsx →
-   `RingLinks`; WebKit testi `tools/safari`). Kod incelemesi + plan bu oturumda (A → B → C → D).
-   ⏭ Sırada (kullanıcı: "geri kalanı sonraki oturumlarda"):
-   **C · kullanıcı kararı:** httpOnly çerez, panel IP kilidi, analytics + gizlilik notu, CTA, og:image,
-   HSTS includeSubDomains (alt alan adı planı yoksa), sunucu dışı yedek.
-   **D · Beyaz tema → Faz 8 tema paneli** (aşağıdaki ⏸ notları; önce canlı seçenek sayfası).
-   Küçük: `@types/node` 22 → 26 bilerek yapılmadı (konteyner Node 22); 4 saatlik token panelde
-   kaydedilmemiş düzenlemeyi düşürebilir — şikâyet gelirse sessiz yenileme.
-7. ✅ (Oturum 6) **Güvenlik taraması + yayın öncesi testler** (kullanıcı isteği) — rapor:
-   https://claude.ai/code/artifact/b63b856b-06fa-4ae0-948f-e70fbed95811 · 1 kritik (/data/site.db,
-   daha önce kapandı), 2 yüksek (kimlikten önce gövde okuma, sınırda asılı kalan yükleme), orta/düşükler;
-   hepsi giderildi. Araçlar: `tools/guvenlik/yokla.mjs` (37), `tools/yayin/uctan-uca.mjs` (26),
-   `tools/yayin/tarayici.mjs` (13), pytest 23, Lighthouse 100/100/100 → CALISTIRMA "Yayın öncesi testler".
-8. ✅ **Beyaz tema (05.11.2026)** — yön A2·B2·C4·D4·E2 (Cam plaka). Ziyaretçi seçimi: üst çubukta güneş/ay düğmesi
-   (`SchemeSwitch`, dil seçici gibi; `theme/scheme.ts`, localStorage `prizma.scheme`), **varsayılan koyu**
-   (`prefers-color-scheme` okunmaz), geçiş = **ışık süpürmesi + dalgalı sıvı cam ucu** (`theme/sweep.ts`, Oğuz seçimi G3; demo: artifact Fkrx1B2hY9sYP6gEQHAbBT): tayf bandı arkada, ön kenarda squircle+Snell kırılma haritalı `backdrop-filter` cam (yalnız Chromium; Safari/Firefox bulanık cam, `data-lite` yalnız bant, hareket azaltılmışsa anında). View Transitions bırakıldı (eski görüntü donuk kalıyordu). Açık palet, koyu ön ayarın ton sayısına örneklenir (`mix.ts → resample`): sahne ton sayısını yalnız kurulurken okur, sayı değişirse geçişte renk zıplar. Etkiler `html[data-sweeping]` ile yumuşak geçer. Dikkat: sitenin `svg{max-width:100%}` kuralı 0 genişlikli üst öğede svg'yi ezer (`.ss-edge{max-width:none}`).
-   Açık palet `LIGHT_TOKENS` (presets.ts), etkiler `theme/light.css`. Panel hep koyu. Açık-tema cilası (05.11): footer/bağlantı kontrastı, panel altı tayf sızması, ray çizgileri, panel arkasında prizma, 404 çizgisi koyu, yenilemede flaş yok (`public/theme-init.js`, `html[data-boot]`), mobil 320–390 px temiz. Açık kalan: dev ön ayarı Turbo (canlı Tayf; dev panelinden Oğuz çevirecek). Sonra Faz 8 tema paneli.
-Plan: `C:\Users\drn49\.claude\plans\hadi-back-and-e-hidden-puddle.md`.
-Kullanıcı notu (Claude Docs, API'yi denerken bilinmesi gerekenler):
-https://claude.ai/code/artifact/8a071f83-aa54-4eb2-a4a7-592661b51c62
+1. **Tema geçişi:** sıvı cam görünümü iyileştirilecek (Oğuz: yeterince iyi değil); küçük kasma → performans
+   kademeleri (tam / dengeli / hafif: `hardwareConcurrency`, `deviceMemory`, kare ölçümü; isteğe bağlı elle seçim).
+2. **Temaya özgü / uyum animasyonları, içerik düzenlemeleri, araştırmalar** (Oğuz, 05.11).
+3. Skill ve plugin konuşması + araştırma (hafıza: `skill-plugin-konusmasi-hatirlat`).
+4. API bağımlılıkları kilitsiz: `uv lock` + `uv sync --frozen`, uv/alpine/caddy/node imajlarını sabitle (hafıza: `prizma-uv-lock-hatirlat`).
+5. **Faz 8 tema paneli** ve bekleyen C kararları: httpOnly çerez, panel IP kilidi, analytics + gizlilik notu, CTA, og:image,
+   HSTS `includeSubDomains`, sunucu dışı yedek.
+6. **Sunucuya uygulanacaklar (Oğuz, adım adım):** Caddyfile'daki `/sites/*` kapatma ve `/fonts/*` + `/theme-init.js`
+   önbellek başlıkları, yeni web/api imajları → `docs/CALISTIRMA.md` "Yayın (sunucu)". Sonra `uctan-uca` ve tarayıcı testi
+   (yalnızca test yığınında; `CANLI_ONAY` olmadan canlıya çalışmaz).
+7. İncelemeden (05.11) bilerek ertelenenler: HTTP/3 için UDP 443 ya da `protocols h1 h2`, `healthcheck`, `paginate` O(n²)
+   (büyük içerikte), Docker volume sahiplik yarışı (yeni makine), konteyner sertleştirme, çok kareli ICC profili.
 
 **GitHub:** özel depo `github.com/oguz-hd/prizma-portfolio`; `master` →
 `origin/master`. `git push` doğrudan çalışıyor (kimlik Git Credential Manager'da).
-Kullanıcı her iş sonunda **commit** istiyor; **push yalnızca isteyince** (Oturum 5: "her seferinde push etme").
-
-
-Telefonda deneme: trycloudflare hızlı tüneli (`prizma-tunel` + `prizma-yayin-web`,
-`prizma-yayin` ağı). Faz 6'dan beri `web/dist` değil, **yayın imajı** + Caddyfile +
-dev'in veri volume'u sunuluyor (meta şablonu ve content.json için) — adres her
-başlatmada değişir, bilgisayar uyuyunca kopar. → `docs/CALISTIRMA.md` "Telefonda deneme".
-Kalıcı yayın için Cloudflare Pages önerildi, hesap gerekir.
+Kullanıcı her iş sonunda **commit** istiyor; **push yalnızca isteyince**.
 
 🛑 **Yeni bir faza kendiliğinden geçme — önce sor.** Ama ONAYLANMIŞ bir planın alt
-fazları arasında onay sorma (kullanıcı, Oturum 6: "yapayım mı diye sorma, seçmem gereken
-yerde sor"): kapılar → commit → devam; soru yalnızca gerçek seçimde (görsel, kapsam).
+fazları arasında onay sorma (kullanıcı: "yapayım mı diye sorma, seçmem gereken yerde sor"): kapılar → commit → devam; soru yalnızca gerçek seçimde (görsel, kapsam).
 
 ### Ertelenenler
 - OG görseli (`web/public/og.png`, 1200×630) — tasarım oturunca çekilecek; `index.html`'e eklenecek (not: `api/app/content.py` → `render_meta`)
 - Tema paneli (Faz 8): kontrast doğrulama, ince ayar, canlı önizleme — ARCHITECTURE § 4
-- Görsel yükleme — içerikte görsel alanı yok, gerekince
 - Proje `repoUrl`/`liveUrl` alanları boş — kullanıcı söyleyecek
 
 ## İçerik nereden geliyor

@@ -41,7 +41,7 @@ sonra Windows yeniden kurulmadan tekrar açılamaz. Bu yüzden tercih edilmedi.
 Docker Desktop açık olmalı ("Engine running" yazana kadar bekle).
 
 ```powershell
-cd C:\Users\drn49\Desktop\prizma-portfolio
+cd C:\Users\drn49\Desktop\ozi\projects\prizma-portfolio
 
 # İlk sefer (imaj indirilir + npm ci çalışır, birkaç dakika sürebilir)
 docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
@@ -63,9 +63,8 @@ bunu API'ye yönlendiriyor (`vite.config.ts` → proxy; meta etiketleri de API'd
 API kapalıysa ya da henüz açılmadıysa site **"İçerik yüklenemedi"** ekranı gösterir —
 yedek içerik bilerek yok. API ayağa kalkınca "Yeniden dene" yeter.
 
-> Portlar trex-portfolio'dan (5173/8000) **bilerek farklı**: iki site aynı anda
-> çalışabilsin. Vite konteynerin içinde de 5174'te dinliyor — HMR soketi sayfanın
-> portuna bağlanıyor; 5173'e giderse eski sitenin sunucusuna düşer.
+> Vite konteynerin içinde de 5174'te dinliyor — HMR soketi sayfanın portuna
+> bağlanıyor; başka porta giderse başka bir sunucuya düşer.
 >
 > ⚠️ Docker Desktop kapanıp açılırsa dev konteynerleri kendiliğinden kalkmaz
 > (`restart: 'no'`, bilerek). Yukarıdaki `up` komutunu yeniden çalıştır.
@@ -113,15 +112,15 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
 `DOMAIN` boşsa Caddy `:80` dinler (yerel deneme).
 Gerçek alan adı verilirse Let's Encrypt sertifikasını kendi alır.
 
-⚠️ **API üretimde varsayılanlarla AÇILMAZ** (Oturum 15): `JWT_SECRET` varsayılansa
+⚠️ **API üretimde varsayılanlarla AÇILMAZ:** `JWT_SECRET` varsayılansa
 ya da veritabanındaki admin hesabı `degistir` parolasını kabul ediyorsa API
 başlarken hata verip kapanır. Site (Caddy) etkilenmez, yalnızca API.
 
 ### API prod'da açılmıyor: "Üretimde güvensiz varsayılanlar"
 
 `.env`'e `JWT_SECRET` ve `ADMIN_PASSWORD` yaz. **Hesap zaten oluşmuşsa bu yetmez:**
-tohumlama yalnızca boş veritabanında çalışır. Dev ve prod aynı `data` volume'unu
-paylaşıyor — dev'de `degistir` ile kurulan hesap prod'a da taşınır. Çözüm
+tohumlama yalnızca boş veritabanında çalışır. YEREL yığında dev ve prod aynı `data` volume'unu
+paylaşıyor — dev'de `degistir` ile kurulan hesap yerel prod'a da taşınır (yayın sunucusunun kendi volume'u var). Çözüm
 veritabanını sıfırlamak (aşağıdaki "Temiz başlangıç", **veri siler**) ya da
 parolayı **dev'de** değiştirmek (`PUT /api/auth/password`, Faz 7'de panelden de):
 prod API bu hesapla hiç açılmadığı için parola prod'dan değiştirilemez, ama
@@ -254,7 +253,7 @@ docker network create prizma-yayin            # yalnızca ilk sefer
 docker rm -f prizma-yayin-web
 docker run -d --name prizma-yayin-web --network prizma-yayin `
   -v prizma-portfolio_data:/srv/data:ro `
-  -v "C:\Users\drn49\Desktop\prizma-portfolio\Caddyfile:/etc/caddy/Caddyfile:ro" `
+  -v "C:\Users\drn49\Desktop\ozi\projects\prizma-portfolio\Caddyfile:/etc/caddy/Caddyfile:ro" `
   prizma-portfolio-web:prod
 
 # 3) Tünel (yalnızca ilk sefer — sunucu yeniden kurulunca tünele dokunmak gerekmiyor)
@@ -347,7 +346,7 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml build web
 docker rm -f prizma-olcum-web
 docker run -d --name prizma-olcum-web -p 127.0.0.1:5180:80 `
   -v prizma-portfolio_data:/srv/data:ro `
-  -v "C:\Users\drn49\Desktop\prizma-portfolio\Caddyfile:/etc/caddy/Caddyfile:ro" `
+  -v "C:\Users\drn49\Desktop\ozi\projects\prizma-portfolio\Caddyfile:/etc/caddy/Caddyfile:ro" `
   prizma-portfolio-web:prod
 node tools/perf/olcum.mjs http://localhost:5180/ dizustu,orta,telefon,gpusuz   # PowerShell'den
 ```
@@ -371,7 +370,7 @@ foreach ($s in @(@{n='a';api=8011;web=5181},@{n='b';api=8012;web=5182})) { $n=$s
   docker run -d --name "prizma-buyuk-$n-api" -p "127.0.0.1:$($s.api):8000" -v "prizma-buyuk-${n}:/data" `
     -e DATA_DIR=/data -e DEBUG=1 prizma-portfolio-api:dev      # DEBUG yoksa varsayılan parolayla açılmaz
   docker run -d --name "prizma-buyuk-$n-web" -p "127.0.0.1:$($s.web):80" -v "prizma-buyuk-${n}:/srv/data:ro" `
-    -v "C:\Users\drn49\Desktop\prizma-portfolio\Caddyfile:/etc/caddy/Caddyfile:ro" prizma-portfolio-web:prod }
+    -v "C:\Users\drn49\Desktop\ozi\projects\prizma-portfolio\Caddyfile:/etc/caddy/Caddyfile:ro" prizma-portfolio-web:prod }
 node tools/icerik/buyut.mjs A http://localhost:8011    # → http://localhost:5181
 node tools/icerik/buyut.mjs B http://localhost:8012    # → http://localhost:5182
 ```
@@ -386,13 +385,13 @@ türlerden birer bölüm ve 6 örnek görsel. Test yığınında panel açmak (s
 docker network create prizma-c
 # --network-alias api: Caddyfile API'yi `api:8000` diye arıyor (yoksa her istek DNS'te asılı kalır)
 docker run -d --name prizma-c-api --network prizma-c --network-alias api -p 127.0.0.1:8013:8000 -v prizma-buyuk-c:/data `
-  -v "C:\Users\drn49\Desktop\prizma-portfolio\api\app:/app/app" -e DATA_DIR=/data -e DEBUG=1 prizma-portfolio-api:dev
+  -v "C:\Users\drn49\Desktop\ozi\projects\prizma-portfolio\api\app:/app/app" -e DATA_DIR=/data -e DEBUG=1 prizma-portfolio-api:dev
 docker run -d --name prizma-c-web --network prizma-c -p 127.0.0.1:5183:80 -v prizma-buyuk-c:/srv/data:ro `
-  -v "C:\Users\drn49\Desktop\prizma-portfolio\Caddyfile:/etc/caddy/Caddyfile:ro" prizma-portfolio-web:prod
+  -v "C:\Users\drn49\Desktop\ozi\projects\prizma-portfolio\Caddyfile:/etc/caddy/Caddyfile:ro" prizma-portfolio-web:prod
 docker run -d --name prizma-c-admin --network prizma-c -p 127.0.0.1:5186:5175 -e VITE_USE_POLLING=1 `
   -e API_ORIGIN=http://prizma-c-api:8000 -e WEB_ORIGIN=http://prizma-c-web:80 -e VITE_SITE_URL=http://localhost:5183/ `
-  -v "C:\Users\drn49\Desktop\prizma-portfolio\admin:/app" -v /app/node_modules `
-  -v "C:\Users\drn49\Desktop\prizma-portfolio\web\src:/web/src:ro" prizma-portfolio-admin:dev
+  -v "C:\Users\drn49\Desktop\ozi\projects\prizma-portfolio\admin:/app" -v /app/node_modules `
+  -v "C:\Users\drn49\Desktop\ozi\projects\prizma-portfolio\web\src:/web/src:ro" prizma-portfolio-admin:dev
 ```
 
 ---
@@ -401,8 +400,8 @@ docker run -d --name prizma-c-admin --network prizma-c -p 127.0.0.1:5186:5175 -e
 
 API açılışta eksik şema adımlarını uygular (`api/app/migrations.py`); her uygulamadan önce
 `/data/site.db.bak-v<eski sürüm>` kopyası alınır. Geri dönmek: API'yi durdur, `.bak`'ı
-`site.db`'nin yerine kopyala. Faz 9 göçünün yedeği: volume'da `site.db.bak-v0` ve masaüstünde
-`prizma-site.db.yedek-2026-10-01`.
+`site.db`'nin yerine kopyala. Faz 9 göçünün yedeği: volume'da `site.db.bak-v0` (yeniden denemede ezilmez) ve proje kökünde
+`prizma-site.db.yedek-2026-10-01` (git'te izlenmez).
 
 
 ---
@@ -427,9 +426,10 @@ DEĞİL. Sunucu dışına kopya, barındırma seçildikten sonra kurulacak.
 - Giriş: aynı IP'den 15 dakikada 5 hatalı deneme → 429 (`api/app/throttle.py`).
 - Başlıklar (Caddyfile): CSP (betik yalnızca kendi kökten), nosniff, X-Frame-Options DENY,
   Referrer-Policy, Permissions-Policy, HSTS. Site ve panelde CSP ihlali yok (ölçüldü).
-- Yükleme: Caddy 16 MB'ın üstünü API'ye iletmiyor; API 15 MB + 40 MP sınırı, EXIF/GPS siliniyor.
-- Gövde sınırı API'de (`api/app/limits.py`, 16 MB, gövde okunmadan): token'sız yönetim isteği
-  gövdesi okunmadan 401. Caddy'nin payı (20 MB) bundan BÜYÜK kalmalı — eşitken bağlantı asılı
+- Yükleme: Caddy 20 MB'ın üstünü API'ye iletmiyor; API gövde sınırı 16 MB, görsel 15 MB + 40 MP, EXIF/GPS siliniyor,
+  yalnızca JPEG/PNG/WebP (telefon JPEG'leri = MPO dahil), yükseklik en fazla 16383 px.
+- Gövde sınırı API'de (`api/app/limits.py`, 16 MB, gövde okunmadan): geçerli (imzalı, süresi dolmamış) Bearer
+  token'ı olmayan yönetim isteği gövdesi okunmadan 401; sahte başlık da yetmez. Caddy'nin payı (20 MB) bundan BÜYÜK kalmalı — eşitken bağlantı asılı
   kalıyordu. Caddy zaman aşımları: başlık 10 sn, gövde 2 dk, API yanıtı 2 dk.
 - Yayında API belgeleri (`/docs`, `/openapi.json`) kapalı; API `uid 10001` ile çalışıyor; JWT
   anahtarı 32 karakterden kısaysa API açılmıyor.

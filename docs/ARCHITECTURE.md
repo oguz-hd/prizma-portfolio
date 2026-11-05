@@ -1,9 +1,8 @@
 # Mimari
 
-> trex-portfolio'dan taşındı (28.09.2026). Oradaki kararlar (07.09.2026, Oturum 3)
-> burada da geçerli: yığın, içerik modeli, API, "renkler veri", iki dillilik.
-> Ön yüzün prizma/slayt katmanı → `DESIGN.md`. `content.json` bağlantısı Faz 6'da
-> (Oturum 5) yapıldı — § 3; admin panel (Faz 7) ve tema paneli (Faz 8) sırada.
+> Kararlar: yığın, içerik modeli, API, "renkler veri", iki dillilik.
+> Ön yüzün prizma/slayt katmanı → `DESIGN.md`. `content.json` bağlantısı § 3; yönetim paneli (Faz 7) ve bölüm
+> türleri/medya (Faz 9) bitti, yayında; tema paneli (Faz 8) sırada.
 >
 > Site statik bir sayfa değil: **React ön yüz + admin panelli, içerik yönetilebilir bir uygulama.**
 
@@ -306,6 +305,5 @@ Kendiliğinden işleyenler (ölçüme dayalı, dokunmaya gerek yok): kaydırma �
 (`scrollbar-gutter`), taşan slaytın içinde kayma (deck), tayf uzunluğu (etiket
 genişliği ölçülüyor), etiket çakışması, "SCROLL" ipucunun yeri, isim yayının boyutu.
 
-- Barındırma nerede? (backend bir sunucu istiyor — Railway / Render / Fly.io / VPS)
-- Domain
-- Görsel yükleme: diskte mi, bir nesne depolamada mı?
+- ~~Barındırma, domain, görsel yükleme~~ — çözüldü: kendi VDS'imiz (DigitalOcean) + oguzhd.com (`ozi/SUNUCU.md`); görseller
+  `/data/uploads` altında WebP, EXIF silinerek (Faz 9).
