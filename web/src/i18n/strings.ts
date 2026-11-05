@@ -37,6 +37,9 @@ const STRINGS = {
   navLabel: { tr: 'Bölümler', en: 'Sections' },
   slidesLabel: { tr: 'Slaytlar', en: 'Slides' },
   slideIntro: { tr: 'Giriş', en: 'Intro' },
+  schemeToLight: { tr: 'Açık temaya geç', en: 'Switch to light theme' },
+  schemeToDark: { tr: 'Koyu temaya geç', en: 'Switch to dark theme' },
+
   scrollHint: { tr: 'Kaydır', en: 'Scroll' },
 
   // 404 — "404 nm": prizmanın tayfında o dalga boyunda karanlık bir çizgi.

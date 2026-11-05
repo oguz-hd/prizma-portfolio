@@ -3,9 +3,11 @@ import { createRoot } from 'react-dom/client'
 
 import './theme/fonts.css'
 import './theme/theme.css'
+import './theme/light.css'
 import { applyTheme } from './theme/applyTheme'
 import { applyFavicon } from './theme/favicon'
 import { PRESETS } from './theme/presets'
+import { initScheme } from './theme/scheme'
 import { getPreset, loadContent } from './content/useContent'
 import { initLocale } from './i18n/useLocale'
 import { prepareIntro } from './prism/intro'
@@ -48,9 +50,8 @@ async function boot(root: HTMLElement): Promise<void> {
     return
   }
 
-  const tokens = PRESETS[getPreset()].tokens
-  applyTheme(tokens)
-  applyFavicon(tokens)
+  // Koyu ön ayar içerikten, açık/koyu seçimi ziyaretçiden (theme/scheme.ts).
+  initScheme(getPreset())
   if (!isLab) prepareIntro()
 
   createRoot(root).render(

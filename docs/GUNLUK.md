@@ -89,3 +89,6 @@ Oturum 9 (06.10.2026, tinyroamers oturumundan): sunucu proje sayfalarına açıl
 deposunun `site` dalından /opt/sites/<ad>'a çekiliyor, alt alanı proje.oguzhd.com. İlki
 tinyroamers.oguzhd.com (eski /tinyroamers/* → 301). Push'ta otomatik güncelleme denendi ve kullanıcı
 isteğiyle bırakıldı. Ortak belge: ozi/SUNUCU.md.
+
+## 05.11.2026 — Beyaz tema
+Seçenek sayfası (tasarimci) → Oğuz A2·B2·C4·D4·E2 seçti. Seçici ziyaretçide (dil gibi), varsayılan koyu, geçiş daire (View Transitions). Panel koyu kaldı. Ayrıntı: CLAUDE.md Sırada 8.

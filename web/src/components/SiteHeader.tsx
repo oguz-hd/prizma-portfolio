@@ -1,6 +1,7 @@
 import { useStrings } from '../i18n/strings'
 import { LocaleSwitch } from './LocaleSwitch'
 import { Nav } from './Nav'
+import { SchemeSwitch } from './SchemeSwitch'
 
 /**
  * Sabit üst çubuk: prizma işareti (girişe dönüş) + bölümler solda, dil sağda.
@@ -23,7 +24,10 @@ export function SiteHeader() {
           {t('slideIntro')}
         </a>
         <Nav />
-        <LocaleSwitch />
+        <div className="header-controls">
+          <SchemeSwitch />
+          <LocaleSwitch />
+        </div>
       </div>
     </header>
   )

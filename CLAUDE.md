@@ -191,7 +191,11 @@ temadan (`applyTheme` → `appliedTokens`), içerikten değil — panel sahneyi 
    daha önce kapandı), 2 yüksek (kimlikten önce gövde okuma, sınırda asılı kalan yükleme), orta/düşükler;
    hepsi giderildi. Araçlar: `tools/guvenlik/yokla.mjs` (37), `tools/yayin/uctan-uca.mjs` (26),
    `tools/yayin/tarayici.mjs` (13), pytest 23, Lighthouse 100/100/100 → CALISTIRMA "Yayın öncesi testler".
-8. ⏸ **Beyaz tema** (yarım: altyapı `scheme` hazır, açık ön ayar yok) → sonra Faz 8 tema paneli.
+8. ✅ **Beyaz tema (05.11.2026)** — yön A2·B2·C4·D4·E2 (Cam plaka). Ziyaretçi seçimi: üst çubukta güneş/ay düğmesi
+   (`SchemeSwitch`, dil seçici gibi; `theme/scheme.ts`, localStorage `prizma.scheme`), **varsayılan koyu**
+   (`prefers-color-scheme` okunmaz), geçiş = düğmeden büyüyen daire (View Transitions; desteklemezse/hareket azaltılmışsa anında).
+   Açık palet `LIGHT_TOKENS` (presets.ts), etkiler `theme/light.css`. Panel hep koyu. Açık: E2'de INTRO/ray tonları 3:1 altı
+   (bilerek), 404 soğurma çizgisi açıkta beyaz boşluk (karar bekliyor), index.html zemin flaşı. Sonra Faz 8 tema paneli.
 Plan: `C:\Users\drn49\.claude\plans\hadi-back-and-e-hidden-puddle.md`.
 Kullanıcı notu (Claude Docs, API'yi denerken bilinmesi gerekenler):
 https://claude.ai/code/artifact/8a071f83-aa54-4eb2-a4a7-592661b51c62
@@ -200,10 +204,6 @@ https://claude.ai/code/artifact/8a071f83-aa54-4eb2-a4a7-592661b51c62
 `origin/master`. `git push` doğrudan çalışıyor (kimlik Git Credential Manager'da).
 Kullanıcı her iş sonunda **commit** istiyor; **push yalnızca isteyince** (Oturum 5: "her seferinde push etme").
 
-⏸ **Beyaz tema** (kullanıcı "daha sonra" dedi) — presets.ts'e açık bir ön
-ayar + seçici; theme.css renk kodu içermediği için bileşenlere dokunulmaz.
-⚠️ Hale (`.prism-glow`) ve `mix-blend-mode: screen` koyu zemine göre — açık temada
-yeniden düşünülmeli.
 
 Telefonda deneme: trycloudflare hızlı tüneli (`prizma-tunel` + `prizma-yayin-web`,
 `prizma-yayin` ağı). Faz 6'dan beri `web/dist` değil, **yayın imajı** + Caddyfile +

@@ -1,0 +1,105 @@
+/*
+  Açık tema etkileri (ziyaretçi seçimi, theme/scheme.ts). Renk kodu YOK — hepsi token (kural 1).
+  Seçilen yön: A2 B2 C4 D4 E2 (Oğuz, 05.11.2026); seçenek sayfası ve elenenler:
+  docs/tasarim/beyaz-tema/. A ve E presets.ts → LIGHT_TOKENS'ta; B/C/D burada.
+  prism.css / starfield.css'teki genel [data-scheme='light'] kuralları bunun TEMELİ;
+  buradakiler (sonra yüklenir) onları ayrıntıda ezer.
+*/
+
+/* ── Ortak (her açık yönde) ─────────────────────────────────────────────── */
+/* INTRO yazısı: koyu gökte ışıma; kâğıtta ışıma leke gibi duruyor → ince mürekkep kenarı. */
+[data-scheme='light'] .brand {
+  filter: drop-shadow(0 0 0.6px color-mix(in srgb, var(--ink) 55%, transparent));
+}
+[data-scheme='light'] .brand:hover,
+[data-scheme='light'] .brand:focus-visible {
+  filter: drop-shadow(0 0 0.8px var(--ink));
+}
+/* Ray işareti ve duyuru noktası: ışıma yerine tok renk. */
+[data-scheme='light'] .rail-link[aria-current] .rail-mark {
+  box-shadow: none;
+}
+[data-scheme='light'] .announcement-dot {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--lead) 18%, transparent);
+}
+/* Cam panel: açık zeminde %48 yüzeyde doygun tayf metnin altında fazla; %70 prizmayı siliyordu → %58. */
+[data-scheme='light'] .panel {
+  background: color-mix(in srgb, var(--surface) 58%, transparent);
+}
+
+/* B2 Gravür (Newton, Opticks levhaları): tayf soluk boya, kenarları mürekkep tel;
+   ışık ince bir mürekkep çizgisi; darbe mürekkep ucu gibi kayar. */
+[data-scheme='light'] .prism-fan {
+  fill-opacity: 0.4;
+  stroke: var(--ink);
+  stroke-opacity: 0.55;
+  stroke-width: 0.75px;
+}
+[data-scheme='light'] [id^='ps-'] {
+  stroke: var(--ink);
+  stroke-width: 0.75px;
+}
+[data-scheme='light'] [id^='pb-'] .prism-light-stop {
+  stop-color: var(--ink);
+}
+[data-scheme='light'] [id^='pc-'] .prism-light-stop {
+  stop-color: var(--ground);
+}
+[data-scheme='light'] .prism-glass {
+  fill-opacity: 0.05;
+}
+[data-scheme='light'] .prism-back {
+  stroke-opacity: 0.4;
+}
+[data-scheme='light'] .prism-stage svg .prism-face {
+  stroke-opacity: 1;
+}
+
+/* C4 Işık masası: tonlar ağartılıp geniş yayılıyor — renkli zeminde (plaka, gök)
+   zeminden AÇIK okunur, arkadan aydınlatılmış cam gibi. Beyaz zeminde kaybolur. */
+[data-scheme='light'] .prism-glow {
+  filter: blur(30px) saturate(1.25) brightness(1.75);
+  opacity: 0.9;
+}
+
+/* Plaka lekeleri: astronomi plakaları negatif — yıldız açık camda koyu nokta. */
+[data-scheme='light'] .star {
+  background: var(--ink) !important;
+  transform: scale(1.5);
+}
+[data-scheme='light'] .starfield {
+  opacity: 0.5;
+}
+/* D4 Réseau: Carte du Ciel plakalarına pozlanan ölçü ağı, 88 px (11 × 8) artılar + plaka lekeleri. */
+[data-scheme='light'] .starfield::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--ink-faint);
+  opacity: 0.55;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='88' height='88'%3E%3Cpath d='M43.5 38h1v12h-1zM38 43.5h12v1H38z'/%3E%3C/svg%3E")
+    0 0 / 88px 88px repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='88' height='88'%3E%3Cpath d='M43.5 38h1v12h-1zM38 43.5h12v1H38z'/%3E%3C/svg%3E")
+    0 0 / 88px 88px repeat;
+}
+
+/* ── Tema geçişi (components/SchemeSwitch.tsx) ──────────────────────────────
+   View Transitions: eski görünüm yerinde kalır, yenisi düğmeden büyüyen bir daireyle açılır.
+   Varsayılan çapraz solma kapalı; dairenin kendisi JS'te (clip-path, Web Animations). */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+::view-transition-old(root) {
+  z-index: 1;
+}
+::view-transition-new(root) {
+  z-index: 2;
+}
+
+/* Hafif kipte tam ekran etkiler kapalı: cam bulanıklığı zaten gitti, `brightness` + 30 px
+   blur'lu hale de aynı cihazda ağır. */
+html[data-lite][data-scheme='light'] .prism-glow {
+  display: none;
+}

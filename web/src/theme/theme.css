@@ -402,6 +402,31 @@ html[data-intro='pending'] :is([data-reveal], [data-reveal-panel], [data-reveal-
   color: var(--ink);
 }
 
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* Tema düğmesi: dil düğmeleriyle aynı dokunma hedefi ve renk dili (WCAG 2.2 · 2.5.8). */
+.scheme-btn {
+  display: grid;
+  place-items: center;
+  min-width: 24px;
+  min-height: 24px;
+  background: none;
+  border: none;
+  border-radius: var(--radius);
+  padding: var(--space-1);
+  cursor: pointer;
+  color: var(--ink-faint);
+  transition: color var(--duration-fast) var(--ease-out);
+}
+
+.scheme-btn:hover {
+  color: var(--ink);
+}
+
 .locale-switch {
   display: flex;
   gap: var(--space-1);

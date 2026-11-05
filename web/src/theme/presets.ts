@@ -1,4 +1,4 @@
-import type { Preset, PresetId } from './types'
+import type { Preset, PresetId, ThemeTokens } from './types'
 
 /**
  * ★ PROJEDEKİ TEK HEX BARINDIRAN DOSYA.
@@ -94,3 +94,22 @@ export const PRESETS: Record<PresetId, Preset> = {
 }
 
 export const PRESET_LIST: Preset[] = Object.values(PRESETS)
+
+/**
+ * Açık tema paleti (ziyaretçi seçimi, theme/scheme.ts). "Cam plaka": astronomi
+ * plakasının gümüş-gri emülsiyonu (A2) + parlak tayf (E2). Panelden seçilen koyu
+ * ön ayarlardan bağımsız tek palet; panel hep koyu kalır. Seçenek sayfası:
+ * docs/tasarim/beyaz-tema. E2'de sarı/yeşil/camgöbeği 3:1 altı — bilinçli kabul
+ * (Oğuz, 05.11.2026); `lead` koyu çünkü düğme/bağlantı metni olarak da kullanılıyor.
+ */
+export const LIGHT_TOKENS: ThemeTokens = {
+  ground: '#E4E7E1',
+  surface: '#F1F3EE',
+  line: '#C3C9BE',
+  ink: '#171B16',
+  inkDim: '#434A42',
+  inkFaint: '#555D54',
+  lead: '#006F86',
+  accents: ['#8B5CF6', '#3B82F6', '#06B6D4', '#22C55E', '#EAB308', '#F97316', '#EF4444'],
+  scheme: 'light',
+}
