@@ -20,7 +20,7 @@ import { SlideRail } from './deck/SlideRail'
 import { PrismStage } from './prism/PrismStage'
 import { playIntro } from './prism/intro'
 import { isLab, isNotFound } from './route'
-import { watchFrameRate } from './lite'
+import { watchFrameRate } from './perf'
 
 /**
  * Bölüm TÜRÜ → bileşen. Panelden eklenen her

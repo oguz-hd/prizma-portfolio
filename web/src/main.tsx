@@ -9,6 +9,7 @@ import { PRESETS } from './theme/presets'
 import { initScheme } from './theme/scheme'
 import { getPreset, loadContent } from './content/useContent'
 import { initLocale } from './i18n/useLocale'
+import { initPerf } from './perf'
 import { prepareIntro } from './prism/intro'
 import { isLab } from './route'
 import { ErrorBoundary } from './components/ErrorBoundary'
@@ -38,6 +39,7 @@ if (!root) throw new Error('#root bulunamadı — index.html ile main.tsx uyuşm
 
 async function boot(root: HTMLElement): Promise<void> {
   initLocale()
+  initPerf() // kademe ilk boyamadan önce: hale/yıldız/geçiş buna bakıyor
 
   try {
     await loadContent()

@@ -1,0 +1,18 @@
+/*
+  Performans kademesi görünümü (perf.ts). `lite` kuralları theme.css/light.css'te (`html[data-lite]`) kalır.
+  Dengeli: küçük hale, yarı yıldız. Cam kırılması ve geçiş süresi sweep.ts'te kademeye bakar.
+*/
+
+/* Hale: koyu temada küçük blur, açık temada (C4) ağartma korunur ama yayılma küçülür. */
+html[data-perf='balanced'] .prism-glow {
+  filter: blur(14px) saturate(1.8) brightness(1.15);
+}
+html[data-perf='balanced'][data-scheme='light'] .prism-glow {
+  filter: blur(16px) saturate(1.25) brightness(1.5);
+}
+
+/* Yıldızların yarısı: her biri ayrı bir katman (will-change: opacity). */
+html[data-perf='balanced'] .star:nth-child(even),
+html[data-perf='lite'] .star:nth-child(even) {
+  display: none;
+}

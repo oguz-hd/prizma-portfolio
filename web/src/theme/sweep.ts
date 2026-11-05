@@ -2,6 +2,7 @@ import { applyTheme } from './applyTheme'
 import { mixTokens } from './mix'
 import { getScheme, repaint, setScheme, tokensOf, type Scheme } from './scheme'
 import { reducedMotion } from '../motion'
+import { getTier } from '../perf'
 import './sweep.css'
 
 /**
@@ -20,7 +21,7 @@ import './sweep.css'
 const SVG_NS = 'http://www.w3.org/2000/svg'
 const GLASS_W = 150 // px, cam şeridin genişliği
 const SKEW = -12 // derece, bant ve cam aynı eğimde
-const DURATION = 1700 // ms
+const DURATION = { full: 1700, balanced: 1300, lite: 1100 } // ms, kademeye göre
 const ROWS = 30 // dalga kenarının dikey örnek sayısı
 const WAVE_STEP_MS = 16 // dalga/clip-path güncelleme aralığı: 240 Hz ekranda da ~60 Hz (GPU yükü yenileme hızıyla orantılı)
 const MIX_STEPS = 30 // renk karışımı adım sayısı (her karede stil yeniden hesabı olmasın)
@@ -123,9 +124,10 @@ export function sweepTo(next: Scheme): void {
   // sweep.css: tema etkileri (hale, gravür, yıldız) tek karede değil, yumuşak geçsin.
   window.clearTimeout(cleanupTimer)
   root.dataset.sweeping = ''
-  const lite = 'lite' in root.dataset
+  const tier = getTier()
+  const lite = tier === 'lite'
   const glassOk = !lite && !matchMedia('(prefers-reduced-transparency: reduce)').matches
-  const refract = glassOk && ensureFilter()
+  const refract = tier === 'full' && glassOk && ensureFilter() // dengeli: cam var, kırılma yok
   const W = innerWidth
   const H = innerHeight
   const Hh = H * 1.24
@@ -205,7 +207,7 @@ export function sweepTo(next: Scheme): void {
   }
 
   const step = (now: number) => {
-    const p = clamp01((now - t0) / DURATION)
+    const p = clamp01((now - t0) / DURATION[tier])
     const lead = -GLASS_W + ease(p) * (W + GLASS_W * 2 + bandW * 0.25)
     run.style.transform = `translate3d(${lead.toFixed(1)}px,0,0) skewX(${SKEW}deg)`
     overlay.style.opacity = Math.min(1, Math.sin(Math.PI * Math.min(1, p * 1.03)) * 1.9).toFixed(3)

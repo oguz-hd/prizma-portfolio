@@ -101,6 +101,10 @@ Kullanıcı notu (Claude Docs, API'yi denerken): https://claude.ai/code/artifact
 - Geçiş `theme/sweep.ts`: tayf bandı + dalgalı sıvı cam ucu (squircle+Snell kırılma haritası, `backdrop-filter: url()`
   yalnız Chromium). Yedekler: Safari/Firefox bulanık cam, `data-lite`/azaltılmış saydamlık yalnız bant, hareket azalt anında.
   Dalga ~60 Hz, renk karışımı 30 adım (GPU yükü yenileme hızıyla orantılı). `html[data-sweeping]` etkileri yumuşatır.
+- **Performans kademesi** (`perf.ts`, `html[data-perf]`): `full` (her şey) / `balanced` (cam kırılmasız, küçük hale, yarı yıldız,
+  60 fps, kısa geçiş) / `lite` (bulanıklık ve hale yok, yalnız bant; `data-lite` de açık). Başlangıç tahmini çekirdek, bellek,
+  dokunmatik; çalışırken kare ölçümü yalnızca aşağı iner (12 sn izleme). Elle: `?perf=full|balanced|lite`, `setTier()`
+  (localStorage `prizma.perf`; elle seçilince otomatik düşürme kapanır). Ayar arayüzü henüz yok.
 - Yenilemede flaş yok: `public/theme-init.js` → `html[data-boot=light]` (CSP `script-src 'self'` yüzünden dış dosya).
 - ⚠️ Tuzaklar: sitenin `svg{max-width:100%}` kuralı 0 genişlikli üst öğede svg'yi ezer (`.ss-edge{max-width:none}`);
   `#E4E7E1` (açık zemin) presets.ts, index.html ve theme-init.js'te, birlikte değişmeli.
