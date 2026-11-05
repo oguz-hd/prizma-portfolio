@@ -86,7 +86,7 @@ bunlar değişince panelin kapıları da çalıştırılır.
 
 ## Durum · 05.11.2026
 
-**Yayında: https://oguzhd.com** (DigitalOcean, Caddy; sunucu işleri → `../../SUNUCU.md`, `docs/CALISTIRMA.md` "Yayın (sunucu)").
+**Yayında: https://oguzhd.com** (05.11.2026'da `a49ac21` canlıya alındı: açık tema, sıvı cam geçişi, performans kademeleri, inceleme düzeltmeleri, `/sites/*` kapatma; DigitalOcean, Caddy; sunucu işleri → `../../SUNUCU.md`, `docs/CALISTIRMA.md` "Yayın (sunucu)").
 Biten: prizma sitesi, iki dil, yönetim paneli (Faz 7), bölüm türleri ve medya (Faz 9), güvenlik taraması + yayın kontrol
 listesi, **beyaz tema**. Faz faz tarihçe: `docs/GUNLUK.md` (eski "Durum/Sırada" metni orada arşivde).
 Kullanıcı notu (Claude Docs, API'yi denerken): https://claude.ai/code/artifact/8a071f83-aa54-4eb2-a4a7-592661b51c62
@@ -113,9 +113,7 @@ Kullanıcı notu (Claude Docs, API'yi denerken): https://claude.ai/code/artifact
 
 ## Sırada
 
-1. **Canlıya alma (Oğuz, adım adım):** bu blok (açık tema, cam, kademeler, düzeltmeler) sunucuya çıkacak; Caddyfile'daki
-   `/sites/*` kapatma ve önbellek başlıkları da onunla. Sonra performans kademesi için küçük bir ayar arayüzü
-   (Otomatik / Tam / Hafif) istenirse eklenir; şimdilik `?perf=`.
+1. Performans kademesi için küçük bir ayar arayüzü (Otomatik / Tam / Hafif) istenirse eklenir; şimdilik `?perf=`.
 2. Skill ve plugin konuşması + araştırma (hafıza: `skill-plugin-konusmasi-hatirlat`).
 3. **Temaya özgü / uyum animasyonları, içerik düzenlemeleri, araştırmalar** (Oğuz, 05.11).
 4. API bağımlılıkları kilitsiz: `uv lock` + `uv sync --frozen`, uv/alpine/caddy/node imajlarını sabitle (hafıza: `prizma-uv-lock-hatirlat`).

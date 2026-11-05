@@ -100,6 +100,13 @@ yüzünden renk zıplaması. Sonra 4 paralel `inceleyici` (tema, API, arayüz, a
 kodda vardı, ekranda yoktu (Oturum 1'deki cam panel dersinin tekrarı). Ölçüm dersi: headless Chrome pencere boyutunu
 zorlayınca 2× piksel yoğunluğunda boşta bile 26 fps verdi; kare süresi ölçmeden önce ortamın tabanını ölç.
 
+**Canlıya alma (05.11.2026).** Sıvı cam seçenekleri (A–E) gerçek koddan ekran görüntüleriyle sunuldu, D seçildi, sonra iOS'taki
+gibi hafifletildi ve ucunun hareketi yatıştırıldı; geçiş 2,1 sn (1,7 sn denendi, "yavaş kalsın" denince geri alındı). Performans
+kademeleri (`perf.ts`) eklendi. Sunucuya `git pull` + `up -d --build` (~2 dk, volume etkilenmedi); dışarıdan doğrulandı: yeni sürüm,
+`/sites/*` 404, önbellek başlıkları, `theme-init.js` doğru türde, diğer siteler 200, canlıda geçiş CSP altında çalışıyor.
+Ders: sunucu işlerinde ben `ssh prizma` ile salt okunur bakmaya çalıştım, otomatik mod izin sınıflandırıcısı üretim okumasını
+reddetti; çıktıyı Oğuz yapıştırır, dışarıdan doğrulama (curl/Playwright) serbest.
+
 ## Arşiv · eski "Durum" ve "Sırada" (CLAUDE.md'den taşındı, 05.11.2026)
 
 > Aşağısı CLAUDE.md'nin eski durum/sırada bölümüdür; güncel olan CLAUDE.md'de. Bazı satırlar (telefonda
