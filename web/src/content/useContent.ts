@@ -123,9 +123,22 @@ function resolveContent(source: RawSiteContent, locale: Locale): SiteContent {
   }
 }
 
+/**
+ * Çözülmüş içerik (dil seçilmiş) kaynak + dil + gün başına bir kez üretilir. Her render'da yeni nesne üretmek
+ * Nav/Hero/SlideRail efektlerini her slayt değişiminde sökülüp yeniden kurduruyordu (bağımlılık kimliği).
+ * Gün anahtarı: duyuru bölümlerinin tarih aralığı gece yarısı değişebilir.
+ */
+const resolved = new WeakMap<RawSiteContent, Map<string, SiteContent>>()
+
 export function useContent(): SiteContent {
   const locale = useLocale()
-  return resolveContent(source(), locale)
+  const src = source()
+  const key = `${locale}|${new Date().toDateString()}`
+  let byKey = resolved.get(src)
+  if (!byKey) resolved.set(src, (byKey = new Map()))
+  let content = byKey.get(key)
+  if (!content) byKey.set(key, (content = resolveContent(src, locale)))
+  return content
 }
 
 /** Tema ön ayarı dile bağlı değil — main.tsx mount öncesi buna ihtiyaç duyuyor. */

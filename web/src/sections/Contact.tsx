@@ -4,6 +4,7 @@ import { INNER_GAP, RingLinks, RingTitle, arc, usePlaceBelow, useRing } from '..
 import { SiteFooter } from '../components/SiteFooter'
 import { useContent } from '../content/useContent'
 import { useStrings } from '../i18n/strings'
+import { useLocale } from '../i18n/useLocale'
 import type { SectionProps } from './Section'
 
 /**
@@ -35,6 +36,7 @@ const SOCIAL = 11
 export function Contact({ id, heading }: SectionProps) {
   const { profile, links } = useContent()
   const t = useStrings()
+  const locale = useLocale()
   const boxRef = useRef<HTMLDivElement>(null)
   const mailRef = useRef<SVGGElement>(null)
   const footerRef = useRef<HTMLElement>(null)
@@ -51,7 +53,8 @@ export function Contact({ id, heading }: SectionProps) {
     (address.length * (geo.adv + LINK_TRACKING) * size) / (geo.r + size * 0.75)
   const mail = span(MAIL.big) < 1.5 ? MAIL.big : MAIL.small
   const mailR = geo.r + mail * 0.75
-  usePlaceBelow(mailRef, footerRef, geo, null, [mail, address])
+  // Altbilgi metni dille değişir ("Başa dön" / "Back to top"): yerleşim dilde de yeniden ölçülsün.
+  usePlaceBelow(mailRef, footerRef, geo, null, [mail, address, locale])
 
   const ids = {
     top: `${id}-ring-top`,
