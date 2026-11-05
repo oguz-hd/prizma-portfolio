@@ -1,0 +1,146 @@
+/*
+  Açık tema seçenekleri — prism.css / starfield.css / theme.css'e girecek ADAYLAR.
+  Renk kodu yok: hepsi token (kural 1). Eksenler html[data-b|c|d] ile seçiliyor;
+  ortak düzeltmeler [data-scheme='light'] altında.
+*/
+
+/* ── Ortak (her açık yönde) ─────────────────────────────────────────────── */
+/* INTRO yazısı: koyu gökte ışıma; kâğıtta ışıma leke gibi duruyor → ince mürekkep kenarı. */
+[data-scheme='light'] .brand {
+  filter: drop-shadow(0 0 0.6px color-mix(in srgb, var(--ink) 55%, transparent));
+}
+[data-scheme='light'] .brand:hover,
+[data-scheme='light'] .brand:focus-visible {
+  filter: drop-shadow(0 0 0.8px var(--ink));
+}
+/* Ray işareti ve duyuru noktası: ışıma yerine tok renk. */
+[data-scheme='light'] .rail-link[aria-current] .rail-mark {
+  box-shadow: none;
+}
+[data-scheme='light'] .announcement-dot {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--lead) 18%, transparent);
+}
+/* Cam panel: açık zeminde %48 yüzeyde doygun tayf metnin altında fazla; %70 prizmayı siliyordu → %58. */
+[data-scheme='light'] .panel {
+  background: color-mix(in srgb, var(--surface) 58%, transparent);
+}
+
+/* ── B · tayfın okunuşu ─────────────────────────────────────────────────── */
+/* B1 Duvara düşen ışık: sahne kâğıtla çarpılıyor (multiply), renk zemine boya gibi
+   oturur; gelen ışık kurşun kalemi, prizmadan çıkan çekirdek beyaz. */
+html[data-b='B1'] .prism-stage {
+  mix-blend-mode: multiply;
+}
+html[data-b='B1'] .prism-fan {
+  fill-opacity: 0.8;
+}
+html[data-b='B1'] [id^='pb-'] .prism-light-stop {
+  stop-color: var(--ink-dim);
+}
+html[data-b='B1'] [id^='pc-'] .prism-light-stop {
+  stop-color: var(--surface);
+}
+html[data-b='B1'] .prism-pulse,
+html[data-b='B1'] .prism-wave {
+  fill: var(--surface);
+  stroke: var(--surface);
+  mix-blend-mode: normal;
+}
+
+/* B2 Gravür (Newton, Opticks levhaları): tayf soluk boya, kenarları mürekkep tel;
+   ışık ince bir mürekkep çizgisi; darbe mürekkep ucu gibi kayar. */
+html[data-b='B2'] .prism-fan {
+  fill-opacity: 0.4;
+  stroke: var(--ink);
+  stroke-opacity: 0.55;
+  stroke-width: 0.75px;
+}
+html[data-b='B2'] [id^='ps-'] {
+  stroke: var(--ink);
+  stroke-width: 0.75px;
+}
+html[data-b='B2'] [id^='pb-'] .prism-light-stop {
+  stop-color: var(--ink);
+}
+html[data-b='B2'] [id^='pc-'] .prism-light-stop {
+  stop-color: var(--ground);
+}
+html[data-b='B2'] .prism-glass {
+  fill-opacity: 0.05;
+}
+html[data-b='B2'] .prism-back {
+  stroke-opacity: 0.4;
+}
+html[data-b='B2'] .prism-stage svg .prism-face {
+  stroke-opacity: 1;
+}
+
+/* B3 Beyaz ışık, gölgesiyle: huzme gerçekten beyaz; kâğıttan bir milim yukarıda,
+   altına düşen gölgeden okunuyor. Darbeler beyaz parıltı. */
+html[data-b='B3'] [id^='pb-'] .prism-light-stop,
+html[data-b='B3'] [id^='pc-'] .prism-light-stop {
+  stop-color: var(--surface);
+}
+html[data-b='B3'] .prism-main {
+  filter: drop-shadow(0 1px 1px color-mix(in srgb, var(--ink) 34%, transparent))
+    drop-shadow(0 8px 14px color-mix(in srgb, var(--ink) 12%, transparent));
+}
+html[data-b='B3'] .prism-fan {
+  fill-opacity: 0.88;
+}
+html[data-b='B3'] .prism-glass {
+  fill-opacity: 0.18;
+}
+html[data-b='B3'] .prism-pulse,
+html[data-b='B3'] .prism-wave {
+  fill: var(--surface);
+  stroke: var(--surface);
+  mix-blend-mode: normal;
+}
+
+/* ── C · hale yerine ────────────────────────────────────────────────────── */
+/* C1 Renkli gölge: prism.css'teki bugünkü açık kural (blur 22, saturate 1.4, %55). */
+/* C2 Hale yok: keskin kenar, sade. */
+html[data-c='C2'] .prism-glow {
+  display: none;
+}
+/* C3 Mürekkep yayılması: suluboya kâğıdı gibi kısa ve doygun taşma. */
+html[data-c='C3'] .prism-glow {
+  filter: blur(7px) saturate(1.7);
+  opacity: 0.4;
+}
+/* C4 Işık masası: tonlar ağartılıp geniş yayılıyor — renkli zeminde (plaka, gök)
+   zeminden AÇIK okunur, arkadan aydınlatılmış cam gibi. Beyaz zeminde kaybolur. */
+html[data-c='C4'] .prism-glow {
+  filter: blur(30px) saturate(1.25) brightness(1.75);
+  opacity: 0.9;
+}
+
+/* ── D · yıldızların karşılığı ──────────────────────────────────────────── */
+/* D1 Toz: starfield.css'teki bugünkü açık kural (aynı tonlar, %35). */
+/* D2 Plaka lekeleri: astronomi plakaları negatif — yıldız açık camda koyu nokta. */
+html[data-d='D2'] .star,
+html[data-d='D4'] .star {
+  background: var(--ink) !important;
+  transform: scale(1.5);
+}
+html[data-d='D2'] .starfield,
+html[data-d='D4'] .starfield {
+  opacity: 0.5;
+}
+/* D3 Gündüz: yıldız yok. */
+html[data-d='D3'] .starfield {
+  display: none;
+}
+/* D4 Réseau: Carte du Ciel plakalarına pozlanan ölçü ağı, 88 px (11 × 8) artılar + plaka lekeleri. */
+html[data-d='D4'] .starfield::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--ink-faint);
+  opacity: 0.55;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='88' height='88'%3E%3Cpath d='M43.5 38h1v12h-1zM38 43.5h12v1H38z'/%3E%3C/svg%3E")
+    0 0 / 88px 88px repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='88' height='88'%3E%3Cpath d='M43.5 38h1v12h-1zM38 43.5h12v1H38z'/%3E%3C/svg%3E")
+    0 0 / 88px 88px repeat;
+}

@@ -1,0 +1,499 @@
+<title>Prizma Gün Işığında</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Yerleşim: solda canlı sahne (sitenin kendisi, 1440×900 ölçekli), sağda eksen tezgâhı;
+   altında kontrast ve token tablosu, en altta beş yön yan yana. */
+@font-face { font-family: 'Departure Mono'; src: url(data:font/woff2;base64,/*FONT_DM*/) format('woff2'); font-display: swap; }
+@font-face { font-family: 'Atkinson Hyperlegible Next'; src: url(data:font/woff2;base64,/*FONT_AT*/) format('woff2'); font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: 'Atkinson Hyperlegible Next'; src: url(data:font/woff2;base64,/*FONT_ATX*/) format('woff2'); font-display: swap;
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+
+:root {
+  --bg: #EFF1EE;
+  --panel: #FBFCFA;
+  --rule: #D3D7D0;
+  --fg: #15181D;
+  --dim: #4A5059;
+  --faint: #626A76;
+  --accent: #006F86;
+  --pass: #1E7A3B;
+  --fail: #B3261E;
+  --bezel: #0B0E14;
+  --mono: 'Departure Mono', ui-monospace, 'Cascadia Mono', Consolas, monospace;
+  --prose: 'Atkinson Hyperlegible Next', 'Segoe UI', system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0B0E14; --panel: #121722; --rule: #232A37; --fg: #E4E9F4; --dim: #A1AAC0; --faint: #808BA3;
+    --accent: #22D3EE; --pass: #4ADE80; --fail: #F87171; --bezel: #000000; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0B0E14; --panel: #121722; --rule: #232A37; --fg: #E4E9F4; --dim: #A1AAC0; --faint: #808BA3;
+  --accent: #22D3EE; --pass: #4ADE80; --fail: #F87171; --bezel: #000000; color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg);
+  font-family: var(--prose); font-size: 16px; line-height: 1.55;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 88px;
+  font-synthesis: none;
+}
+.wrap { max-width: 1400px; margin: 0 auto; }
+.mono { font-family: var(--mono); }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* ── Baş ── */
+.head { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 22px 44px; align-items: end; padding-block: 44px 33px; }
+.head h1 { font-family: var(--mono); font-weight: 400; font-size: 44px; line-height: 1.1; margin: 0 0 11px; letter-spacing: 0.02em; text-wrap: balance; }
+.head p { margin: 0; color: var(--dim); max-width: 68ch; }
+.pick { display: grid; gap: 8px; justify-items: end; }
+.pick-label { font-family: var(--mono); font-size: 11px; color: var(--faint); letter-spacing: 0.06em; }
+.pick-code { font-family: var(--mono); font-size: 22px; letter-spacing: 0.04em; display: flex; gap: 11px; align-items: center; flex-wrap: wrap; justify-content: end; }
+.pick-code b { font-weight: 400; color: var(--accent); }
+.copy { font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; background: none; border: 1px solid var(--rule); padding: 6px 11px; cursor: pointer; border-radius: 2px; }
+.copy:hover { border-color: var(--fg); }
+
+/* ── Tezgâh ── */
+.bench { display: grid; grid-template-columns: minmax(0, 1fr) 400px; gap: 33px; align-items: start; }
+.stage-box { position: relative; background: var(--bezel); border-radius: 3px; overflow: hidden; }
+.stage-box iframe { position: absolute; left: 0; top: 0; width: 1440px; height: 900px; border: 0; transform-origin: 0 0; background: transparent; }
+.stage-fail { position: absolute; inset: 0; display: none; place-items: center; padding: 22px; text-align: center; color: #E4E9F4; font-size: 15px; }
+.views { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 11px; align-items: center; }
+.views button { font-family: var(--mono); font-size: 11px; letter-spacing: 0.04em; padding: 7px 9px; background: none; border: 1px solid var(--rule); border-radius: 2px; cursor: pointer; }
+.views button[aria-pressed="true"] { border-color: var(--fg); background: var(--fg); color: var(--bg); }
+.views .sep { width: 1px; align-self: stretch; background: var(--rule); margin: 0 5px; }
+.views .replay { margin-left: auto; }
+.hint { font-size: 13px; color: var(--faint); margin: 8px 0 0; }
+
+.side { display: grid; gap: 22px; }
+.block-title { font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; color: var(--faint); margin: 0 0 8px; display: flex; justify-content: space-between; gap: 11px; }
+.dirs { display: grid; gap: 0; border-top: 1px solid var(--rule); }
+.dir { display: grid; grid-template-columns: 33px minmax(0, 1fr) 66px; gap: 11px; align-items: center; text-align: left; padding: 9px 4px; background: none; border: 0; border-bottom: 1px solid var(--rule); cursor: pointer; }
+.dir:hover { background: color-mix(in srgb, var(--fg) 4%, transparent); }
+.dir[aria-pressed="true"] { background: color-mix(in srgb, var(--accent) 12%, transparent); }
+.dir-id { font-family: var(--mono); font-size: 11px; color: var(--accent); }
+.dir-name { font-family: var(--mono); font-size: 15px; display: block; }
+.dir-code { font-family: var(--mono); font-size: 11px; color: var(--faint); letter-spacing: 0.04em; }
+.chip-swatch { display: block; height: 22px; border-radius: 2px; position: relative; overflow: hidden; border: 1px solid var(--rule); }
+.chip-swatch i { position: absolute; right: 4px; top: 5px; bottom: 5px; width: 26px; border-radius: 1px; }
+
+.axis { display: grid; gap: 6px; }
+.axis-head { display: flex; justify-content: space-between; gap: 11px; align-items: baseline; }
+.axis-name { font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; color: var(--faint); }
+.opts { display: flex; flex-wrap: wrap; gap: 6px; }
+.opt { display: inline-flex; gap: 8px; align-items: center; padding: 6px 10px 6px 8px; border: 1px solid var(--rule); background: var(--panel); border-radius: 2px; cursor: pointer; font-size: 13px; }
+.opt .k { font-family: var(--mono); font-size: 11px; color: var(--accent); }
+.opt[aria-pressed="true"] { border-color: var(--fg); box-shadow: inset 0 0 0 1px var(--fg); }
+.opt .sw { width: 22px; height: 14px; border-radius: 1px; border: 1px solid color-mix(in srgb, var(--fg) 25%, transparent); flex: none; }
+.axis-note { font-size: 13px; color: var(--dim); margin: 0; min-height: 3em; }
+.side.is-dark .axis { opacity: 0.45; }
+
+/* ── Ölçüm ── */
+.measure { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 33px; margin-top: 44px; align-items: start; }
+h2 { font-family: var(--mono); font-weight: 400; font-size: 22px; margin: 0 0 6px; }
+.lede { color: var(--dim); margin: 0 0 16px; max-width: 70ch; font-size: 15px; }
+.tbl-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--rule); vertical-align: middle; }
+th { font-family: var(--mono); font-weight: 400; font-size: 11px; letter-spacing: 0.06em; color: var(--faint); }
+td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; text-align: right; }
+.pair { display: flex; align-items: center; gap: 8px; }
+.pair-chip { width: 44px; height: 22px; border-radius: 2px; display: grid; place-items: center; font-family: var(--mono); font-size: 11px; border: 1px solid color-mix(in srgb, var(--fg) 18%, transparent); flex: none; }
+.use { color: var(--faint); font-size: 13px; }
+.badge { display: inline-block; font-family: var(--mono); font-size: 11px; letter-spacing: 0.04em; padding: 3px 7px; border-radius: 2px; white-space: nowrap; }
+.badge.ok { background: color-mix(in srgb, var(--pass) 16%, transparent); color: var(--pass); }
+.badge.no { background: var(--fail); color: var(--panel); }
+.badge.info { border: 1px solid var(--rule); color: var(--faint); }
+.tok { width: 100%; }
+.tok td:first-child { font-family: var(--mono); font-size: 13px; }
+.tok .hex { font-family: var(--mono); font-size: 13px; }
+.sw-cell { display: inline-block; width: 18px; height: 18px; border-radius: 2px; vertical-align: middle; margin-right: 8px; border: 1px solid color-mix(in srgb, var(--fg) 20%, transparent); }
+pre { font-family: var(--mono); font-size: 12px; line-height: 1.6; background: var(--panel); border: 1px solid var(--rule); padding: 14px 16px; overflow-x: auto; margin: 0; border-radius: 2px; }
+details { margin-top: 16px; }
+summary { cursor: pointer; font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; color: var(--dim); padding: 6px 0; }
+.code-head { display: flex; justify-content: space-between; align-items: baseline; gap: 11px; margin: 22px 0 8px; }
+
+/* ── Yönler yan yana ── */
+.compare { margin-top: 66px; }
+.row { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 22px 33px; padding: 22px 0; border-top: 1px solid var(--rule); }
+.row-meta h3 { font-family: var(--mono); font-weight: 400; font-size: 22px; margin: 0 0 4px; display: flex; gap: 11px; align-items: baseline; }
+.row-meta h3 span { font-size: 11px; color: var(--accent); }
+.row-meta .codes { font-family: var(--mono); font-size: 13px; color: var(--dim); letter-spacing: 0.04em; margin: 0 0 8px; }
+.row-meta p { margin: 0 0 11px; font-size: 14px; color: var(--dim); }
+.row-meta .tally { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 11px; }
+.load { font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; padding: 7px 11px; border: 1px solid var(--fg); background: none; cursor: pointer; border-radius: 2px; }
+.load:hover { background: var(--fg); color: var(--bg); }
+.shots { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 11px; }
+.shot { display: grid; gap: 4px; background: none; border: 0; padding: 0; cursor: zoom-in; text-align: left; }
+.shot img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; display: block; border: 1px solid var(--rule); border-radius: 2px; background: var(--panel); }
+.shot span { font-family: var(--mono); font-size: 11px; color: var(--faint); letter-spacing: 0.04em; }
+.mini { margin-top: 11px; }
+.mini table { font-size: 12px; }
+.mini td, .mini th { padding: 4px 6px; }
+
+/* ── Notlar ── */
+.notes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 33px; margin-top: 66px; padding-top: 22px; border-top: 1px solid var(--rule); }
+.notes h2 { font-size: 15px; margin-bottom: 8px; }
+.notes ul { margin: 0; padding-left: 18px; color: var(--dim); font-size: 14px; display: grid; gap: 6px; }
+.notes p { margin: 0 0 8px; color: var(--dim); font-size: 14px; }
+.reco { color: var(--fg) !important; }
+
+dialog { border: 0; padding: 0; background: var(--bezel); max-width: min(1440px, 96vw); }
+dialog::backdrop { background: color-mix(in srgb, var(--bezel) 82%, transparent); }
+dialog img { display: block; width: 100%; height: auto; }
+dialog form { position: absolute; top: 8px; right: 8px; }
+dialog button { font-family: var(--mono); font-size: 11px; padding: 6px 10px; background: #0B0E14; color: #E4E9F4; border: 1px solid #E4E9F4; cursor: pointer; }
+
+@media (max-width: 1100px) {
+  .bench, .measure { grid-template-columns: minmax(0, 1fr); }
+  .notes { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 760px) {
+  .head { grid-template-columns: minmax(0, 1fr); }
+  .pick { justify-items: start; }
+  .pick-code { justify-content: start; }
+  .head h1 { font-size: 33px; }
+  .row { grid-template-columns: minmax(0, 1fr); }
+  .shots { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header class="head">
+    <div>
+      <h1>Prizma, gün ışığında</h1>
+      <p>Açık temanın beş yönü, sitenin ve panelin kendi koduyla. Soldaki sahne gerçek site: aynı PrismStage, Ring, kart ve panel, yalnızca token'lar ve açık zemin etkileri değişiyor. Bir yön seç ya da eksenleri tek tek karıştır; seçimini kodla yaz (örnek: <span class="mono">Y2</span> ya da <span class="mono">A2 B3 C4 D4 E1</span>).</p>
+    </div>
+    <div class="pick">
+      <span class="pick-label">SAHNEDEKİ</span>
+      <div class="pick-code"><b id="pickName">Y1</b><span id="pickCode">A1 B1 C3 D1 E1</span></div>
+      <button class="copy" id="copyBtn" type="button">KODU KOPYALA</button>
+    </div>
+  </header>
+
+  <section class="bench" aria-label="Canlı sahne ve eksenler">
+    <div>
+      <div class="stage-box" id="stageBox">
+        <div class="stage-fail" id="stageFail">Canlı sahne bu görüntüleyicide açılamadı. Aşağıdaki ekran görüntüleri aynı sahneden alındı (1440×900).</div>
+      </div>
+      <div class="views" id="views" role="group" aria-label="Görünüm"></div>
+      <p class="hint" id="viewHint">Sahne gerçek site gibi davranıyor: içine tıklayıp tekerlek ya da ok tuşlarıyla slayt değiştirebilirsin. Panel girişinde parola <span class="mono">401</span> yazarsan hatalı parola ekranı (tayfta 401 nm çizgisi) görünür.</p>
+    </div>
+
+    <aside class="side" id="side">
+      <div>
+        <p class="block-title"><span>YÖNLER</span><span>eksen kodları</span></p>
+        <div class="dirs" id="dirs" role="group" aria-label="Yönler"></div>
+      </div>
+      <div id="axes" class="side" style="gap:16px"></div>
+    </aside>
+  </section>
+
+  <section class="measure" aria-label="Kontrast ve token'lar">
+    <div>
+      <h2>Kontrast · <span id="mName">Y1</span></h2>
+      <p class="lede">WCAG 2.1 oranı, sahnedeki token'larla canlı hesaplanıyor. Metin 4.5:1, büyük metin ve grafik (ray işareti, tayf şeridi, simge) 3:1. Cam panel, yüzeyin %58'inin zemine karıştığı hâliyle yaklaşık hesaplandı.</p>
+      <div class="tbl-wrap"><table id="cTable"></table></div>
+    </div>
+    <div>
+      <h2>Token'lar</h2>
+      <p class="lede">Hex yalnızca <span class="mono">presets.ts</span>'e girer. Etkiler (B, C, D) CSS'e token'la yazılıyor; kodları aşağıda.</p>
+      <div class="tbl-wrap"><table class="tok" id="tTable"></table></div>
+      <div class="code-head"><span class="block-title" style="margin:0">PRESETS.TS ADAYI</span><button class="copy" id="copyTs" type="button">KOPYALA</button></div>
+      <pre id="tsOut"></pre>
+      <details>
+        <summary>Etki kuralları (prism.css / starfield.css / theme.css adayı, renk kodu yok)</summary>
+        <pre id="fxOut"></pre>
+      </details>
+    </div>
+  </section>
+
+  <section class="compare" aria-label="Beş yön yan yana">
+    <h2>Beş yön yan yana</h2>
+    <p class="lede">Aynı başsız Chrome'da, 1440×900'de, sitenin ve panelin gerçek koduyla çekildi. Görüntüye tıklayınca büyür; "Sahneye al" yönü canlı sahneye yükler. Her satırda o yönün kontrast özeti.</p>
+    <div id="rows"></div>
+  </section>
+
+  <section class="notes" aria-label="Notlar">
+    <div>
+      <h2>Her yönde ortak</h2>
+      <ul>
+        <li>INTRO yazısının ışıması açık zeminde leke gibi duruyor; yerine 0.6 px mürekkep kenarı.</li>
+        <li>Ray işaretinin ve duyuru noktasının ışıması kalkıyor; tok renk.</li>
+        <li>Cam panel %48 → %58: %48'de doygun tayf metnin altına fazla giriyor, %70'te prizma kayboluyordu (iki değer de denendi).</li>
+        <li>Prizmadan çıkan "beyaz çekirdek" bugün <span class="mono">--ink</span> ile çiziliyor; açık zeminde koyu bir kama oluyor. Üç B seçeneği de bunu ayrı ayrı çözüyor.</li>
+      </ul>
+    </div>
+    <div>
+      <h2>Bilmen gerekenler</h2>
+      <ul>
+        <li>E2'de sarı, yeşil ve camgöbeği 3:1'in altında: rayda ve INTRO'da okunmuyor. Tayfın içinde sorun değil.</li>
+        <li>INTRO 11 px metin, harfleri tayf tonlarıyla dolu: metin eşiği (4.5) yalnızca E3'te tutuyor. E1'de büyük metin eşiğinde.</li>
+        <li>B1'in <span class="mono">multiply</span>'ı ve B3'ün gölgesi tam ekran katmanda; bugünkü hale kadar GPU işi. Hafif kipte (<span class="mono">data-lite</span>) kapatılabilir.</li>
+        <li>C4 yalnızca renkli zeminde (A2, A3) çalışıyor; A1/A4'te görünmez.</li>
+      </ul>
+    </div>
+    <div>
+      <h2>Önerim</h2>
+      <p class="reco"><b class="mono" style="font-weight:400">Y2 · Cam plaka</b> (A2 B2 C2 D4 E3), istersen tek değişiklikle <span class="mono">B3</span>.</p>
+      <p>Koyu tema geceyse açık tema onun gündüzü olmamalı, aynı gökyüzünün kayıt hâli olmalı: plaka, tayfın fotoğrafla ilk kaydedildiği malzeme. Siteyi "beyaza boyanmış koyu tema" olmaktan çıkarıp kendi hikâyesine bağlıyor, bütün tonlar 4.5:1'i geçiyor (metin olarak da güvenli) ve hale, karışım, gölge gibi pahalı etkilere hiç ihtiyaç duymuyor. Réseau ağı 11'in katında (88 px), sitenin piksel ızgarasıyla aynı dilde.</p>
+      <p>Daha canlı bir tayf istersen Y3 (aynı plaka, ışık masası).</p>
+    </div>
+  </section>
+</div>
+
+<dialog id="zoom"><form method="dialog"><button>KAPAT</button></form><img id="zoomImg" alt=""></dialog>
+
+<script id="looks" type="application/json">/*LOOKS*/</script>
+<script id="fxcss" type="text/plain">/*FXCSS*/</script>
+<script>
+(function () {
+  var L = JSON.parse(document.getElementById('looks').textContent);
+  var FX = document.getElementById('fxcss').textContent;
+  var AX = ['A', 'B', 'C', 'D', 'E'];
+  var VIEWS = [
+    { id: 'ust', label: 'GİRİŞ', page: 'site' },
+    { id: 'hakkimda', label: 'HAKKIMDA', page: 'site' },
+    { id: 'deneyim', label: 'DENEYİM', page: 'site' },
+    { id: 'projeler', label: 'PROJELER', page: 'site' },
+    { id: 'iletisim', label: 'İLETİŞİM', page: 'site' },
+    { id: 'nf', label: '404 NM', page: 'nf' },
+    { sep: true },
+    { id: 'login', label: 'PANEL: GİRİŞ', page: 'login' },
+    { id: 'genel', label: 'GENEL', page: 'panel' },
+    { id: 'profil', label: 'PROFİL', page: 'panel' }
+  ];
+  var SHOTS = [['giris', 'Giriş'], ['hakkimda', 'Hakkımda'], ['projeler', 'Projeler'], ['panel-giris', 'Panel girişi']];
+
+  var st = { dir: 'Y1', code: Object.assign({}, L.dirs[0].code), view: 'ust' };
+  try { var saved = JSON.parse(localStorage.getItem('prizma-acik') || 'null'); if (saved && saved.code) st = saved; } catch (e) {}
+  function save() { try { localStorage.setItem('prizma-acik', JSON.stringify(st)); } catch (e) {} }
+
+  // ── renk hesabı (WCAG 2.1) ──
+  function rgb(h) { return [1, 3, 5].map(function (i) { return parseInt(h.slice(i, i + 2), 16) / 255; }); }
+  function lin(c) { return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); }
+  function lum(h) { var c = rgb(h).map(lin); return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]; }
+  function ratio(a, b) { var x = lum(a), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); }
+  function mix(a, b, t) { var x = rgb(a), y = rgb(b); return '#' + x.map(function (v, i) { return Math.round((v * t + y[i] * (1 - t)) * 255).toString(16).padStart(2, '0'); }).join('').toUpperCase(); }
+
+  function tokensFor(dir, code) {
+    if (dir === 'K0') return Object.assign({}, L.dark.t, { scheme: 'dark' });
+    return Object.assign({}, L.axes.A.opts[code.A].t, L.axes.E.opts[code.E].t, { scheme: 'light' });
+  }
+  function fxFor(dir, code) { return dir === 'K0' ? {} : { b: code.B, c: code.C, d: code.D }; }
+  function codeStr(code) { return AX.map(function (k) { return code[k]; }).join(' '); }
+  function dirName(id) { if (id === 'K0') return L.dark.name; var d = L.dirs.filter(function (x) { return x.id === id; })[0]; return d ? d.name : 'Karışım'; }
+
+  var NAMES = ['mor', 'mavi', 'camgöbeği', 'yeşil', 'sarı', 'turuncu', 'kırmızı'];
+  function pairs(t) {
+    var glass = mix(t.surface, t.ground, 0.58);
+    var P = [
+      ['ink', 'ground', 4.5, 'Birincil metin'],
+      ['inkDim', 'ground', 4.5, 'İkincil metin'],
+      ['inkFaint', 'ground', 4.5, 'Etiket, meta'],
+      ['ink', 'surface', 4.5, 'Kart ve panel metni'],
+      ['inkDim', 'surface', 4.5, 'Kartta ikincil'],
+      ['inkFaint', 'surface', 4.5, 'Kartta etiket'],
+      ['inkFaint', glass, 4.5, 'Cam panelde etiket (yaklaşık)'],
+      ['lead', 'ground', 4.5, 'Bağlantı, sayaç, dil seçici'],
+      ['lead', 'surface', 4.5, 'Kartta bağlantı'],
+      ['ground', 'lead', 4.5, 'Düğme yazısı (lead zemin)']
+    ];
+    t.accents.forEach(function (a, i) { P.push(['accents.' + i, 'ground', 3, (i + 1) + ' · ' + NAMES[i] + ': ray, şerit, INTRO']); });
+    P.push(['line', 'ground', 0, 'Ayraç (dekoratif, eşik yok)']);
+    return P.map(function (p) {
+      var fg = p[0].indexOf('accents.') === 0 ? t.accents[+p[0].split('.')[1]] : t[p[0]];
+      var bg = p[1].charAt(0) === '#' ? p[1] : t[p[1]];
+      return { fg: fg, bg: bg, fgName: p[0], bgName: p[1].charAt(0) === '#' ? 'cam' : p[1], min: p[2], use: p[3], r: ratio(fg, bg) };
+    });
+  }
+  function badge(p) {
+    if (!p.min) return '<span class="badge info">bilgi</span>';
+    return p.r >= p.min ? '<span class="badge ok">≥ ' + p.min + ' geçer</span>' : '<span class="badge no">≥ ' + p.min + ' kalır</span>';
+  }
+  function chip(p) { return '<span class="pair-chip" style="background:' + p.bg + ';color:' + p.fg + '">Aa</span>'; }
+
+  function renderTables() {
+    var t = tokensFor(st.dir, st.code);
+    var P = pairs(t);
+    document.getElementById('cTable').innerHTML = '<thead><tr><th>ÇİFT</th><th>KULLANIM</th><th style="text-align:right">ORAN</th><th>EŞİK</th></tr></thead><tbody>' +
+      P.map(function (p) {
+        return '<tr><td><span class="pair">' + chip(p) + '<span class="mono" style="font-size:12px">' + p.fgName + ' / ' + p.bgName + '</span></span></td><td class="use">' + p.use + '</td><td class="num">' + p.r.toFixed(2) + '</td><td>' + badge(p) + '</td></tr>';
+      }).join('') + '</tbody>';
+    var keys = ['ground', 'surface', 'line', 'ink', 'inkDim', 'inkFaint', 'lead'];
+    var src = st.dir === 'K0' ? 'presets.ts' : null;
+    document.getElementById('tTable').innerHTML = '<thead><tr><th>TOKEN</th><th>DEĞER</th><th>KAYNAK</th></tr></thead><tbody>' +
+      keys.map(function (k) {
+        var from = src || (k === 'lead' ? st.code.E : st.code.A);
+        return '<tr><td>' + k + '</td><td><span class="sw-cell" style="background:' + t[k] + '"></span><span class="hex">' + t[k] + '</span></td><td class="use">' + from + '</td></tr>';
+      }).join('') +
+      '<tr><td>accents</td><td>' + t.accents.map(function (a) { return '<span class="sw-cell" title="' + a + '" style="background:' + a + ';margin-right:3px"></span>'; }).join('') + '</td><td class="use">' + (src || st.code.E) + '</td></tr>' +
+      '<tr><td>scheme</td><td class="hex">' + t.scheme + '</td><td class="use">' + (src || 'yeni alan, types.ts') + '</td></tr></tbody>';
+    var name = st.dir === 'K0' ? 'tayf' : 'acik';
+    document.getElementById('tsOut').textContent = st.dir === 'K0' ? '// Bugünkü Tayf — presets.ts\'te zaten var.' :
+      '  /** ' + dirName(st.dir) + ' · ' + codeStr(st.code) + ' (açık tema, seçenek sayfası) */\n' +
+      '  ' + name + ': {\n' +
+      "    id: '" + name + "',\n" +
+      "    name: '" + dirName(st.dir) + "',\n" +
+      "    note: '…',\n" +
+      '    tokens: {\n' +
+      keys.map(function (k) { return "      " + k + ": '" + t[k] + "',"; }).join('\n') + '\n' +
+      "      accents: [" + t.accents.map(function (a) { return "'" + a + "'"; }).join(', ') + "],\n" +
+      "      scheme: 'light',\n" +
+      '    },\n  },';
+    document.getElementById('mName').textContent = st.dir === 'K0' ? 'K0' : (st.dir || 'karışım') + ' · ' + codeStr(st.code);
+  }
+
+  // ── sahne ──
+  var box = document.getElementById('stageBox');
+  var frame = null, framePage = null, ready = false, failTimer = 0;
+  function fit() {
+    var w = box.clientWidth, s = w / 1440;
+    box.style.height = Math.round(900 * s) + 'px';
+    if (frame) frame.style.transform = 'scale(' + s + ')';
+  }
+  function viewOf(id) { return VIEWS.filter(function (v) { return v.id === id; })[0]; }
+  function cfg() {
+    var v = viewOf(st.view);
+    return { tokens: tokensFor(st.dir, st.code), fx: fxFor(st.dir, st.code), nf: v.page === 'nf', page: v.page, hash: v.page === 'panel' ? v.id : undefined };
+  }
+  function load() {
+    var v = viewOf(st.view);
+    if (frame) frame.remove();
+    ready = false;
+    frame = document.createElement('iframe');
+    frame.title = 'Canlı sahne: sitenin kendisi';
+    frame.name = JSON.stringify(cfg());
+    frame.src = (v.page === 'login' || v.page === 'panel') ? 'panel.html' : 'site.html';
+    framePage = v.page;
+    box.appendChild(frame);
+    fit();
+    clearTimeout(failTimer);
+    failTimer = setTimeout(function () { if (!ready) document.getElementById('stageFail').style.display = 'grid'; }, 9000);
+  }
+  function post(m) { if (frame && frame.contentWindow) frame.contentWindow.postMessage(m, '*'); }
+  function sendLook() { var c = cfg(); post({ type: 'look', tokens: c.tokens, fx: c.fx }); }
+  window.addEventListener('message', function (e) {
+    if (!frame || e.source !== frame.contentWindow || !e.data || e.data.type !== 'ready') return;
+    ready = true;
+    document.getElementById('stageFail').style.display = 'none';
+    sendLook();
+    var v = viewOf(st.view);
+    if (v.page === 'site' && v.id !== 'ust') setTimeout(function () { post({ type: 'go', slug: v.id }); }, 60);
+  });
+  new ResizeObserver(fit).observe(box);
+
+  function setView(id) {
+    var v = viewOf(id), prev = viewOf(st.view);
+    st.view = id; save(); renderViews();
+    if (frame && ready && v.page === 'site' && prev.page === 'site') post({ type: 'go', slug: id });
+    else load();
+  }
+  function setLook(dir, code) {
+    st.dir = dir; if (code) st.code = Object.assign({}, code);
+    save(); renderSide(); renderTables();
+    if (frame && ready) sendLook(); else load();
+  }
+
+  // ── çizim ──
+  function spectrum(acc) { return 'linear-gradient(90deg,' + acc.join(',') + ')'; }
+  function renderViews() {
+    var el = document.getElementById('views');
+    el.innerHTML = VIEWS.map(function (v) {
+      return v.sep ? '<span class="sep" aria-hidden="true"></span>' : '<button type="button" data-v="' + v.id + '" aria-pressed="' + (st.view === v.id) + '">' + v.label + '</button>';
+    }).join('') + '<button type="button" class="replay" id="replay">YENİDEN AÇ</button>';
+  }
+  document.getElementById('views').addEventListener('click', function (e) {
+    var b = e.target.closest('button'); if (!b) return;
+    if (b.id === 'replay') return load();
+    setView(b.dataset.v);
+  });
+
+  function renderSide() {
+    var all = L.dirs.concat([{ id: 'K0', name: L.dark.name, code: null }]);
+    document.getElementById('dirs').innerHTML = all.map(function (d) {
+      var t = tokensFor(d.id, d.code || st.code);
+      return '<button type="button" class="dir" data-d="' + d.id + '" aria-pressed="' + (st.dir === d.id) + '">' +
+        '<span class="dir-id">' + d.id + '</span>' +
+        '<span><span class="dir-name">' + d.name + '</span><span class="dir-code">' + (d.code ? codeStr(d.code) : 'koyu referans') + '</span></span>' +
+        '<span class="chip-swatch" style="background:' + t.ground + '"><i style="background:' + spectrum(t.accents) + '"></i></span></button>';
+    }).join('');
+    document.getElementById('side').classList.toggle('is-dark', st.dir === 'K0');
+    document.getElementById('axes').innerHTML = AX.map(function (k) {
+      var ax = L.axes[k];
+      var keys = Object.keys(ax.opts);
+      var cur = ax.opts[st.code[k]];
+      return '<div class="axis"><div class="axis-head"><span class="axis-name">' + k + ' · ' + ax.name.toUpperCase() + '</span></div>' +
+        '<div class="opts">' + keys.map(function (o) {
+          var op = ax.opts[o], sw = '';
+          if (k === 'A') sw = '<span class="sw" style="background:linear-gradient(90deg,' + op.t.ground + ' 50%,' + op.t.surface + ' 50%)"></span>';
+          if (k === 'E') sw = '<span class="sw" style="background:' + spectrum(op.t.accents) + '"></span>';
+          return '<button type="button" class="opt" data-k="' + k + '" data-o="' + o + '" aria-pressed="' + (st.code[k] === o) + '">' + sw + '<span class="k">' + o + '</span>' + op.name + '</button>';
+        }).join('') + '</div><p class="axis-note">' + cur.note + '</p></div>';
+    }).join('');
+    document.getElementById('pickName').textContent = st.dir === 'K0' ? 'K0' : (st.dir || 'Karışım');
+    document.getElementById('pickCode').textContent = st.dir === 'K0' ? 'koyu Tayf' : codeStr(st.code);
+  }
+  document.getElementById('dirs').addEventListener('click', function (e) {
+    var b = e.target.closest('.dir'); if (!b) return;
+    var d = L.dirs.filter(function (x) { return x.id === b.dataset.d; })[0];
+    setLook(b.dataset.d, d ? d.code : null);
+  });
+  document.getElementById('axes').addEventListener('click', function (e) {
+    var b = e.target.closest('.opt'); if (!b) return;
+    var code = Object.assign({}, st.code); code[b.dataset.k] = b.dataset.o;
+    var match = L.dirs.filter(function (d) { return codeStr(d.code) === codeStr(code); })[0];
+    setLook(match ? match.id : '', code);
+  });
+
+  function copy(text, btn) {
+    var done = function () { var o = btn.textContent; btn.textContent = 'KOPYALANDI'; setTimeout(function () { btn.textContent = o; }, 1400); };
+    try { navigator.clipboard.writeText(text).then(done, function () {}); } catch (e) {}
+  }
+  document.getElementById('copyBtn').addEventListener('click', function (e) {
+    copy(st.dir === 'K0' ? 'K0' : ((st.dir ? st.dir + ' = ' : '') + codeStr(st.code)), e.currentTarget);
+  });
+  document.getElementById('copyTs').addEventListener('click', function (e) { copy(document.getElementById('tsOut').textContent, e.currentTarget); });
+  document.getElementById('fxOut').textContent = FX.trim();
+
+  // ── yan yana ──
+  var rows = L.dirs.concat([{ id: 'K0', name: L.dark.name, line: 'Bugünkü site, karşılaştırma için.', code: null }]);
+  document.getElementById('rows').innerHTML = rows.map(function (d) {
+    var t = tokensFor(d.id, d.code || L.dirs[0].code);
+    var P = pairs(t).filter(function (p) { return p.min; });
+    var pass = P.filter(function (p) { return p.r >= p.min; }).length;
+    var fails = P.filter(function (p) { return p.r < p.min; });
+    return '<article class="row"><div class="row-meta"><h3>' + d.name + ' <span>' + d.id + '</span></h3>' +
+      '<p class="codes">' + (d.code ? codeStr(d.code) : 'koyu referans') + '</p><p>' + d.line + '</p>' +
+      '<div class="tally"><span class="badge ' + (fails.length ? 'info' : 'ok') + '">' + pass + ' / ' + P.length + ' çift geçer</span>' +
+      fails.map(function (p) { return '<span class="badge no">' + p.fgName + ' ' + p.r.toFixed(2) + '</span>'; }).join('') + '</div>' +
+      '<button type="button" class="load" data-d="' + d.id + '">SAHNEYE AL</button></div>' +
+      '<div><div class="shots">' + SHOTS.map(function (s) {
+        return '<button type="button" class="shot" data-src="shots/' + d.id + '-' + s[0] + '.jpg"><img decoding="async" src="shots/' + d.id + '-' + s[0] + '.jpg" alt="' + d.name + ', ' + s[1] + ' (1440×900)"><span>' + s[1].toUpperCase() + '</span></button>';
+      }).join('') + '</div>' +
+      '<details class="mini"><summary>Kontrast tablosu (' + P.length + ' çift)</summary><div class="tbl-wrap"><table><tbody>' +
+      pairs(t).map(function (p) { return '<tr><td><span class="pair">' + chip(p) + '<span class="mono">' + p.fgName + ' / ' + p.bgName + '</span></span></td><td class="use">' + p.use + '</td><td class="num">' + p.r.toFixed(2) + '</td><td>' + badge(p) + '</td></tr>'; }).join('') +
+      '</tbody></table></div></details></div></article>';
+  }).join('');
+  document.getElementById('rows').addEventListener('click', function (e) {
+    var l = e.target.closest('.load');
+    if (l) {
+      var d = L.dirs.filter(function (x) { return x.id === l.dataset.d; })[0];
+      setLook(l.dataset.d, d ? d.code : null);
+      document.getElementById('stageBox').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+    var s = e.target.closest('.shot');
+    if (s) { document.getElementById('zoomImg').src = s.dataset.src; document.getElementById('zoom').showModal(); }
+  });
+
+  renderViews(); renderSide(); renderTables(); load();
+})();
+</script>

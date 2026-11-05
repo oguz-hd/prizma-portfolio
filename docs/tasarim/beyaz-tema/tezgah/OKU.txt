@@ -1,0 +1,10 @@
+Açık tema seçenek sayfasının kaynağı (05.11.2026). Uygulama kodu DEĞİL.
+Sayfa: https://claude.ai/artifact/CGtUX9ahVbkxmhfqEGg8QZ
+- h/fx.css      açık zemin etkileri (B/C/D eksenleri + ortak düzeltmeler) — prism.css/starfield.css/theme.css ADAYI
+- looks.json    yönler (Y1–Y5) ve eksen token'ları (A, E) — presets.ts ADAYI
+- build.mjs     web/src ve admin/src'yi olduğu gibi paketler (esbuild-wasm); yalnızca presets ve route harness'ten
+- assemble.mjs  site.html + panel.html + index.html (content.json = oguzhd.com/content.json, herkese açık)
+- shoot.mjs / check.mjs  kendi başsız Chrome'u (playwright-core, channel chrome) ile 1440×900 görüntüler
+Kurulum (geçici klasörde): npm i esbuild-wasm@0.25.10 react@19.3.0 react-dom@19.3.0 gsap@3.15.0 playwright-core@1.56.1
+Not: bu makinede esbuild-wasm'ın alt sürecinde node crypto entropi hatası veriyor → wasm_exec.js
+getRandomData'ya Math.random yedeği eklendi (yalnızca paketleme, güvenlik amaçlı değil).

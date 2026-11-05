@@ -1,0 +1,253 @@
+{
+  "axes": {
+    "A": {
+      "name": "Zemin ve yüzey",
+      "opts": {
+        "A1": {
+          "name": "Kâğıt",
+          "note": "Soğuk beyaz kâğıt, maviye hafif sapmalı. Panel zeminden bir kademe AÇIK (saf beyaz).",
+          "t": {
+            "ground": "#F4F6F9",
+            "surface": "#FFFFFF",
+            "line": "#D5DBE5",
+            "ink": "#141B2B",
+            "inkDim": "#46506A",
+            "inkFaint": "#5B6680"
+          }
+        },
+        "A2": {
+          "name": "Cam plaka",
+          "note": "Astronomi plakasının gümüş-gri emülsiyonu, yeşile hafif sapmalı. Beyaz değil; renkler ve ışık masası (C4) bu tonda okunuyor.",
+          "t": {
+            "ground": "#E4E7E1",
+            "surface": "#F1F3EE",
+            "line": "#C3C9BE",
+            "ink": "#171B16",
+            "inkDim": "#434A42",
+            "inkFaint": "#555D54"
+          }
+        },
+        "A3": {
+          "name": "Gündüz göğü",
+          "note": "Rayleigh mavisi: gökyüzü gündüz bu yüzden mavi, yıldızlar bu yüzden görünmüyor.",
+          "t": {
+            "ground": "#E8F0FA",
+            "surface": "#F6F9FE",
+            "line": "#C9D7EA",
+            "ink": "#0E1A2E",
+            "inkDim": "#3A4B66",
+            "inkFaint": "#4E607C"
+          }
+        },
+        "A4": {
+          "name": "Stüdyo beyazı",
+          "note": "Neredeyse beyaz zemin; panel zeminden bir kademe KOYU. Renk yalnızca tayfta.",
+          "t": {
+            "ground": "#FCFCFD",
+            "surface": "#F1F2F5",
+            "line": "#DFE2E8",
+            "ink": "#0F111A",
+            "inkDim": "#4A4F5E",
+            "inkFaint": "#5F6575"
+          }
+        }
+      }
+    },
+    "B": {
+      "name": "Tayfın okunuşu",
+      "opts": {
+        "B1": {
+          "name": "Duvara düşen ışık",
+          "note": "Sahne zeminle çarpılıyor (multiply): tayf kâğıda boya gibi oturur. Gelen ışık kurşun kalemi, prizmadan çıkan çekirdek beyaz; darbeler beyaz parıltı."
+        },
+        "B2": {
+          "name": "Gravür",
+          "note": "Newton'un Opticks levhaları: tayf soluk boya, kenarları ince mürekkep tel; ışık mürekkep çizgisi, darbe mürekkep ucu gibi kayar."
+        },
+        "B3": {
+          "name": "Beyaz ışık, gölgesiyle",
+          "note": "Huzme gerçekten beyaz; prizma ve ışık kâğıttan bir milim yukarıda, altına düşen yumuşak gölgeden okunuyor."
+        }
+      }
+    },
+    "C": {
+      "name": "Hale yerine",
+      "opts": {
+        "C1": {
+          "name": "Renkli gölge",
+          "note": "prism.css'teki bugünkü açık kural: geniş bulanık kopya, %55. Hazır, kod yok."
+        },
+        "C2": {
+          "name": "Hale yok",
+          "note": "Keskin kenar. Işık efekti yalnızca şekil ve renkten."
+        },
+        "C3": {
+          "name": "Mürekkep yayılması",
+          "note": "Kısa (7 px) ve doygun taşma — suluboya kâğıdına düşen renk."
+        },
+        "C4": {
+          "name": "Işık masası",
+          "note": "Tonlar ağartılıp geniş yayılıyor: renkli zeminde zeminden AÇIK okunur, plakayı arkadan aydınlatan masa gibi. Beyaz zeminde kaybolur."
+        }
+      }
+    },
+    "D": {
+      "name": "Yıldızların karşılığı",
+      "opts": {
+        "D1": {
+          "name": "Toz",
+          "note": "starfield.css'teki bugünkü açık kural: aynı renkli noktalar, %35 — ışıkta süzülen toz."
+        },
+        "D2": {
+          "name": "Plaka lekeleri",
+          "note": "Plakalar negatiftir: yıldız açık camda koyu nokta. Aynı 60 yıldız, mürekkep renginde."
+        },
+        "D3": {
+          "name": "Gündüz",
+          "note": "Yıldız yok. En sade; açılışın ilk evresi (yıldızlar belirir) boş geçer."
+        },
+        "D4": {
+          "name": "Réseau",
+          "note": "Carte du Ciel plakalarına pozlanan ölçü ağı: 88 px'te (11 × 8) artılar + plaka lekeleri."
+        }
+      }
+    },
+    "E": {
+      "name": "Vurgular (lead + 7 ton)",
+      "opts": {
+        "E1": {
+          "name": "Derin tayf",
+          "note": "Tayf tonları her açık zeminde ≥ 3:1 (grafik eşiği) olana dek koyulaştı, tonu korunarak (OKLab). Lead ≥ 4.5:1.",
+          "t": {
+            "lead": "#006F86",
+            "accents": [
+              "#8B5CF6",
+              "#387EF1",
+              "#008FA9",
+              "#00973D",
+              "#A77A00",
+              "#D85D00",
+              "#ED4343"
+            ]
+          }
+        },
+        "E2": {
+          "name": "Parlak tayf",
+          "note": "Koyu temadakine yakın parlak tonlar. Tayf en canlı hâlinde, ama sarı/yeşil/camgöbeği 3:1'in altında: ray ve INTRO'da okunmuyor.",
+          "t": {
+            "lead": "#006F86",
+            "accents": [
+              "#8B5CF6",
+              "#3B82F6",
+              "#06B6D4",
+              "#22C55E",
+              "#EAB308",
+              "#F97316",
+              "#EF4444"
+            ]
+          }
+        },
+        "E3": {
+          "name": "Mürekkep tayfı",
+          "note": "Her ton ≥ 4.5:1 — metin olarak da okunur. Tayf koyu cam / mürekkep gibi; lead camgöbeği tonun kendisi (Tayf'taki kural).",
+          "t": {
+            "lead": "#007087",
+            "accents": [
+              "#7648D7",
+              "#2162C9",
+              "#007087",
+              "#007725",
+              "#875F00",
+              "#B14200",
+              "#C3262C"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "dirs": [
+    {
+      "id": "Y1",
+      "name": "Newton'un duvarı",
+      "code": {
+        "A": "A1",
+        "B": "B1",
+        "C": "C3",
+        "D": "D1",
+        "E": "E1"
+      },
+      "line": "Karanlık odada duvara düşen tayf: kâğıt zemin, boya gibi oturan renk, kurşun kalemi ışık."
+    },
+    {
+      "id": "Y2",
+      "name": "Cam plaka",
+      "code": {
+        "A": "A2",
+        "B": "B2",
+        "C": "C2",
+        "D": "D4",
+        "E": "E3"
+      },
+      "line": "Harvard'ın tayf plakaları: gümüş emülsiyon, ölçü ağı, mürekkep yıldızlar, gravür prizma."
+    },
+    {
+      "id": "Y3",
+      "name": "Işık masası",
+      "code": {
+        "A": "A2",
+        "B": "B3",
+        "C": "C4",
+        "D": "D2",
+        "E": "E1"
+      },
+      "line": "Aynı plaka, arkadan aydınlatılmış: beyaz ışık gölgesiyle, hale zeminden açık."
+    },
+    {
+      "id": "Y4",
+      "name": "Gündüz göğü",
+      "code": {
+        "A": "A3",
+        "B": "B1",
+        "C": "C1",
+        "D": "D3",
+        "E": "E1"
+      },
+      "line": "Gece gökyüzü gündüze döndü: mavi zemin, yıldız yok, bugünkü renkli gölge."
+    },
+    {
+      "id": "Y5",
+      "name": "Stüdyo",
+      "code": {
+        "A": "A4",
+        "B": "B3",
+        "C": "C2",
+        "D": "D3",
+        "E": "E2"
+      },
+      "line": "Beyaz kâğıt üstünde tek nesne: keskin, gölgeli, renk yalnızca tayfta."
+    }
+  ],
+  "dark": {
+    "id": "K0",
+    "name": "Bugün: Tayf (koyu)",
+    "t": {
+      "ground": "#070A12",
+      "surface": "#0F1420",
+      "line": "#1C2436",
+      "ink": "#E4E9F4",
+      "inkDim": "#98A2BA",
+      "inkFaint": "#7C879F",
+      "lead": "#22D3EE",
+      "accents": [
+        "#A78BFA",
+        "#60A5FA",
+        "#22D3EE",
+        "#4ADE80",
+        "#FACC15",
+        "#FB923C",
+        "#F87171"
+      ]
+    }
+  }
+}
