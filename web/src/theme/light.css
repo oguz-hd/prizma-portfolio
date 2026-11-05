@@ -22,6 +22,17 @@
 [data-scheme='light'] .announcement-dot {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--lead) 18%, transparent);
 }
+/* Slayt rayı (Sorun 3, 05.11.2026): 14×2 px çizgiler parlak tonda, %40 opaklıkla gri zeminde 1,2–1,6:1'di
+   (neredeyse görünmez). Ton %45 mürekkeple koyulur, opaklık .85: 3,0–4,8:1; etkin olan tam opak. */
+[data-scheme='light'] :is(.rail-mark, .rail-page) {
+  background: color-mix(in srgb, var(--tone) 55%, var(--ink));
+  opacity: 0.85;
+}
+[data-scheme='light'] .rail-link[aria-current] .rail-mark,
+[data-scheme='light'] .rail-page.is-on,
+[data-scheme='light'] .rail-link:hover .rail-mark {
+  opacity: 1;
+}
 /* Cam panel: açık zeminde %48 yüzeyde doygun tayf metnin altında fazla; %70 prizmayı siliyordu → %58.
    Sorun 2 (05.11.2026): tayf yine de "FastAPI · Python" gibi metne sızıyordu → altındaki renk soluklaştırılıyor
    (saturate .45), bulanıklık 6 → 8 px. 16 px metni temizliyordu ama prizmanın çizgisini de siliyordu. */
