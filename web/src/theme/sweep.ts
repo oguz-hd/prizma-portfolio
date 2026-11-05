@@ -32,10 +32,10 @@ const FILTER_ID = 'scheme-glass'
  * ve dalga tepelerinde beyaz parlamalar kayar.
  */
 const LOOK = {
-  width: 150, // şeridin genişliği (px)
-  scale: 90, // kırılma gücü (feDisplacementMap)
-  tint: [0.02, 0.1], // iç dolgu beyaz alfası: [orta, ön kenar]
-  rim: 1.2, // kenar çizgilerinin kalınlık çarpanı
+  width: 130, // şeridin genişliği (px)
+  scale: 42, // kırılma gücü (feDisplacementMap): hafif bükülme, içerik okunur kalır
+  tint: [0.005, 0.04], // iç dolgu beyaz alfası: [orta, ön kenar], neredeyse saydam
+  rim: 0.8, // kenar çizgilerinin kalınlık çarpanı
 }
 
 /** Yalnızca geliştirmede: `?hold=0.5` süpürmeyi o ilerlemede dondurur (ekran görüntüsü için). */
@@ -173,7 +173,7 @@ export function sweepTo(next: Scheme): void {
     glass.style.width = `${GW}px`
     glass.style.right = `${-GW * 0.25}px`
     glass.style.background = `linear-gradient(90deg, transparent, rgb(255 255 255 / ${LOOK.tint[0]}) 55%, rgb(255 255 255 / ${LOOK.tint[1]}))`
-    const bf = `${filterId ? `url(#${filterId}) ` : 'blur(5px) '}saturate(1.7) brightness(1.1)`
+    const bf = `${filterId ? `url(#${filterId}) ` : 'blur(3px) '}saturate(1.25) brightness(1.04)`
     glass.style.backdropFilter = bf
     glass.style.setProperty('-webkit-backdrop-filter', bf)
 
@@ -191,11 +191,11 @@ export function sweepTo(next: Scheme): void {
     edge.append(defs)
     // Alttan üste: koyu zeminde okunsun diye kontur, kromatik ayrışma (kırmızı/camgöbeği), parlak kenar, kayan parlama.
     const layers: [string, number, number, boolean][] = [
-      ['var(--ink)', 3.6 * LOOK.rim, 0.28, false],
-      [B.accents[B.accents.length - 1], 1.6, 0.8, true],
-      [B.accents[2 % B.accents.length], 1.6, 0.8, true],
-      ['url(#ss-top)', 2.2 * LOOK.rim, 0.95, false],
-      ['#fff', 7, 0.5, false], // dalga tepelerinde kayan parlama
+      ['var(--ink)', 3.6 * LOOK.rim, 0.12, false],
+      [B.accents[B.accents.length - 1], 1.4, 0.45, true],
+      [B.accents[2 % B.accents.length], 1.4, 0.45, true],
+      ['url(#ss-top)', 2.2 * LOOK.rim, 0.7, false],
+      ['#fff', 5, 0.26, false], // dalga tepelerinde kayan parlama
     ]
     for (const [color, w, o, screen] of layers) {
       const p = document.createElementNS(SVG_NS, 'path')

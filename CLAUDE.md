@@ -99,8 +99,9 @@ Kullanıcı notu (Claude Docs, API'yi denerken): https://claude.ai/code/artifact
   yalnız kurulurken okur; sayı değişirse geçişte renk zıplar). Etkiler `theme/light.css` (**App'ten sonra yüklenir**,
   yoksa prism.css/starfield.css ezer).
 - Geçiş `theme/sweep.ts`: tayf bandı + dalgalı sıvı cam ucu (squircle+Snell kırılma haritası, `backdrop-filter: url()`
-  yalnız Chromium). Cam görünümü **D "Parlak damla"** (Oğuz seçimi; denenen A–E: `docs/tasarim/sivi-cam/`): berrak cam,
-  yukarıdan aydınlanan kenar, dalga tepelerinde kayan parlamalar. Süre tam 2,1 sn / dengeli 1,6 / hafif 1,3. Yedekler: Safari/Firefox bulanık cam, `data-lite`/azaltılmış saydamlık yalnız bant, hareket azalt anında.
+  yalnız Chromium). Cam görünümü **D "Parlak damla" HAFİFLETİLMİŞ** (Oğuz: "iOS'taki gibi hafif ışık kırılması, belirgin olmasın";
+  denenen A–E ve hafif: `docs/tasarim/sivi-cam/`): neredeyse saydam ince cam (kırılma 42), silik kenar, yukarıdan aydınlanan çizgi,
+  dalga tepelerinde hafif parlamalar. Daha belirgin istenirse `LOOK` ve kenar opaklıkları (sweep.ts) artırılır; "düz kenar + güçlü cam" denendi, geri alındı. Süre tam 2,1 sn / dengeli 1,6 / hafif 1,3. Yedekler: Safari/Firefox bulanık cam, `data-lite`/azaltılmış saydamlık yalnız bant, hareket azalt anında.
   Dalga ~60 Hz, renk karışımı 30 adım (GPU yükü yenileme hızıyla orantılı). `html[data-sweeping]` etkileri yumuşatır.
 - **Performans kademesi** (`perf.ts`, `html[data-perf]`): `full` (her şey) / `balanced` (cam kırılmasız, küçük hale, yarı yıldız,
   60 fps, kısa geçiş) / `lite` (bulanıklık ve hale yok, yalnız bant; `data-lite` de açık). Başlangıç tahmini çekirdek, bellek,

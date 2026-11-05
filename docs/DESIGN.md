@@ -266,7 +266,7 @@ görüntüleri: `docs/tasarim/beyaz-tema/`.
 - **Neden View Transitions değil:** eski sayfanın durağan görüntüsü geçiş boyunca ekranda kalır, prizma donmuş görünür.
 - **Tuzaklar:** `light.css` `prism.css`/`starfield.css`'ten SONRA yüklenmeli; sahne ton sayısını yalnız kurulurken okur
   (açık palet koyu ön ayarın ton sayısına örneklenir); sitenin `svg{max-width:100%}` kuralı 0 genişlikli üst öğede svg'yi ezer.
-- **Cam görünümü:** D "Parlak damla" seçildi (beş seçenek: `docs/tasarim/sivi-cam/`): berrak cam, kenar yukarıdan aydınlanır, dalga
-  tepelerinde beyaz parlamalar kayar. Geçiş tam kademede 2,1 sn.
+- **Cam görünümü:** D "Parlak damla", sonra iOS'taki gibi hafifletildi (beş seçenek ve hafif sürüm: `docs/tasarim/sivi-cam/`): neredeyse
+  saydam, ince; kenar yukarıdan aydınlanır, dalga tepelerinde hafif parlamalar kayar. Geçiş tam kademede 2,1 sn.
 - **Performans kademeleri** (`perf.ts`): tam / dengeli (cam kırılmasız, küçük hale, yarı yıldız, 60 fps) / hafif (yalnız bant, bulanıklık yok);
   başlangıç cihaz tahmini + çalışırken kare ölçümü (yalnız aşağı), `?perf=` ile elle.
