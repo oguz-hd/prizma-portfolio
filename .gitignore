@@ -8,17 +8,19 @@ admin/dist/
 
 # veritabanı ve çalışma zamanı verisi
 # ⚠️ data/ Docker volume'una karşılık gelir — asla commit edilmez
-data/
+/data/
+/api/data/
 *.db
 *.db-wal
 *.db-shm
 # elle alınmış veritabanı yedekleri (ör. prizma-site.db.yedek-2026-10-01)
 *.yedek-*
 
-# ortam değişkenleri (.env.example commit edilir, .env edilmez)
+# ortam değişkenleri (.env.example commit edilir, diğerleri edilmez; test.env, ports.yml: CALISTIRMA "Yayın öncesi testler")
 .env
-.env.local
-.env.*.local
+.env.*
+!.env.example
+*.env
 
 # python (Faz 5)
 __pycache__/

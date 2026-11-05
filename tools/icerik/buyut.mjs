@@ -14,7 +14,9 @@
  *       projeler, zaman çizelgesi, serbest metin; bir proje kapaklı
  */
 import { deflateSync } from 'node:zlib'
+import { yalnizYerel } from '../ortak/yerel-koruma.mjs'
 const [senaryo, API = 'http://localhost:8011'] = process.argv.slice(2)
+yalnizYerel(API)
 if (!['A', 'B', 'C'].includes(senaryo)) throw new Error('Kullanım: node tools/icerik/buyut.mjs A|B|C [api]')
 if (API.includes(':8001')) throw new Error("8001 geliştirme veritabanı — test API'si kullan (8011)")
 

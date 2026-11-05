@@ -12,8 +12,10 @@ import { spawn } from 'node:child_process'
 import { mkdtempSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
+import { canliyaIzinIste } from '../ortak/yerel-koruma.mjs'
 
 const SITE = process.argv[2] ?? 'http://127.0.0.1:8090'
+canliyaIzinIste(SITE)
 const { ADMIN_EMAIL: EMAIL, ADMIN_PASSWORD: PAROLA } = process.env
 if (!EMAIL || !PAROLA) throw new Error('ADMIN_EMAIL ve ADMIN_PASSWORD gerekli')
 const PORT = 9395
@@ -22,6 +24,7 @@ const chrome = spawn('C:/Program Files/Google/Chrome/Application/chrome.exe', [
   '--headless=new', `--remote-debugging-port=${PORT}`, `--user-data-dir=${mkdtempSync(join(tmpdir(), 'yayin-'))}`,
   '--window-size=1440,900', 'about:blank',
 ], { stdio: 'ignore' })
+process.on('exit', () => chrome.kill()) // hata verip çıksa da Chrome açık kalmasın
 const bekle = (ms) => new Promise((r) => setTimeout(r, ms))
 let hedefler
 for (let i = 0; i < 40 && !hedefler; i++) {
@@ -92,13 +95,17 @@ const tok = (await (await api('POST', '/api/auth/login', { email: EMAIL, passwor
 const ayar = (await (await fetch(SITE + '/content.json')).json()).settings
 await api('PUT', '/api/admin/settings', { ...ayar, preset: 'turbo' }, tok)
 const TURBO_ZEMIN = '#0A0A10'
-temizle()
-await cdp('Page.navigate', { url: SITE + '/admin/' })
-await bekle(4500)
-const zemin = await js("getComputedStyle(document.documentElement).getPropertyValue('--ground').trim()")
+let zemin
+try {
+  temizle()
+  await cdp('Page.navigate', { url: SITE + '/admin/' })
+  await bekle(4500)
+  zemin = await js("getComputedStyle(document.documentElement).getPropertyValue('--ground').trim()")
+} finally {
+  await api('PUT', '/api/admin/settings', ayar, tok) // canlı site Turbo'da KALMASIN
+}
 kontrol('Panel girişi: korumalı adrese gitmiyor', olaylar.ag.length === 0, olaylar.ag.join(', '))
 kontrol('Panel girişi: sitenin paletinde', zemin.toUpperCase() === TURBO_ZEMIN, `beklenen Turbo ${TURBO_ZEMIN} · zemin ${zemin}`)
-await api('PUT', '/api/admin/settings', ayar, tok)
 await js("document.querySelector('input[type=email]').focus()")
 await yaz(EMAIL)
 await js("document.querySelector('input[type=password]').focus()")

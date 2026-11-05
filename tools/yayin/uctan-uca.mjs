@@ -9,8 +9,10 @@
  * ilk yayından hemen sonra, içerik girilmeden çalıştır (CALISTIRMA "Yayın öncesi testler").
  */
 import { deflateSync } from 'node:zlib'
+import { canliyaIzinIste } from '../ortak/yerel-koruma.mjs'
 
 const SITE = process.argv[2] ?? 'http://127.0.0.1:8090'
+canliyaIzinIste(SITE)
 const EMAIL = process.env.ADMIN_EMAIL
 const PAROLA = process.env.ADMIN_PASSWORD
 if (!EMAIL || !PAROLA) throw new Error('ADMIN_EMAIL ve ADMIN_PASSWORD gerekli')
@@ -94,11 +96,18 @@ kontrol('Görsel ve bölüm silindi', (await json('DELETE', `/api/admin/media/${
 
 // Parola değişimi: eski oturum düşer; sonra geri alınır.
 const yeni = `${PAROLA}-gecici`
-const deg = await json('PUT', '/api/auth/password', { currentPassword: PAROLA, newPassword: yeni }, tok)
-const tok2 = (await deg.json()).accessToken
-kontrol('Parola değişince eski oturum düşüyor', deg.status === 200 && (await json('GET', '/api/auth/me', null, tok)).status === 401)
-const geri = await json('PUT', '/api/auth/password', { currentPassword: yeni, newPassword: PAROLA }, tok2)
-kontrol('Parola geri alındı', geri.status === 200, `HTTP ${geri.status}`)
+let tok2 = null
+try {
+  const deg = await json('PUT', '/api/auth/password', { currentPassword: PAROLA, newPassword: yeni }, tok)
+  tok2 = (await deg.json()).accessToken
+  kontrol('Parola değişince eski oturum düşüyor', deg.status === 200 && (await json('GET', '/api/auth/me', null, tok)).status === 401)
+} finally {
+  // Arada bir şey çökse bile yönetici parolası geçici değerde KALMASIN.
+  if (tok2) {
+    const geri = await json('PUT', '/api/auth/password', { currentPassword: yeni, newPassword: PAROLA }, tok2)
+    kontrol('Parola geri alındı', geri.status === 200, `HTTP ${geri.status}`)
+  }
+}
 
 // ── Rapor ───────────────────────────────────────────────────────────────────
 for (const s of sonuc) console.log(`${s.gecti ? 'GEÇTİ' : 'KALDI'}  ${s.ad}${s.ayrinti ? '  — ' + s.ayrinti : ''}`)

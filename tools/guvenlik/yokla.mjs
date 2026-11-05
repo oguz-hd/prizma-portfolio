@@ -8,7 +8,9 @@
  * API adresi doğrudan API (yalnızca token almak ve uç noktaları listelemek için).
  * Her satır: GEÇTİ / KALDI + ne denendi. Çıkış kodu kalan sayısı.
  */
+import { yalnizYerel } from '../ortak/yerel-koruma.mjs'
 const [SITE = 'http://localhost:5183', API = 'http://localhost:8013'] = process.argv.slice(2)
+yalnizYerel(SITE, API) // canlı alan adları ASLA: giriş sınırını doldurur, kayıt açıp siler
 if (/:(80|443|5174|8001)\b/.test(SITE + API)) throw new Error('Yalnızca test yığını (5183/8013)')
 
 const sonuc = []

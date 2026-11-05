@@ -18,12 +18,13 @@
 	}
 }
 
-# ── Güvenlik başlıkları (yayına hazırlık, Oturum 6) — site ve panel ──
+# ── Güvenlik başlıkları — site ve panel ──
 # Parça (snippet): hem normal yanıtlara hem handle_errors'a (404 sayfası) eklenmeli —
-# hata yolu ayrı bir rota, sitenin `header`'ını almıyor (05.10.2026, ölçüldü).
+# hata yolu ayrı bir rota, sitenin `header`'ını almıyor (ölçüldü).
 # CSP: betik yalnızca kendi kökümüzden (ikisi de dış dosya); stil 'unsafe-inline'
-# index.html'deki ilk boya <style>'ı ve React'in style özniteliği için. Görsel
-# data: favicon için (theme/favicon.ts). frame-ancestors + X-Frame-Options: başka
+# index.html'deki ilk boya <style>'ı ve React'in style özniteliği için. `img-src data:`: favicon
+# (theme/favicon.ts), tema geçişinin kırılma haritası (canvas → feImage, theme/sweep.ts) ve açık
+# temanın ölçü ağı maskesi (light.css). frame-ancestors + X-Frame-Options: başka
 # site çerçeveye alamaz — panelde görünmez çerçevede "Sil"e tıklatma yolu kapalı.
 # HSTS yalnızca HTTPS'te geçerli (tarayıcı http'de yok sayar); :80 yerel denemeye zararsız.
 (security_headers) {
@@ -76,9 +77,15 @@ import /srv/sites/*/Caddyfile
 
 	# ⚠️ Veri volume'u /srv/data'da — meta şablonu (/data/meta.html) kökten okuyor,
 	# taşınamıyor. Ama HTTP'den ASLA: aşağıdaki SPA bloğu /srv'yi sunduğu için
-	# /data/site.db (admin parola hash'i dahil) ve göç yedekleri indirilebiliyordu
-	# (Oturum 6, yayına hazırlıkta bulundu). Dışarı yalnızca content.json ve uploads.
+	# /data/site.db (admin parola hash'i dahil) ve göç yedekleri indirilebiliyordu.
+	# Dışarı yalnızca content.json ve uploads.
 	handle /data/* {
+		respond 404
+	}
+
+	# Proje sayfalarının depoları (/srv/sites, docker-compose.prod.yml) yalnızca kendi alt alanlarında
+	# sunulur; ana alan adından Caddyfile'ları (ve olası .git klasörü) okunamasın.
+	handle /sites/* {
 		respond 404
 	}
 
@@ -129,6 +136,18 @@ import /srv/sites/*/Caddyfile
 	@discovery path /robots.txt /sitemap.xml /llms.txt
 	handle @discovery {
 		root * /srv/data
+		header Cache-Control "no-cache"
+		file_server
+	}
+
+	# Yazı tipleri hash'siz adlı ama nadiren değişir: bir ay önbellek.
+	handle /fonts/* {
+		header Cache-Control "public, max-age=2592000"
+		file_server
+	}
+
+	# İlk boyama betiği (web/public/theme-init.js): render'ı bloklar, değişirse eski kopya kalmasın.
+	handle /theme-init.js {
 		header Cache-Control "no-cache"
 		file_server
 	}
