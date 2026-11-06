@@ -99,6 +99,13 @@
   }
 }
 
+/* 320 px'te 33 px'lik "Experience" tek başına kartı aşıyor (11'in katı: bir alt basamak 22). */
+@media (max-width: 340px) {
+  :root {
+    --text-heading: 22px;
+  }
+}
+
 /* --- Reset -------------------------------------------------------------- */
 
 *,
@@ -910,8 +917,9 @@ html[data-lite] .panel {
 
 .section-head {
   display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
-  gap: var(--space-4);
+  gap: var(--space-2) var(--space-4);
   margin-bottom: var(--space-8);
 }
 
@@ -919,7 +927,11 @@ html[data-lite] .panel {
   color: var(--lead);
 }
 
+/* Başlığın en uzun kelimesi indeksin yanına sığmıyorsa satır alta iner (390 px "Experience" karttan taşıyordu);
+   sığıyorsa yan yana kalır ve başlık kalan genişlikte kendi içinde kırılır. */
 .section-heading {
+  flex: 1 1 0;
+  min-width: min-content;
   font-size: var(--text-heading);
 }
 

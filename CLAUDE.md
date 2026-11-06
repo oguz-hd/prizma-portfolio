@@ -113,6 +113,12 @@ Kullanıcı notu (Claude Docs, API'yi denerken): https://claude.ai/code/artifact
 
 ## Sırada
 
+**06.11 mobil testi (Playwright, EN/TR, 12 boyut):** tüm slaytlar temiz; tema geçişi mobilde iki yönde tamamlanıyor, konsol temiz.
+Düzeltildi: Deneyim başlığı mobilde karttan taşıyordu (`.section-head` flex-wrap + başlık `min-width:min-content`; ≤340 px'te başlık 22 px).
+**Açık, üretilemedi:** Oğuz "Contact'ta Back to top yazıları üstte, footer kalıyor" dedi — 24 koşulda (12 boyut × EN/TR), yavaş font,
+yeniden boyutlama, dil/tema değişimi akışlarında footer hep e-postanın 16 px altında, çakışma yok. Bilinen tek ilgili davranış: yer yetmezse
+`usePlaceBelow` footer'ı bilerek gizler (yatay telefon 844×390'da gizli). Oğuz'dan cihaz/boyut/ekran görüntüsü bekleniyor.
+
 0. **Tema geçişi donması (06.11, Oğuz: renk akışı + dalga ortada iken her geçişte).** Ölçüm (CDP izi, 4× CPU, canlı): maliyet
    ana iş parçacığında stil hesabı (`UpdateLayoutTree`, 358 öğenin tamamı), kademeden bağımsız. Yapıldı: yıldız parıltısı
    `@keyframes var()` yerine Web Animations (stil −%33) + `warmSweep()` (ilk geçişteki ~90 ms filtre kurulumu boşta).
