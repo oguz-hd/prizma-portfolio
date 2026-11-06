@@ -55,6 +55,15 @@ html[data-sweeping] :is(.prism-fan, .prism-glass, .prism-back, .prism-face, .pri
     opacity 0.65s ease,
     filter 0.65s ease;
 }
+/*
+  Süpürme boyunca görünmeyen slaytlar stil hesabına girmez: her renk adımı :root'taki özel özellikleri değiştirir ve
+  kalıtımla tüm ağacı yeniden hesaplatır (gizli slaytlar ağacın ~%33'ü; 4× CPU'da adım başına 12 → 6 ms).
+  Yalnızca süpürme sürerken (sweep.ts → data-sweep-lock) ve yalnızca durumsuz slaytlarda: kalıcı olursa Ring.tsx'in
+  ölçümleri ve slayt girişindeki ilk düzen bozulur. Slayta girilince data-state gelir, kural eşleşmez.
+*/
+html[data-sweep-lock] .slide:not([data-state]) {
+  content-visibility: hidden;
+}
 html[data-sweeping] .panel {
   transition:
     background-color 0.65s ease,

@@ -153,6 +153,7 @@ export function sweepTo(next: Scheme): void {
   // sweep.css: tema etkileri (hale, gravür, yıldız) tek karede değil, yumuşak geçsin.
   window.clearTimeout(cleanupTimer)
   root.dataset.sweeping = ''
+  root.dataset.sweepLock = '' // sweep.css: gizli slaytlar renk adımlarının stil hesabına girmesin
   const tier = getTier()
   const lite = tier === 'lite'
   const glassOk = !lite && !matchMedia('(prefers-reduced-transparency: reduce)').matches
@@ -237,6 +238,7 @@ export function sweepTo(next: Scheme): void {
   const finish = () => {
     overlay.remove()
     if (!flipped) setScheme(next, false)
+    delete root.dataset.sweepLock // repaint()'in tek stil hesabı gizli slaytları da kapsasın
     repaint() // tam token'lar
     busy = false
     cleanupTimer = window.setTimeout(() => delete root.dataset.sweeping, 700) // etkilerin geçişi bitsin

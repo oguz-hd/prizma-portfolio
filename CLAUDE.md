@@ -116,10 +116,19 @@ Kullanıcı notu (Claude Docs, API'yi denerken): https://claude.ai/code/artifact
 0. **Tema geçişi donması (06.11, Oğuz: renk akışı + dalga ortada iken her geçişte).** Ölçüm (CDP izi, 4× CPU, canlı): maliyet
    ana iş parçacığında stil hesabı (`UpdateLayoutTree`, 358 öğenin tamamı), kademeden bağımsız. Yapıldı: yıldız parıltısı
    `@keyframes var()` yerine Web Animations (stil −%33) + `warmSweep()` (ilk geçişteki ~90 ms filtre kurulumu boşta).
-   **Hâlâ açık:** renk karışımı adımlarında 45–55 ms'lik (4×) stil patlamaları sürüyor; geçişler, hale, panel bulanıklığı,
-   prizma sahnesi, `--spectrum` kullanıcıları ELENDİ (canlıda geçici CSS ile A/B). Sıradaki deney: `applyTheme`
-   yazımlarını gruplara bölüp (zemin/mürekkep, accent-1..8, spectrum, scheme/meta) hangisinin pahalı olduğunu bulmak;
-   `data-scheme` ve `meta theme-color` her adımda yeniden yazılıyor (aynı değer bile). Kalite düşürülmeyecek (Oğuz).
+   **06.11 ikinci tur (ölçüldü, dev yığını, Chrome DevTools MCP, 1440×900):**
+   - `applyTheme` gruplara bölmek BOŞ: `:root`'ta herhangi bir özel özellik değişimi (kullanılmayan `--zzz` bile) ~12 ms (4×)
+     sabit tam-ağaç stil hesabı; 7+8+2 değişken ayrı ayrı daha ucuz değil. `data-scheme` aynı değerle yazmak bedava (0,1 ms) — şüpheli elendi.
+   - Kısıtsız hızda (1×) ana iş parçacığı sorun DEĞİL (medyan 4,2 ms, en uzun kare 12–21 ms). Yük **GPU'da**: `CrGpuMain` süpürme
+     penceresinde (~900–1700 ms) sürekli ~%100 (dışında ~%60); kırılma filtresi yüzünden değil (dengeli kademede de aynı).
+   - Sebep: `sweep.css`'teki 0,65 sn'lik geçişlerin TOPLAMI. Hepsi kapalıyken doygunluk ~800 → ~200 ms'ye iniyor (kalan = renk
+     karışımının kendisi). Tek tek kapatınca fark YOK: `filter`, SVG (`stroke*`/`fill-opacity`), `.panel`+`stop-color` ayrı ayrı elendi.
+   - Yapıldı: süpürme boyunca gizli slaytlar `content-visibility:hidden` (`data-sweep-lock`, finish()'te kalkar). Mikro ölçümde adım
+     başına stil 12 → 6 ms, ama gerçek geçişte kare toplamında gürültüden ayırt edilemedi (~%10). Zararsız, kalıcı.
+   - **Hâlâ açık / sıradaki:** geçişleri azaltmak ya da tek geçişte toplamak (kalite kararı, Oğuz'a sorulacak): (a) süpürme dışına
+     `data-scheme` etkilerini kademeli değil ani yapıp bandın altına saklamak, (b) yalnız en görünür 2–3 geçişi bırakmak, (c) mimari:
+     View Transitions API ile eski/yeni görüntü takası (Chromium; renk karışımı ve geçişler kalkar, eski taraf donuk kalır — risk yüksek,
+     önce prototip). Ayrıca 4× kısıtta art arda süpürme kareleri giderek bozuluyor (270–820 ms) — sızıntı mı, kısıt yan etkisi mi bakılmadı.
 1. Performans kademesi için küçük bir ayar arayüzü (Otomatik / Tam / Hafif) istenirse eklenir; şimdilik `?perf=`.
 2. Skill ve plugin konuşması + araştırma (hafıza: `skill-plugin-konusmasi-hatirlat`).
 3. **Temaya özgü / uyum animasyonları, içerik düzenlemeleri, araştırmalar** (Oğuz, 05.11).
