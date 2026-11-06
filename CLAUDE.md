@@ -117,6 +117,9 @@ Kullanıcı notu (Claude Docs, API'yi denerken): https://claude.ai/code/artifact
 
 **06.11 mobil testi (Playwright, EN/TR, 12 boyut):** tüm slaytlar temiz; tema geçişi mobilde iki yönde tamamlanıyor, konsol temiz.
 Düzeltildi: Deneyim başlığı mobilde karttan taşıyordu (`.section-head` flex-wrap + başlık `min-width:min-content`; ≤340 px'te başlık 22 px).
+**Menü (canlı, 5 öğe) hata DEĞİL:** dar telefonda menü zaten tek satır, yatay kayar, kenar söner, aktif bölüm görünür alana kayar (`Nav.tsx` + `.nav[data-fade]`).
+Çakışma testi kırpılmış (kaydırılmış) bağlantıların kutusunu saydığı için yalancı alarm verdi — menü ölçerken `nav` görünür kutusuyla kırp. Dev verisi (4 öğe,
+`drn4902@gmail.com`) canlıdan (5 öğe + Projeler, `contact@oguzhd.com`) farklı: mobil/düzen testini canlı içerikle de yap.
 **Açık, üretilemedi:** Oğuz "Contact'ta Back to top yazıları üstte, footer kalıyor" dedi — 24 koşulda (12 boyut × EN/TR), yavaş font,
 yeniden boyutlama, dil/tema değişimi akışlarında footer hep e-postanın 16 px altında, çakışma yok. Bilinen tek ilgili davranış: yer yetmezse
 `usePlaceBelow` footer'ı bilerek gizler (yatay telefon 844×390'da gizli). Oğuz'dan cihaz/boyut/ekran görüntüsü bekleniyor.
