@@ -72,3 +72,24 @@ html[data-sweeping] .panel {
 html[data-sweeping] .prism-stage stop {
   transition: stop-color 0.65s ease;
 }
+
+/*
+  Geçişler aynı anda başlamasın: GPU'yu ölçtük (06.11), tek tek hiçbiri baskın değil ama hepsi `data-scheme`
+  değiştiği karede birden başlayınca ~0,8 sn %100 doluyor. Renk karışımı önce (sweep.ts), etkiler arkasından sırayla.
+  ⚠ Süpürme biterken `repaint()` tam token'ları yazar ve geçişleri YENİDEN başlatır: en geç bitiş = bitiş anı + son gecikme
+  + 0,65 sn; bu, sweep.ts `cleanupTimer` kuyruğundan (1000 ms) kısa kalmalı, yoksa geçiş ortada kesilip zıplar.
+  Sıra: prizma → hale → yıldız → panel/marka. Bu blok `transition:` kısaltmalarından SONRA durmalı (kısaltma gecikmeyi sıfırlar).
+*/
+html[data-sweeping] :is(.prism-fan, .prism-glass, .prism-back, .prism-face, .prism-main),
+html[data-sweeping] .prism-stage stop {
+  transition-delay: 0.06s;
+}
+html[data-sweeping] .prism-glow {
+  transition-delay: 0.14s;
+}
+html[data-sweeping] :is(.starfield, .star) {
+  transition-delay: 0.22s;
+}
+html[data-sweeping] :is(.brand, .panel) {
+  transition-delay: 0.3s;
+}

@@ -125,10 +125,17 @@ Kullanıcı notu (Claude Docs, API'yi denerken): https://claude.ai/code/artifact
      karışımının kendisi). Tek tek kapatınca fark YOK: `filter`, SVG (`stroke*`/`fill-opacity`), `.panel`+`stop-color` ayrı ayrı elendi.
    - Yapıldı: süpürme boyunca gizli slaytlar `content-visibility:hidden` (`data-sweep-lock`, finish()'te kalkar). Mikro ölçümde adım
      başına stil 12 → 6 ms, ama gerçek geçişte kare toplamında gürültüden ayırt edilemedi (~%10). Zararsız, kalıcı.
-   - **Hâlâ açık / sıradaki:** geçişleri azaltmak ya da tek geçişte toplamak (kalite kararı, Oğuz'a sorulacak): (a) süpürme dışına
-     `data-scheme` etkilerini kademeli değil ani yapıp bandın altına saklamak, (b) yalnız en görünür 2–3 geçişi bırakmak, (c) mimari:
-     View Transitions API ile eski/yeni görüntü takası (Chromium; renk karışımı ve geçişler kalkar, eski taraf donuk kalır — risk yüksek,
-     önce prototip). Ayrıca 4× kısıtta art arda süpürme kareleri giderek bozuluyor (270–820 ms) — sızıntı mı, kısıt yan etkisi mi bakılmadı.
+   - **Yapıldı (Oğuz'un önerisi, kalite korunarak): geçişler SIRALI.** Renk karışımı önce, etkiler `transition-delay` ile arkasından:
+     prizma 0,06 → hale 0,14 → yıldız 0,22 → panel/marka 0,3 sn (`sweep.css` sonu). GPU doygun pencere ~800 → ~300 ms (açık→koyu, 1×,
+     aynı görünüm). ⚠ Süpürme biterken `repaint()` geçişleri YENİDEN başlatır (en geç bitiş = bitiş + son gecikme + 0,65 sn) → kuyruk
+     `cleanupTimer` 700 → 1000 ms yapıldı; gecikme eklenirse bu ikisi birlikte değişmeli (`transitioncancel` ile doğrulandı, kesilme yok).
+     `transition-delay` bloğu `transition:` kısaltmalarından SONRA durmalı (kısaltma gecikmeyi sıfırlar).
+   - ⚠ Ölçüm tuzağı: yeni (izole) sekmede `emulate viewport 1440x900x1` verilmeden alınan iz karşılaştırılamaz (yanlış sonuca götürdü).
+     GPU %'si yenileme hızıyla ölçeklenir (başsız Chrome 240 Hz; boşta bile ~%60) — 60 Hz ekranda mutlak değerler daha düşük.
+   - **Hâlâ açık:** kalan doygunluk (~900–1200 ms) renk karışımının kendisi (her adım tüm ağacı yeniden hesaplatıp her şeyi yeniden boyuyor).
+     Seçenekler: adım sayısını/aralığını azaltmak ya da mimari (View Transitions API: eski/yeni görüntü takası — Chromium, renk karışımı kalkar,
+     eski taraf donuk kalır; risk yüksek, önce prototip). 4× kısıtta art arda süpürmede kareler giderek bozuluyor (270–820 ms) — sızıntı mı, kısıt
+     yan etkisi mi bakılmadı. Oğuz'un kendi ekranında donma geçti mi: teyit bekliyor.
 1. Performans kademesi için küçük bir ayar arayüzü (Otomatik / Tam / Hafif) istenirse eklenir; şimdilik `?perf=`.
 2. Skill ve plugin konuşması + araştırma (hafıza: `skill-plugin-konusmasi-hatirlat`).
 3. **Temaya özgü / uyum animasyonları, içerik düzenlemeleri, araştırmalar** (Oğuz, 05.11).

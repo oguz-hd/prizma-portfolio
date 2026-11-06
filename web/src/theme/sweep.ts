@@ -241,7 +241,7 @@ export function sweepTo(next: Scheme): void {
     delete root.dataset.sweepLock // repaint()'in tek stil hesabı gizli slaytları da kapsasın
     repaint() // tam token'lar
     busy = false
-    cleanupTimer = window.setTimeout(() => delete root.dataset.sweeping, 700) // etkilerin geçişi bitsin
+    cleanupTimer = window.setTimeout(() => delete root.dataset.sweeping, 1000) // etkilerin sıralı geçişi bitsin (sweep.css: son gecikme 0,3 sn + 0,65 sn)
   }
 
   const frame = (now: number): void => {
