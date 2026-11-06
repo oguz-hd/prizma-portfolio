@@ -86,7 +86,9 @@ bunlar değişince panelin kapıları da çalıştırılır.
 
 ## Durum · 05.11.2026
 
-**Yayında: https://oguzhd.com** (05.11.2026'da `a49ac21` canlıya alındı: açık tema, sıvı cam geçişi, performans kademeleri, inceleme düzeltmeleri, `/sites/*` kapatma; DigitalOcean, Caddy; sunucu işleri → `../../SUNUCU.md`, `docs/CALISTIRMA.md` "Yayın (sunucu)").
+**Yayında: https://oguzhd.com** — **06.11.2026'da `3ba0df4` canlıya alındı** (Claude, Oğuz'un isteğiyle: push + `ssh prizma` → `git pull --ff-only` + `up -d --build`;
+yalnız web imajı yeniden kuruldu, API/Caddyfile değişmedi; canlıda 200/404 kapıları, yeni CSS ve tema geçişi doğrulandı): sıralı tema geçişi, gizli slayt kilidi,
+yıldız parıltısı Web Animations, mobil Deneyim başlığı düzeltmesi. (Önceki: 05.11.2026'da `a49ac21` canlıya alındı: açık tema, sıvı cam geçişi, performans kademeleri, inceleme düzeltmeleri, `/sites/*` kapatma; DigitalOcean, Caddy; sunucu işleri → `../../SUNUCU.md`, `docs/CALISTIRMA.md` "Yayın (sunucu)").
 Biten: prizma sitesi, iki dil, yönetim paneli (Faz 7), bölüm türleri ve medya (Faz 9), güvenlik taraması + yayın kontrol
 listesi, **beyaz tema**. Faz faz tarihçe: `docs/GUNLUK.md` (eski "Durum/Sırada" metni orada arşivde).
 Kullanıcı notu (Claude Docs, API'yi denerken): https://claude.ai/code/artifact/8a071f83-aa54-4eb2-a4a7-592661b51c62
@@ -148,9 +150,8 @@ yeniden boyutlama, dil/tema değişimi akışlarında footer hep e-postanın 16 
 4. API bağımlılıkları kilitsiz: `uv lock` + `uv sync --frozen`, uv/alpine/caddy/node imajlarını sabitle (hafıza: `prizma-uv-lock-hatirlat`).
 5. **Faz 8 tema paneli** ve bekleyen C kararları: httpOnly çerez, panel IP kilidi, analytics + gizlilik notu, CTA, og:image,
    HSTS `includeSubDomains`, sunucu dışı yedek.
-6. **Sunucuya uygulanacaklar (Oğuz, adım adım):** Caddyfile'daki `/sites/*` kapatma ve `/fonts/*` + `/theme-init.js`
-   önbellek başlıkları, yeni web/api imajları → `docs/CALISTIRMA.md` "Yayın (sunucu)". Sonra `uctan-uca` ve tarayıcı testi
-   (yalnızca test yığınında; `CANLI_ONAY` olmadan canlıya çalışmaz).
+6. ~~Sunucuya uygulanacaklar~~ **Yapıldı (06.11):** sunucu `3ba0df4`; `/sites/*` canlıda 404, `theme-init.js` `no-cache`. Kalan: `uctan-uca`
+   testi (yalnızca test yığınında; `CANLI_ONAY` olmadan canlıya çalışmaz).
 7. İncelemeden (05.11) bilerek ertelenenler: HTTP/3 için UDP 443 ya da `protocols h1 h2`, `healthcheck`, `paginate` O(n²)
    (büyük içerikte), Docker volume sahiplik yarışı (yeni makine), konteyner sertleştirme, çok kareli ICC profili.
 
