@@ -14,27 +14,10 @@
 .star {
   position: absolute;
   border-radius: 50%;
-  animation-name: twinkle;
-  animation-iteration-count: infinite;
-  animation-timing-function: ease-in-out;
   will-change: opacity;
 }
 
-@keyframes twinkle {
-  0%,
-  100% {
-    opacity: var(--star-dim, 0.3);
-  }
-  50% {
-    opacity: 1;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .star {
-    animation: none;
-  }
-}
+/* Parıltı Starfield.tsx içinde Web Animations ile (keyframe'de var() stil hesabını şişiriyordu). */
 
 /* Açık zeminde yıldız değil, ışıkta süzülen toz: aynı tonlar, çok daha soluk. */
 [data-scheme='light'] .starfield {

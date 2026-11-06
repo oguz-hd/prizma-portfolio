@@ -113,6 +113,13 @@ Kullanıcı notu (Claude Docs, API'yi denerken): https://claude.ai/code/artifact
 
 ## Sırada
 
+0. **Tema geçişi donması (06.11, Oğuz: renk akışı + dalga ortada iken her geçişte).** Ölçüm (CDP izi, 4× CPU, canlı): maliyet
+   ana iş parçacığında stil hesabı (`UpdateLayoutTree`, 358 öğenin tamamı), kademeden bağımsız. Yapıldı: yıldız parıltısı
+   `@keyframes var()` yerine Web Animations (stil −%33) + `warmSweep()` (ilk geçişteki ~90 ms filtre kurulumu boşta).
+   **Hâlâ açık:** renk karışımı adımlarında 45–55 ms'lik (4×) stil patlamaları sürüyor; geçişler, hale, panel bulanıklığı,
+   prizma sahnesi, `--spectrum` kullanıcıları ELENDİ (canlıda geçici CSS ile A/B). Sıradaki deney: `applyTheme`
+   yazımlarını gruplara bölüp (zemin/mürekkep, accent-1..8, spectrum, scheme/meta) hangisinin pahalı olduğunu bulmak;
+   `data-scheme` ve `meta theme-color` her adımda yeniden yazılıyor (aynı değer bile). Kalite düşürülmeyecek (Oğuz).
 1. Performans kademesi için küçük bir ayar arayüzü (Otomatik / Tam / Hafif) istenirse eklenir; şimdilik `?perf=`.
 2. Skill ve plugin konuşması + araştırma (hafıza: `skill-plugin-konusmasi-hatirlat`).
 3. **Temaya özgü / uyum animasyonları, içerik düzenlemeleri, araştırmalar** (Oğuz, 05.11).

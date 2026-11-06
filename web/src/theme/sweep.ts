@@ -115,6 +115,19 @@ function ensureFilter(): string | null {
   return FILTER_ID
 }
 
+/**
+ * İlk geçişte kırılma haritasının canvas/PNG üretimi ve SVG filtresinin kurulumu tek karede ~90 ms sürüyordu.
+ * Sayfa oturduktan sonra boşta önceden kurulur; görüntü değişmez, ilk tıklama akıcı olur.
+ */
+export function warmSweep(): void {
+  const warm = () => {
+    if (getTier() === 'full') ensureFilter()
+  }
+  // Safari'de requestIdleCallback yok.
+  if (typeof window.requestIdleCallback === 'function') window.requestIdleCallback(warm, { timeout: 8000 })
+  else globalThis.setTimeout(warm, 4000)
+}
+
 function el(tag: string, cls: string, parent: Element): HTMLElement {
   const e = document.createElement(tag)
   e.className = cls

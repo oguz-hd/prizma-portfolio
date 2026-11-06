@@ -1,8 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { useStrings } from '../i18n/strings'
 import { useScheme } from '../theme/scheme'
-import { sweepTo } from '../theme/sweep'
+import { sweepTo, warmSweep } from '../theme/sweep'
 
 /**
  * Açık / koyu tema düğmesi (dil seçicisinin yanında). Bilgi yalnızca renkle taşınmaz (docs/DESIGN.md § F/6):
@@ -15,6 +15,8 @@ export function SchemeSwitch() {
   const next = scheme === 'dark' ? 'light' : 'dark'
   // İlk yüklemede değil, yalnızca kullanıcı değiştirince duyurulur.
   const [changed, setChanged] = useState(false)
+
+  useEffect(warmSweep, [])
 
   return (
     <>

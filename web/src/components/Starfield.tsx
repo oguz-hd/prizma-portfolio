@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 
 import './starfield.css'
 
@@ -53,9 +53,28 @@ function makeStars(): Star[] {
 
 export function Starfield() {
   const stars = useMemo(makeStars, [])
+  const root = useRef<HTMLDivElement>(null)
+
+  // Parıltı CSS @keyframes yerine Web Animations ile: keyframe içinde `var()` olunca Chrome, kökte
+  // her token değiştiğinde (tema süpürmesinde 30 kez) 60 yıldızın animasyonunu baştan çözüyordu.
+  // Burada anahtar kareler sabit sayı; görüntü aynı, stil hesabı hafif.
+  useEffect(() => {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const running = Array.from(root.current?.children ?? []).map((el, i) => {
+      const s = stars[i]
+      return el.animate([{ opacity: s.dim }, { opacity: 1 }, { opacity: s.dim }], {
+        duration: s.duration * 1000,
+        delay: s.delay * 1000,
+        iterations: Infinity,
+        easing: 'ease-in-out',
+        fill: 'both',
+      })
+    })
+    return () => running.forEach((a) => a.cancel())
+  }, [stars])
 
   return (
-    <div className="starfield" aria-hidden="true">
+    <div ref={root} className="starfield" aria-hidden="true">
       {stars.map((s, i) => (
         <span
           key={i}
@@ -66,11 +85,6 @@ export function Starfield() {
             width: s.size,
             height: s.size,
             background: `var(--accent-${s.accent})`,
-            // Keyframe bu değişkeni okuyor. Inline `opacity` yazsaydık
-            // animasyon onu ezerdi ve her yıldız aynı sönüklükte olurdu.
-            ['--star-dim' as string]: String(s.dim),
-            animationDelay: `${s.delay}s`,
-            animationDuration: `${s.duration}s`,
           }}
         />
       ))}
